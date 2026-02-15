@@ -1,0 +1,32 @@
+{
+  "name": "sf-book-club",
+  "version": "1.0.0",
+  "description": "SF Fantasy & Sci-Fi Book Club — editorial archive and voting app",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnwaynehill/sfbc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/johnwaynehill/sfbc/issues"
+  },
+  "homepage": "https://github.com/johnwaynehill/sfbc#readme",
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.19.0",
+    "nodemailer": "^8.0.1"
+  }
+}

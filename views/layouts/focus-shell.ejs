@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' + club.name : club.name %></title>
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+</head>
+<body>
+  <header class="focus-header">
+    <div class="page-container">
+      <a href="/" class="nav-brand t-brand"><%= club.name %></a>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-container">
+      <%- body %>
+    </div>
+  </main>
+</body>
+</html>

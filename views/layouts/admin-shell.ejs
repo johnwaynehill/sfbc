@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | Admin' : 'Admin' %></title>
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+</head>
+<body>
+  <nav class="admin-nav" role="navigation" aria-label="Admin navigation">
+    <div class="page-container">
+      <a href="/admin" class="nav-brand t-brand">Admin</a>
+      <ul class="nav-links">
+        <li><a href="/admin" class="t-nav">Overview</a></li>
+        <li><a href="/admin/nominations" class="t-nav">Nominations</a></li>
+        <li><a href="/admin/results" class="t-nav">Results</a></li>
+        <li><a href="/admin/settings" class="t-nav">Settings</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-container">
+      <%- body %>
+    </div>
+  </main>
+</body>
+</html>

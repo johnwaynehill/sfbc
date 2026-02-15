@@ -1,0 +1,10 @@
+<nav class="global-nav" role="navigation" aria-label="Main navigation">
+  <div class="page-container">
+    <a href="/" class="nav-brand t-brand"><%= club.name %></a>
+    <ul class="nav-links">
+      <li><a href="/" class="t-nav<%= currentPath === '/' ? ' is-active' : '' %>">Home</a></li>
+      <li><a href="/history" class="t-nav<%= currentPath === '/history' ? ' is-active' : '' %>">History</a></li>
+      <li><a href="/my-reviews" class="t-nav<%= currentPath === '/my-reviews' ? ' is-active' : '' %>">My Reviews</a></li>
+    </ul>
+  </div>
+</nav>
