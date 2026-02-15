@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SF Fantasy & Sci-Fi Book Club</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --bg: #f6f0e6;
+      --surface: #ffffff;
+      --surface2: #f3eadc;
+      --text: #111111;
+      --text2: rgba(17,17,17,.72);
+      --text3: rgba(17,17,17,.52);
+      --border: rgba(17,17,17,.14);
+      --accent: #b45309;
+      --accent2: #0f766e;
+      --danger: #b91c1c;
+      --shadow: 0 14px 40px rgba(17,17,17,.10);
+      --shadow-sm: 0 4px 12px rgba(17,17,17,.06);
+      --shadow-hover: 0 8px 24px rgba(17,17,17,.12);
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --maxw: 860px;
+      --gutter: 18px;
+      --s-1: 8px;
+      --s-2: 12px;
+      --s-3: 16px;
+      --s-4: 24px;
+      --s-5: 32px;
+      --s-6: 48px;
+      --s-7: 72px;
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'Source Serif 4', Georgia, serif;
+      --font-ui: 'IBM Plex Sans', sans-serif;
+    }
+
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--bg);
+      min-height: 100vh;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 180ms ease;
+    }
+
+    a:hover {
+      color: var(--text);
+    }
+
+    /* ============================================
+       TYPOGRAPHY
+       ============================================ */
+    .t-display {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .t-section {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.375rem;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+
+    .t-body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .t-meta {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: var(--text2);
+    }
+
+    .t-label {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .page-container {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+
+    /* ============================================
+       GLOBAL NAV
+       ============================================ */
+    .global-nav {
+      padding: var(--s-4) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .global-nav .page-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-4);
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .nav-brand:hover {
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--s-4);
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.875rem;
+      color: var(--text3);
+      text-decoration: none;
+      transition: color 180ms ease;
+      padding: var(--s-1) 0;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-links a.is-active {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ============================================
+       BOOK HERO
+       ============================================ */
+    .book-hero {
+      padding: var(--s-7) 0 var(--s-6);
+    }
+
+    .book-hero-inner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--s-5);
+      align-items: start;
+    }
+
+    .book-hero-cover {
+      width: 220px;
+      aspect-ratio: 2 / 3;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .book-hero-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .book-hero-content {
+      padding-top: var(--s-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-3);
+    }
+
+    .book-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      line-height: 1;
+    }
+
+    .book-hero-badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+    }
+
+    .book-hero-title {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+    }
+
+    .book-hero-author {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 1.125rem;
+      color: var(--text2);
+      font-style: italic;
+    }
+
+    .book-hero-date {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.8125rem;
+      color: var(--text3);
+      margin-top: var(--s-1);
+    }
+
+    .book-hero-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--accent);
+      margin-top: var(--s-2);
+      transition: gap 180ms ease, color 180ms ease;
+    }
+
+    .book-hero-link:hover {
+      gap: 10px;
+      color: var(--text);
+    }
+
+    .book-hero-link svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 180ms ease;
+    }
+
+    /* ============================================
+       MEETING INFO
+       ============================================ */
+    .meeting-info {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--s-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-3);
+    }
+
+    .meeting-info-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .meeting-info-rows {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+    }
+
+    .meeting-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--s-2);
+    }
+
+    .meeting-info-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .meeting-info-text {
+      font-family: var(--font-ui);
+      font-size: 0.875rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .meeting-info-text strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .meeting-info-link {
+      font-family: var(--font-ui);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ============================================
+       ACTION BANNER
+       ============================================ */
+    .action-banner {
+      background: var(--text);
+      color: var(--bg);
+      border-radius: var(--radius-md);
+      padding: var(--s-4) var(--s-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-4);
+      margin-top: var(--s-5);
+    }
+
+    .action-banner-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .action-banner-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.0625rem;
+      color: var(--bg);
+      line-height: 1.3;
+    }
+
+    .action-banner-subtitle {
+      font-family: var(--font-ui);
+      font-size: 0.8125rem;
+      color: rgba(246,240,230,.6);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      white-space: nowrap;
+      min-height: 44px;
+      text-decoration: none;
+    }
+
+    .btn-primary--light {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn-primary--light:hover {
+      background: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      color: var(--text);
+    }
+
+    .btn-primary--dark {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .btn-primary--dark:hover {
+      background: #2a2a2a;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
+      color: var(--bg);
+    }
+
+    /* ============================================
+       HISTORY STRIP
+       ============================================ */
+    .history-section {
+      padding: var(--s-7) 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--s-3);
+      margin-bottom: var(--s-4);
+    }
+
+    .section-link {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: 0.8125rem;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      transition: gap 180ms ease;
+    }
+
+    .section-link:hover {
+      gap: 8px;
+    }
+
+    .section-link svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .history-strip {
+      display: flex;
+      gap: var(--s-3);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: var(--s-2);
+      margin: 0 calc(var(--gutter) * -1);
+      padding-left: var(--gutter);
+      padding-right: var(--gutter);
+    }
+
+    .history-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .book-card {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-2);
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 200ms ease;
+    }
+
+    .book-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .book-card:hover .book-card-cover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .book-card-cover {
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--surface2);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 200ms ease;
+    }
+
+    .book-card-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .book-card-title {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      line-height: 1.35;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-card-author {
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--text3);
+      line-height: 1.3;
+    }
+
+    .book-card-date {
+      font-family: var(--font-ui);
+      font-size: 0.6875rem;
+      color: var(--text3);
+      letter-spacing: 0.02em;
+    }
+
+    /* ============================================
+       ABOUT SECTION
+       ============================================ */
+    .about-section {
+      padding: 0 0 var(--s-7);
+      border-top: 1px solid var(--border);
+      padding-top: var(--s-6);
+    }
+
+    .about-content {
+      max-width: 560px;
+    }
+
+    .about-text {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: var(--s-3);
+    }
+
+    .about-link {
+      font-family: var(--font-ui);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .about-stats {
+      display: flex;
+      gap: var(--s-6);
+      margin-top: var(--s-5);
+    }
+
+    .about-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .about-stat-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .about-stat-label {
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--text3);
+      letter-spacing: 0.02em;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: var(--s-5) 0;
+    }
+
+    .site-footer .page-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-text {
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--text3);
+    }
+
+    .footer-link {
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--text3);
+    }
+
+    .footer-link:hover {
+      color: var(--text2);
+    }
+
+    /* ============================================
+       DIVIDER
+       ============================================ */
+    .section-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+      border: none;
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .animate-hero {
+      animation: fadeInUp 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .animate-delay-1 {
+      animation: fadeInUp 500ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both;
+    }
+
+    .animate-delay-2 {
+      animation: fadeInUp 500ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+    }
+
+    .animate-delay-3 {
+      animation: fadeIn 500ms cubic-bezier(0.22, 1, 0.36, 1) 450ms both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-hero,
+      .animate-delay-1,
+      .animate-delay-2,
+      .animate-delay-3 {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+
+      * {
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+
+    /* Mobile: stack hero vertically */
+    @media (max-width: 600px) {
+      .book-hero-inner {
+        grid-template-columns: 1fr;
+        gap: var(--s-4);
+        justify-items: center;
+        text-align: center;
+      }
+
+      .book-hero-cover {
+        width: 180px;
+      }
+
+      .book-hero-content {
+        padding-top: 0;
+        align-items: center;
+      }
+
+      .book-hero-title {
+        font-size: 2rem;
+      }
+
+      .action-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--s-4);
+      }
+
+      .book-card {
+        width: 120px;
+      }
+
+      .about-stats {
+        gap: var(--s-5);
+      }
+
+      .nav-brand {
+        font-size: 0.925rem;
+      }
+
+      .nav-links {
+        gap: var(--s-3);
+      }
+
+      .nav-links a {
+        font-size: 0.8125rem;
+      }
+    }
+
+    /* Tablet and up */
+    @media (min-width: 601px) {
+      .book-hero-cover {
+        width: 240px;
+      }
+
+      .book-hero-inner {
+        gap: clamp(var(--s-5), 5vw, var(--s-6));
+      }
+
+      .book-card {
+        width: 148px;
+      }
+    }
+
+    /* Desktop */
+    @media (min-width: 860px) {
+      .book-hero-cover {
+        width: 260px;
+      }
+
+      .history-strip {
+        margin: 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== GLOBAL NAV ===== -->
+  <nav class="global-nav" role="navigation" aria-label="Main navigation">
+    <div class="page-container">
+      <a href="/" class="nav-brand">SF Fantasy &amp; Sci-Fi Book Club</a>
+      <ul class="nav-links">
+        <li><a href="/" class="is-active">Home</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/my-reviews">My Reviews</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-container">
+
+      <!-- ===== BOOK HERO ===== -->
+      <section class="book-hero animate-hero" aria-label="Currently reading">
+        <div class="book-hero-inner">
+          <div class="book-hero-cover">
+            <img
+              src="https://covers.openlibrary.org/b/isbn/9780547572291-L.jpg"
+              alt="Cover of Ubik by Philip K. Dick"
+              loading="eager"
+            />
+          </div>
+          <div class="book-hero-content">
+            <span class="book-hero-badge">Currently Reading</span>
+            <h1 class="book-hero-title t-display">Ubik</h1>
+            <p class="book-hero-author">Philip K. Dick</p>
+            <p class="book-hero-date">February 2026</p>
+            <a href="/books/1/ubik-philip-k-dick" class="book-hero-link">
+              View book details
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12l4-4-4-4"/></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MEETING INFO ===== -->
+      <section class="meeting-info animate-delay-1" aria-label="Next meeting details">
+        <div class="meeting-info-header">
+          <span class="t-label">Next Meeting</span>
+          <a href="https://www.meetup.com/san-francisco-fantasy-book-club/" class="meeting-info-link" target="_blank" rel="noopener">
+            View on Meetup
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9.5V12.5C12 13.05 11.55 13.5 11 13.5H3.5C2.95 13.5 2.5 13.05 2.5 12.5V5C2.5 4.45 2.95 4 3.5 4H6.5"/><path d="M9.5 2.5H13.5V6.5"/><path d="M6.5 9.5L13.5 2.5"/></svg>
+          </a>
+        </div>
+        <div class="meeting-info-rows">
+          <div class="meeting-info-row">
+            <svg class="meeting-info-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="14" height="14" rx="2"/>
+              <path d="M3 8h14"/>
+              <path d="M7 2v4"/>
+              <path d="M13 2v4"/>
+            </svg>
+            <span class="meeting-info-text"><strong>Wednesday, February 25</strong> &middot; 6:30 PM</span>
+          </div>
+          <div class="meeting-info-row">
+            <svg class="meeting-info-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 11a3 3 0 100-6 3 3 0 000 6z"/>
+              <path d="M10 18s-7-5.75-7-10a7 7 0 0114 0c0 4.25-7 10-7 10z"/>
+            </svg>
+            <span class="meeting-info-text"><strong>Barebottle Brewing</strong> &middot; 1525 Cortland Ave, SF</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ACTION BANNER ===== -->
+      <div class="action-banner animate-delay-2" role="region" aria-label="Current activity">
+        <div class="action-banner-text">
+          <p class="action-banner-title">Nominations are open</p>
+          <p class="action-banner-subtitle">Submit your pick for the April read</p>
+        </div>
+        <a href="/nominate/3" class="btn-primary btn-primary--light">Nominate a Book</a>
+      </div>
+
+      <!-- ===== RECENTLY READ ===== -->
+      <section class="history-section animate-delay-3" aria-label="Previously read books">
+        <div class="section-header">
+          <h2 class="t-section">Previously Read</h2>
+          <a href="/history" class="section-link">
+            View all
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12l4-4-4-4"/></svg>
+          </a>
+        </div>
+        <div class="history-strip" role="list">
+
+          <a href="/books/2/the-long-way-to-a-small-angry-planet-becky-chambers" class="book-card" role="listitem">
+            <div class="book-card-cover">
+              <img src="https://covers.openlibrary.org/b/isbn/9780062444134-M.jpg" alt="The Long Way to a Small, Angry Planet" loading="lazy" />
+            </div>
+            <span class="book-card-title">The Long Way to a Small, Angry Planet</span>
+            <span class="book-card-author">Becky Chambers</span>
+            <span class="book-card-date">January 2026</span>
+          </a>
+
+          <a href="/books/3/the-spear-cuts-through-water-simon-jimenez" class="book-card" role="listitem">
+            <div class="book-card-cover">
+              <img src="https://covers.openlibrary.org/b/isbn/9780593156612-M.jpg" alt="The Spear Cuts Through Water" loading="lazy" />
+            </div>
+            <span class="book-card-title">The Spear Cuts Through Water</span>
+            <span class="book-card-author">Simon Jimenez</span>
+            <span class="book-card-date">December 2025</span>
+          </a>
+
+          <a href="/books/4/victories-greater-than-death-charlie-jane-anders" class="book-card" role="listitem">
+            <div class="book-card-cover">
+              <img src="https://covers.openlibrary.org/b/isbn/9781250317315-M.jpg" alt="Victories Greater Than Death" loading="lazy" />
+            </div>
+            <span class="book-card-title">Victories Greater Than Death</span>
+            <span class="book-card-author">Charlie Jane Anders</span>
+            <span class="book-card-date">November 2025</span>
+          </a>
+
+          <a href="/books/5/a-deadly-education-naomi-novik" class="book-card" role="listitem">
+            <div class="book-card-cover">
+              <img src="https://covers.openlibrary.org/b/isbn/9780593128480-M.jpg" alt="A Deadly Education" loading="lazy" />
+            </div>
+            <span class="book-card-title">A Deadly Education</span>
+            <span class="book-card-author">Naomi Novik</span>
+            <span class="book-card-date">October 2025</span>
+          </a>
+
+          <a href="/books/6/children-of-time-adrian-tchaikovsky" class="book-card" role="listitem">
+            <div class="book-card-cover">
+              <img src="https://covers.openlibrary.org/b/isbn/9780316452502-M.jpg" alt="Children of Time" loading="lazy" />
+            </div>
+            <span class="book-card-title">Children of Time</span>
+            <span class="book-card-author">Adrian Tchaikovsky</span>
+            <span class="book-card-date">September 2025</span>
+          </a>
+
+          <a href="/books/7/red-rising-pierce-brown" class="book-card" role="listitem">
+            <div class="book-card-cover">
+              <img src="https://covers.openlibrary.org/b/isbn/9780345539809-M.jpg" alt="Red Rising" loading="lazy" />
+            </div>
+            <span class="book-card-title">Red Rising</span>
+            <span class="book-card-author">Pierce Brown</span>
+            <span class="book-card-date">August 2025</span>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== ABOUT ===== -->
+      <section class="about-section" aria-label="About the club">
+        <div class="about-content">
+          <h2 class="t-section" style="margin-bottom: var(--s-3);">About</h2>
+          <p class="about-text">A San Francisco book club exploring worlds beyond. We meet monthly to discuss sci-fi &amp; fantasy&thinsp;&mdash;&thinsp;from golden-age classics to modern epics.</p>
+          <a href="https://www.meetup.com/san-francisco-fantasy-book-club/" class="about-link" target="_blank" rel="noopener">
+            Join us on Meetup
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9.5V12.5C12 13.05 11.55 13.5 11 13.5H3.5C2.95 13.5 2.5 13.05 2.5 12.5V5C2.5 4.45 2.95 4 3.5 4H6.5"/><path d="M9.5 2.5H13.5V6.5"/><path d="M6.5 9.5L13.5 2.5"/></svg>
+          </a>
+          <div class="about-stats">
+            <div class="about-stat">
+              <span class="about-stat-value">935</span>
+              <span class="about-stat-label">Members</span>
+            </div>
+            <div class="about-stat">
+              <span class="about-stat-value">32</span>
+              <span class="about-stat-label">Books read</span>
+            </div>
+            <div class="about-stat">
+              <span class="about-stat-value">20</span>
+              <span class="about-stat-label">Months running</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="page-container">
+      <span class="footer-text">&copy; 2026 SF Fantasy &amp; Sci-Fi Book Club</span>
+      <a href="https://www.meetup.com/san-francisco-fantasy-book-club/" class="footer-link" target="_blank" rel="noopener">Meetup</a>
+    </div>
+  </footer>
+
+</body>
+</html>
