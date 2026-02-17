@@ -1,4 +1,36 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="section">
+  <h1 class="t-section" style="margin-bottom: var(--s-4);">History</h1>
+
+  <% if (books.length > 0) { %>
+  <div class="history-grid">
+    <% for (const book of books) { %>
+      <a href="<%= bookPath(book.title, book.author) %>" class="book-card book-card--grid">
+        <div class="book-card__cover">
+          <% const coverUrl = getCoverUrl(book); %>
+          <% if (coverUrl) { %>
+            <img src="<%= coverUrl %>" alt="Cover of <%= book.title %>" loading="lazy">
+          <% } else { %>
+            <div class="placeholder-cover">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+              </svg>
+            </div>
+          <% } %>
+        </div>
+        <div class="book-card__title"><%= book.title %></div>
+        <div class="book-card__author"><%= book.author %></div>
+        <div class="book-card__footer">
+          <% if (book.avg_weight != null) { %>
+            <span class="grade-badge grade-badge--sm"><%= weightToGrade(book.avg_weight) %></span>
+          <% } %>
+          <span class="t-label text-tertiary"><%= formatMonthYear(book.month_year) %></span>
+        </div>
+      </a>
+    <% } %>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <p class="empty-state__message">No books have been read yet. Check back soon!</p>
+  </div>
+  <% } %>
 </section>

@@ -86,8 +86,8 @@ Ship after the core experience is solid.
 
 * PWA manifest and offline caching of static assets.
 * Offline draft storage with retry for nominations/votes.
-* Markdown export to DreamHost.
-* Canonical URL slugs with 301 redirect on slug change.
+* Markdown export to Fly.io persistent volume and/or object storage.
+* Canonical URL slugs (`/books/:authorSlug/:titleSlug`) — implemented in Phase 2.
 * Historical data seeding (32 past meetings from Meetup).
 * About section on Home page.
 * Slug collision handling.
@@ -118,6 +118,7 @@ Tracked for architectural awareness but explicitly out of scope for v1.
 * As an attendee, I can rank nominees on a phone and see live results.
 * As an admin, I can close voting and share the winner.
 * As a member, I can log in via magic link and leave a letter-grade review.
+* As a member, after magic-link sign-in I can set a display name used across participation and reviews.
 * As a member, I can see my own review history.
 * As a public visitor, I can browse book history without seeing reviewer names.
 
@@ -135,7 +136,7 @@ Scan QR -> ranked ballot -> submit -> live results screen (auto-updating) -> fin
 
 ## Review (member, post-meeting)
 
-Request magic link -> email link -> review form (grade + comment) -> confirmation -> "My Reviews".
+Request magic link -> email link -> set display name (first login only) -> review form (grade + comment) -> confirmation -> "My Reviews".
 
 ## Browse (public)
 
@@ -226,17 +227,14 @@ Orient new visitors, provide quick entry into current meeting flows, and showcas
 1. Header Section
 
    * Club name
-   * Short identity tagline (e.g., "A San Francisco sci-fi & fantasy book club exploring worlds beyond.")
+   * Global navigation links (Home, History, My Reviews, Login/Logout)
 
 2. Current Book Panel
 
    * Cover image
    * Title + author
    * Meeting date
-   * Quick links:
-
-     * Reviews
-     * External links (Goodreads/StoryGraph)
+   * Primary CTA to Book Detail page
 
 3. Current Action Banner (Dynamic)
 
@@ -248,8 +246,8 @@ Orient new visitors, provide quick entry into current meeting flows, and showcas
 
 4. Recent History Preview
 
-   * Last 3–6 books with covers
-   * Horizontal scroll layout
+   * Last 3 books with covers
+   * Static card grid layout (no horizontal carousel)
    * Medium sized cards with the book covers featured prominently
 
 5. About Section (Minimal)
@@ -278,6 +276,10 @@ Browse past selections.
   * Author
   * Month/year
   * Average grade (if available)
+* Search/filter controls:
+
+  * Search by title, author, or month/year
+  * Scope filter: All, Upcoming, Past
 
 ### Interaction
 
@@ -370,8 +372,12 @@ Ultra-fast in-person entry.
 
 * Title input
 * Author input
-* Optional cover auto-fetch preview
+* Cover auto-fetch preview
+* Optional: Why this recommendation input
 * Submit button
+* If signed in, show "Nominating as {display name}"
+* Persist signed-in nominator identity on submissions so voting cards can display "Nominated by {display name}".
+* If nomination came from an anonymous attendee, omit nominator identity text.
 
 ### UX Rules
 
@@ -410,12 +416,15 @@ Fast ranked ballot designed for physical-room interaction.
 * Clear instruction text.
 * Submit CTA.
 * "Votes counted: X" indicator.
+* If signed in, show "Voting as {display name}".
 * Each nomination should feature
 
   * Medium-sized book cover
   * Author
   * Date of publication
   * Number of pages
+  * Why this recommendation, from nomination
+  * Name of person who submitted
   * Link to details on Open Library, Google Books, or Good Reads\
 
 ### After Submit
@@ -440,6 +449,7 @@ Create shared excitement during meetings.
 
 * Real-time bar chart.
 
+  * Horizontal bars
   * Each nomination should be a different color
   * Features a medium-sized book cover
 * Ranked list.
@@ -666,9 +676,10 @@ This section represents long-term optional enhancements and should not impact MV
 # 8A. Interaction Design Notes
 
 * Ranked ballot uses drag-to-reorder on mobile; tap-to-rank fallback if drag fails.
-* Live results display as a vertical bar chart with current points and total votes counted.
+* Live results display as a horizontal bar chart with current points and total votes counted.
 * Results screen shows a "Votes counted: X" indicator and updates in real time.
 * Public reviews display without names; authenticated views show display names.
+* Display names are collected after first magic-link login and used instead of email attribution.
 * Review grade selector includes S and A+ at the top.
 
 ---
@@ -686,7 +697,7 @@ This section represents long-term optional enhancements and should not impact MV
   * Public history pages (by month)
   * Book detail pages (optional)
   * Review collections (optional)
-* These exports are written to DreamHost as static files and may be git-backed for version history.
+* These exports are written to Fly.io-attached persistent storage (and optionally mirrored to object storage or git for version history).
 
 ## Guiding Rule
 
@@ -718,7 +729,7 @@ This section represents long-term optional enhancements and should not impact MV
 
 → **See [Tech-Specs.md](Tech-Specs.md) §1** for full technical requirements.
 
-Summary: Node.js backend, DreamHost mail for magic-links, SSE for real-time updates, responsive mobile UI.
+Summary: Node.js backend, SMTP mail for magic-links, SSE for real-time updates, responsive mobile UI.
 
 ---
 

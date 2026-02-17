@@ -156,7 +156,7 @@ Define explicit routes so that implementation remains predictable and consistent
 
 * GET /
 * GET /history
-* GET /books/:bookId
+* GET /books/:authorSlug/:titleSlug
 
 ## QR Flow Pages
 
@@ -245,35 +245,34 @@ To minimize complexity (especially on DreamHost) while maximizing speed and reli
 
 # 7. Canonical URL & Slug Strategy
 
-The app should generate stable, shareable URLs for book and meeting pages that remain valid over time. URLs should not change when metadata is corrected (e.g., cover updates, title casing, author formatting).
+The app uses human-readable, slug-based URLs for book pages. Book URLs are composed of two slugs — author and title — stored as indexed columns in the database for direct lookup.
 
 ## Principles
 
-* Prefer immutable IDs for canonical routing.
-* Use human-readable slugs for aesthetics and sharing.
-* Support redirects when slugs change.
+* Use human-readable slugs as the canonical routing mechanism for books.
+* Store `author_slug` and `title_slug` columns in the `books` table with a unique composite index.
 * Keep QR URLs short, stable, and meeting-scoped.
-
-## Canonical IDs
-
-* Use a stable internal ID (e.g., integer or UUID) for Books and Meetings.
-* Canonical routes should work with IDs even if slugs are missing.
+* No numeric IDs exposed in public URLs.
 
 ## Book URLs
 
-Preferred canonical form:
+Canonical form:
 
-* /books/:bookId/:slug
+* `/books/:authorSlug/:titleSlug`
+
+Example:
+
+* `/books/becky-chambers/the-long-way-to-a-small-angry-planet`
 
 Where:
 
-* bookId is the canonical identifier.
-* slug is derived from title + author (e.g., "jade-city-fonda-lee").
+* `authorSlug` is derived from the author name (e.g., "becky-chambers").
+* `titleSlug` is derived from the book title (e.g., "the-long-way-to-a-small-angry-planet").
 
-Rules:
+Lookup:
 
-* If the slug in the URL does not match the current canonical slug for that book, respond with a 301 redirect to the canonical URL.
-* If slug is omitted, respond with a 302/301 redirect to /books/:bookId/:slug.
+* Query: `WHERE author_slug = ? AND title_slug = ?` — direct indexed lookup, no slug recomputation.
+* 404 if no match.
 
 ## Meeting URLs
 
@@ -301,12 +300,12 @@ QR pages may redirect internally based on meeting state, but the public QR URLs 
 Markdown exports should also be stable and predictable:
 
 * /history/:monthYear.md (e.g., /history/2026-02.md)
-* Optional: /books/:bookId-:slug.md (for portability)
+* Optional: /books/:authorSlug/:titleSlug.md (for portability)
 
 ## Editing & Corrections
 
-* Admins may edit book metadata (title/author/cover) without breaking inbound links.
-* The redirect rules above ensure old slugs remain valid.
+* If an admin edits a book's title or author, the slugs must be regenerated and the database updated.
+* Old slug-based URLs will return 404 (no redirect system for slug changes in v1). This is acceptable since the primary audience shares links within the club.
 
 ---
 
@@ -317,39 +316,40 @@ To ensure consistency across links, exports, and QR flows, slug generation must 
 ### Generation Algorithm
 
 * Convert text to lowercase.
+* Remove punctuation and special characters except hyphens and spaces.
 * Replace spaces with hyphens (`-`).
-* Remove punctuation and special characters except hyphens.
 * Collapse multiple hyphens into a single hyphen.
 * Trim leading and trailing hyphens.
-* Limit slug length to a reasonable maximum (e.g., 80 characters) to prevent excessively long URLs.
+* Limit slug length to a reasonable maximum (80 characters).
+
+### Slugs Are Generated Per-Field
+
+* `author_slug` = `slugify(author)`
+* `title_slug` = `slugify(title)`
 
 Example:
 
-* "Jade City" by "Fonda Lee" → `jade-city-fonda-lee`
-
-### Source Fields
-
-* Primary slug source: `title + author`.
-* Fallback if author missing: `title` only.
+* "Jade City" by "Fonda Lee" → author_slug: `fonda-lee`, title_slug: `jade-city`
+* URL: `/books/fonda-lee/jade-city`
 
 ### Collision Handling
 
-If two books produce identical slugs:
+The `(author_slug, title_slug)` pair has a unique index. If a collision occurs (same author, same title — very rare):
 
-* Append a short deterministic suffix, such as:
+* Append publication year to title_slug (e.g., `dune-1965`).
+* Fallback: append internal bookId (e.g., `dune-123`).
 
-  * publication year if available (e.g., `dune-frank-herbert-1965`), or
-  * internal bookId as fallback (e.g., `dune-frank-herbert-123`).
+### Helper Functions (Implemented in `utils/slug.js`)
 
-### Immutability Rule
+* `slugify(str)` — converts any string to a URL-safe slug.
+* `bookPath(title, author)` — returns `/books/${slugify(author)}/${slugify(title)}`.
+* Both are passed to templates for generating links.
 
-* Slugs may change when metadata is edited, but canonical routing is always based on `bookId` or `meetingId`.
-* Server must redirect old slug URLs to the current canonical slug using a 301 redirect.
+### Implementation Guidance
 
-### Implementation Guidance (Codex)
-
-* Slug generation should be implemented as a single shared utility function.
-* All routes, exports, and admin tools must use this function to avoid divergence.
+* Slug generation is implemented as a shared utility in `utils/slug.js`.
+* All routes, templates, and exports must use `slugify()` / `bookPath()` to avoid divergence.
+* Slugs are stored in the database at insert time (not computed on every request).
 
 ---
 

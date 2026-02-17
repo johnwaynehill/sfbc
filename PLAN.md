@@ -285,9 +285,9 @@ sf-book-club/
    - Components: BookCard grid (responsive 2→3→4-6 columns), EmptyState fallback
    - Book covers via Open Library cover API
 
-3. **Book Detail page (`GET /books/:bookId/:slug?`)**
-   - Query: book + meeting context + reviews (anonymous) + average grade
-   - Slug redirect logic (301 if slug doesn't match, 302 if missing)
+3. **Book Detail page (`GET /books/:authorSlug/:titleSlug`)**
+   - Query: book by `author_slug` + `title_slug` columns, plus meeting context + reviews (anonymous) + average grade
+   - 404 if no match
    - Components: BookHero, MetadataList (external links), review summary (average grade + distribution), ReviewList
    - Grade distribution visualization
 
@@ -432,9 +432,9 @@ sf-book-club/
    - Set session with 30-day expiry ("Remember this device")
    - Redirect to intended destination or home
 
-4. **Review page (`GET /books/:bookId/review`)**
+4. **Review page (`GET /reviews/:authorSlug/:titleSlug/new`)**
    - Auth required (AuthGate)
-   - Query: existing review by this user for this book (for edit)
+   - Resolve book by slug pair, then query existing review by this user for this book (for edit)
    - GradePicker component (S through F-)
    - Markdown comment textarea
    - Submit button
