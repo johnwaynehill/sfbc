@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/johnwaynehill/sfbc#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
+    "better-sqlite3-session-store": "^0.1.0",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
     "express": "^5.2.1",

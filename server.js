@@ -1,7 +1,20 @@
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const session = require('express-session');
 const config = require('./config');
+
+// ---------------------------------------------------------------------------
+// Database & migrations
+// ---------------------------------------------------------------------------
+const db = require('./db');
+const migrate = require('./db/migrate');
+migrate();
+
+// ---------------------------------------------------------------------------
+// Session store
+// ---------------------------------------------------------------------------
+const SqliteStore = require('better-sqlite3-session-store')(session);
 
 const app = express();
 
@@ -21,15 +34,43 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // ---------------------------------------------------------------------------
-// Session (Phase 1 — uncomment when SQLite session store is ready)
+// Session
 // ---------------------------------------------------------------------------
-// const session = require('express-session');
-// app.use(session({
-//   secret: config.sessionSecret,
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
-// }));
+app.use(session({
+  store: new SqliteStore({
+    client: db,
+    expired: {
+      clear: true,
+      intervalMs: 900000,
+    },
+  }),
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: config.nodeEnv === 'production',
+  },
+}));
+
+// ---------------------------------------------------------------------------
+// User injection
+// ---------------------------------------------------------------------------
+app.use((req, res, next) => {
+  res.locals.user = null;
+  if (req.session && req.session.userId) {
+    const user = db.prepare('SELECT id, email, display_name, role FROM users WHERE id = ?')
+      .get(req.session.userId);
+    if (user) {
+      res.locals.user = user;
+    } else {
+      delete req.session.userId;
+    }
+  }
+  next();
+});
 
 // ---------------------------------------------------------------------------
 // Global template locals

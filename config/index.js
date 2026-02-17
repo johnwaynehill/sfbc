@@ -5,6 +5,8 @@ module.exports = {
   nodeEnv: process.env.NODE_ENV || 'development',
   sessionSecret: process.env.SESSION_SECRET || 'dev-secret-change-me',
   appUrl: process.env.APP_URL || 'http://localhost:3000',
+  databasePath: process.env.DATABASE_PATH || './data/bookclub.sqlite',
+  bootstrapKey: process.env.BOOTSTRAP_KEY || '',
   club: {
     name: process.env.CLUB_NAME || 'SF Fantasy & Sci-Fi Book Club',
     tagline: process.env.CLUB_TAGLINE || 'A San Francisco sci-fi & fantasy book club exploring worlds beyond.',
