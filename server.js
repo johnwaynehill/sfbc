@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const config = require('./config');
 
 // ---------------------------------------------------------------------------
@@ -32,6 +33,7 @@ app.use(expressLayouts);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 // ---------------------------------------------------------------------------
 // Session

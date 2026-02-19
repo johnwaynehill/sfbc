@@ -153,15 +153,22 @@ router.get('/books/:authorSlug/:titleSlug', (req, res) => {
     });
   }
 
-  // Reviews (anonymous: no display_name exposed)
+  // Reviews with display names
   const reviews = db.prepare(`
-    SELECT r.grade, r.body_markdown, r.created_at,
-           gw.weight
+    SELECT r.grade, r.body_markdown, r.created_at, r.user_id,
+           u.display_name, gw.weight
     FROM reviews r
     JOIN grade_weights gw ON gw.grade = r.grade
+    JOIN users u ON u.id = r.user_id
     WHERE r.book_id = ?
     ORDER BY r.created_at DESC
   `).all(book.id);
+
+  // Check if current user already has a review for this book
+  const userId = req.session && req.session.userId ? req.session.userId : null;
+  const userReview = userId
+    ? reviews.find(r => r.user_id === userId)
+    : null;
 
   // Grade stats
   let avgWeight = null;
@@ -195,6 +202,7 @@ router.get('/books/:authorSlug/:titleSlug', (req, res) => {
     pageTitle: `${book.title} by ${book.author}`,
     book,
     reviews,
+    userReview,
     avgGrade,
     gradeDistribution,
     getCoverUrl,

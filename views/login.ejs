@@ -1,4 +1,112 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="login-page">
+  <% if (step === 'form') { %>
+    <h1 class="t-section login-page__heading">Sign In</h1>
+    <p class="t-body text-secondary login-page__subtitle">
+      Enter your email and we'll send you a login link.
+    </p>
+
+    <% if (error) { %>
+      <div class="nom-message nom-message--error" style="margin-bottom: var(--s-3);">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form id="login-form" method="POST" action="/auth/send-link" class="login-form">
+      <label class="form-label">
+        Email
+        <input type="email" name="email" required autofocus autocomplete="email"
+               class="form-input" placeholder="you@example.com"
+               value="<%= email || '' %>">
+      </label>
+
+      <div id="login-message" hidden></div>
+
+      <button type="submit" class="btn btn--primary" id="login-submit" style="width: 100%;">
+        Send Login Link
+      </button>
+    </form>
+
+  <% } else if (step === 'sent') { %>
+    <div class="login-sent">
+      <h1 class="t-section login-page__heading">Check Your Email</h1>
+      <p class="t-body">
+        We sent a login link to <strong><%= email %></strong>.
+      </p>
+      <p class="t-body text-secondary">
+        Click the link in the email to sign in. It expires in 15 minutes.
+      </p>
+      <p class="t-caption text-secondary" style="margin-top: var(--s-4);">
+        Didn't receive it? Check your spam folder or
+        <a href="/login">try again</a>.
+      </p>
+    </div>
+
+  <% } else if (step === 'error') { %>
+    <div class="login-sent">
+      <h1 class="t-section login-page__heading"><%= pageTitle %></h1>
+      <div class="nom-message nom-message--error" style="margin-bottom: var(--s-4);">
+        <%= error %>
+      </div>
+      <a href="/login" class="btn btn--primary">Try Again</a>
+    </div>
+  <% } %>
 </section>
+
+<script>
+(function () {
+  'use strict';
+
+  var form = document.getElementById('login-form');
+  if (!form) return;
+
+  var submitBtn = document.getElementById('login-submit');
+  var messageEl = document.getElementById('login-message');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var email = form.querySelector('[name="email"]').value.trim();
+    if (!email) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending\u2026';
+
+    try {
+      var res = await fetch('/auth/send-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email: email }),
+      });
+
+      var data = await res.json();
+
+      if (res.ok && data.success) {
+        // Replace form with success message
+        form.innerHTML =
+          '<div class="login-sent">' +
+          '<h2 class="t-section" style="margin-bottom: var(--s-3);">Check Your Email</h2>' +
+          '<p class="t-body">We sent a login link to <strong>' + email + '</strong>.</p>' +
+          '<p class="t-body text-secondary">Click the link in the email to sign in. It expires in 15 minutes.</p>' +
+          '<p class="t-caption text-secondary" style="margin-top: var(--s-4);">' +
+          'Didn\'t receive it? Check your spam folder or <a href="/login">try again</a>.</p>' +
+          '</div>';
+        return;
+      }
+
+      messageEl.hidden = false;
+      messageEl.className = 'nom-message nom-message--error';
+      messageEl.textContent = data.error || 'Something went wrong.';
+    } catch (err) {
+      messageEl.hidden = false;
+      messageEl.className = 'nom-message nom-message--error';
+      messageEl.textContent = 'Network error. Please try again.';
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Login Link';
+  });
+})();
+</script>

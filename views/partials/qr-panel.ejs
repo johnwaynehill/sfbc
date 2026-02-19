@@ -1,0 +1,14 @@
+<% if (typeof qrCodes !== 'undefined' && qrCodes && qrCodes.length > 0) { %>
+<div class="qr-panel">
+  <h2 class="t-body-bold qr-panel__heading">QR Codes</h2>
+  <div class="qr-panel__grid">
+    <% for (const qr of qrCodes) { %>
+      <div class="qr-panel__item">
+        <img src="<%= qr.dataUrl %>" alt="QR code for <%= qr.label %>" class="qr-panel__code">
+        <span class="qr-panel__label"><%= qr.label %></span>
+        <span class="qr-panel__url"><%= qr.url %></span>
+      </div>
+    <% } %>
+  </div>
+</div>
+<% } %>

@@ -1,4 +1,94 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="results-page">
+  <header class="results-page__header">
+    <h1 class="t-section results-page__heading"><%= pageTitle %></h1>
+    <p class="t-body text-secondary">for <%= meeting.month_year %></p>
+    <div class="results-page__meta">
+      <span class="status-pill status-pill--<%= isVotingOpen ? 'open' : 'closed' %>">
+        <%= isVotingOpen ? 'Voting Open' : 'Voting Closed' %>
+      </span>
+      <span class="t-caption text-secondary">
+        <span id="results-vote-count"><%= results.voteCount %></span> vote<%= results.voteCount === 1 ? '' : 's' %>
+      </span>
+    </div>
+  </header>
+
+  <% if (winner) { %>
+    <div class="results-winner">
+      <span class="results-winner__label t-caption">Winner</span>
+      <div class="results-winner__card">
+        <div class="book-cover book-cover--sm">
+          <% if (winner.cover_url) { %>
+            <img src="<%= winner.cover_url %>" alt="<%= winner.title %> cover">
+          <% } else { %>
+            <div class="placeholder-cover placeholder-cover--sm">
+              <span class="placeholder-cover__title"><%= winner.title %></span>
+            </div>
+          <% } %>
+        </div>
+        <div class="results-winner__info">
+          <span class="results-winner__title t-body-bold"><%= winner.title %></span>
+          <span class="results-winner__author t-caption text-secondary"><%= winner.author %></span>
+          <a href="<%= bookPath(winner.title, winner.author) %>" class="btn btn--primary btn--sm results-winner__link">
+            View Book &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Horizontal bar chart -->
+  <div class="results-chart" id="results-chart">
+    <% results.rankings.forEach(function(r) { %>
+      <div class="results-bar" data-book-id="<%= r.book_id %>">
+        <div class="book-cover book-cover--xs results-bar__cover">
+          <% if (r.cover_url) { %>
+            <img src="<%= r.cover_url %>" alt="<%= r.title %> cover" loading="lazy">
+          <% } else { %>
+            <div class="placeholder-cover placeholder-cover--xs">
+              <span class="placeholder-cover__title"><%= r.title %></span>
+            </div>
+          <% } %>
+        </div>
+        <div class="results-bar__info">
+          <span class="results-bar__title t-caption-bold"><%= r.title %></span>
+          <span class="results-bar__author t-caption text-secondary"><%= r.author %></span>
+          <div class="results-bar__track">
+            <div class="results-bar__fill"
+                 style="width: <%= r.pct %>%; background-color: <%= colors[r.book_id] %>;"
+                 data-pct="<%= r.pct %>"></div>
+          </div>
+        </div>
+        <span class="results-bar__points t-caption" data-points="<%= r.points %>">
+          <%= r.points %> pt<%= r.points === 1 ? '' : 's' %>
+        </span>
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Ranked list -->
+  <ol class="results-list" id="results-list">
+    <% results.rankings.forEach(function(r) { %>
+      <li class="results-item" data-book-id="<%= r.book_id %>">
+        <span class="results-item__rank">#<%= r.rank %></span>
+        <span class="results-item__title t-body"><%= r.title %></span>
+        <span class="results-item__author t-caption text-secondary"><%= r.author %></span>
+        <span class="results-item__points t-caption"><%= r.points %> pt<%= r.points === 1 ? '' : 's' %></span>
+      </li>
+    <% }); %>
+  </ol>
+
+  <% if (isVotingOpen) { %>
+    <p class="t-caption text-secondary results-page__note">
+      Results update in real time as votes come in.
+    </p>
+  <% } %>
 </section>
+
+<script>
+  // Config for SSE client
+  window.__RESULTS_CONFIG__ = {
+    meetingId: <%= meeting.id %>,
+    isVotingOpen: <%= isVotingOpen ? 'true' : 'false' %>,
+    colors: <%- JSON.stringify(colors) %>,
+  };
+</script>

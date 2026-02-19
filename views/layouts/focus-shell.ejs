@@ -6,6 +6,7 @@
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' + club.name : club.name %></title>
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
   <header class="focus-header">
@@ -19,5 +20,7 @@
       <%- body %>
     </div>
   </main>
+
+  <%- typeof pageScript !== 'undefined' && pageScript ? '<script src="' + pageScript + '" defer></script>' : '' %>
 </body>
 </html>

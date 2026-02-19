@@ -1,4 +1,127 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="admin-page">
+  <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
+
+  <!-- Stats row -->
+  <div class="admin-stats">
+    <div class="admin-stat-card">
+      <span class="admin-stat-card__value"><%= stats.totalBooks %></span>
+      <span class="admin-stat-card__label t-caption text-secondary">Books</span>
+    </div>
+    <div class="admin-stat-card">
+      <span class="admin-stat-card__value"><%= stats.totalMembers %></span>
+      <span class="admin-stat-card__label t-caption text-secondary">Members</span>
+    </div>
+  </div>
+
+  <!-- Current meeting -->
+  <h2 class="t-body-bold admin-page__subheading">Current Meeting</h2>
+
+  <% if (current) { %>
+    <div class="admin-meeting-card">
+      <div class="admin-meeting-card__header">
+        <span class="t-body-bold"><%= current.month_year %></span>
+        <span class="status-pill status-pill--<%= current.status %>"><%= current.status %></span>
+      </div>
+
+      <div class="admin-meeting-card__body">
+        <p class="t-caption text-secondary">
+          <%= nominees.length %> nominee<%= nominees.length === 1 ? '' : 's' %>
+          &middot; <%= voteCount %> vote<%= voteCount === 1 ? '' : 's' %>
+          <% if (current.status === 'results' && current.book_title) { %>
+            &middot; Winner: <strong><%= current.book_title %></strong>
+          <% } %>
+        </p>
+      </div>
+
+      <div class="admin-meeting-card__actions">
+        <a href="/admin/meetings/<%= current.id %>" class="btn btn--primary btn--sm">Manage</a>
+
+        <% if (current.status === 'reading') { %>
+          <button class="btn btn--secondary btn--sm js-advance-status"
+                  data-meeting-id="<%= current.id %>"
+                  data-new-status="nominations">Open Nominations</button>
+        <% } else if (current.status === 'nominations') { %>
+          <button class="btn btn--secondary btn--sm js-advance-status"
+                  data-meeting-id="<%= current.id %>"
+                  data-new-status="voting">Start Voting</button>
+        <% } else if (current.status === 'voting') { %>
+          <button class="btn btn--secondary btn--sm js-advance-status"
+                  data-meeting-id="<%= current.id %>"
+                  data-new-status="results">Finalize Results</button>
+        <% } %>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="admin-empty">
+      <p class="t-body text-secondary">No meetings yet.</p>
+      <a href="/admin/meetings/new" class="btn btn--primary btn--sm">Create Meeting</a>
+    </div>
+  <% } %>
+
+  <%- include('../partials/qr-panel') %>
+
+  <% if (results && results.rankings.length > 0) { %>
+    <h2 class="t-body-bold admin-page__subheading">Current Results</h2>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th class="t-caption">Rank</th>
+          <th class="t-caption">Title</th>
+          <th class="t-caption">Author</th>
+          <th class="t-caption" style="text-align: right;">Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% results.rankings.forEach(function(r) { %>
+          <tr>
+            <td class="t-body"><%= r.rank %></td>
+            <td class="t-body"><%= r.title %></td>
+            <td class="t-body text-secondary"><%= r.author %></td>
+            <td class="t-body" style="text-align: right;"><%= r.points %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
 </section>
+
+<script>
+(function () {
+  'use strict';
+  document.querySelectorAll('.js-advance-status').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      var meetingId = btn.dataset.meetingId;
+      var newStatus = btn.dataset.newStatus;
+      var labels = {
+        nominations: 'open nominations',
+        voting: 'start voting',
+        results: 'finalize results',
+      };
+      if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Updating\u2026';
+
+      try {
+        var res = await fetch('/api/admin/meetings/' + meetingId + '/status', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        var data = await res.json();
+        if (res.ok && data.success) {
+          window.location.reload();
+        } else {
+          alert(data.error || 'Something went wrong.');
+          btn.disabled = false;
+          btn.textContent = btn.dataset.newStatus === 'nominations' ? 'Open Nominations'
+            : btn.dataset.newStatus === 'voting' ? 'Start Voting' : 'Finalize Results';
+        }
+      } catch (err) {
+        alert('Network error.');
+        btn.disabled = false;
+      }
+    });
+  });
+})();
+</script>

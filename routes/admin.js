@@ -1,12 +1,45 @@
+'use strict';
+
 const router = require('express').Router();
+const db = require('../db');
+const QRCode = require('qrcode');
+const config = require('../config');
 const { requireAdmin } = require('../middleware/auth');
+const meetings = require('../services/meetings');
+const { calculateResults, getVoteCount } = require('../services/voting');
+
+/* ------------------------------------------------------------------ */
+/*  QR code helper                                                     */
+/* ------------------------------------------------------------------ */
+
+async function generateQrCodes(meetingId, status) {
+  const base = config.appUrl;
+  const codes = [];
+
+  if (status === 'nominations' || status === 'voting' || status === 'results') {
+    codes.push({ label: 'Nominate', url: `${base}/nominate/${meetingId}` });
+  }
+  if (status === 'voting' || status === 'results') {
+    codes.push({ label: 'Vote', url: `${base}/vote/${meetingId}` });
+  }
+  codes.push({ label: 'Results', url: `${base}/results/${meetingId}` });
+
+  for (const code of codes) {
+    code.dataUrl = await QRCode.toDataURL(code.url, {
+      width: 200,
+      margin: 2,
+      color: { dark: '#1a1a1a', light: '#ffffff' },
+    });
+  }
+
+  return codes;
+}
 
 // ---------------------------------------------------------------------------
 // Admin login page (no auth required)
 // ---------------------------------------------------------------------------
 router.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
-    const db = require('../db');
     const user = db.prepare('SELECT role FROM users WHERE id = ?').get(req.session.userId);
     if (user && user.role === 'admin') {
       return res.redirect('/admin');
@@ -23,23 +56,108 @@ router.use(requireAdmin);
 
 router.use((req, res, next) => {
   res.locals.layout = 'layouts/admin-shell';
+  res.locals.adminPath = req.path;
   next();
 });
 
-router.get('/', (req, res) => {
-  res.render('admin/overview', { pageTitle: 'Admin Overview' });
+// ---------------------------------------------------------------------------
+// Overview dashboard
+// ---------------------------------------------------------------------------
+router.get('/', async (req, res) => {
+  const current = meetings.getCurrent();
+  const stats = meetings.getStats();
+
+  let nominees = [];
+  let voteCount = 0;
+  let results = null;
+  let qrCodes = [];
+
+  if (current) {
+    nominees = meetings.getNominees(current.id);
+    voteCount = getVoteCount(current.id);
+    if (current.status === 'voting' || current.status === 'results') {
+      results = calculateResults(current.id);
+    }
+    qrCodes = await generateQrCodes(current.id, current.status);
+  }
+
+  res.render('admin/overview', {
+    pageTitle: 'Admin Overview',
+    current,
+    stats,
+    nominees,
+    voteCount,
+    results,
+    qrCodes,
+  });
 });
 
-router.get('/nominations', (req, res) => {
-  res.render('admin/overview', { pageTitle: 'Nominations' });
+// ---------------------------------------------------------------------------
+// Meetings list
+// ---------------------------------------------------------------------------
+router.get('/meetings', (req, res) => {
+  const allMeetings = meetings.getAll();
+  res.render('admin/meetings', {
+    pageTitle: 'Meetings',
+    meetings: allMeetings,
+  });
 });
 
-router.get('/results', (req, res) => {
-  res.render('admin/overview', { pageTitle: 'Results' });
+// ---------------------------------------------------------------------------
+// New meeting form
+// ---------------------------------------------------------------------------
+router.get('/meetings/new', (req, res) => {
+  res.render('admin/meeting-detail', {
+    pageTitle: 'New Meeting',
+    pageScript: '/js/admin-meetings.js',
+    meeting: null,
+    nominees: [],
+    voteCount: 0,
+    results: null,
+    qrCodes: [],
+  });
 });
 
+// ---------------------------------------------------------------------------
+// Meeting detail
+// ---------------------------------------------------------------------------
+router.get('/meetings/:id', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.redirect('/admin/meetings');
+
+  const meeting = meetings.getById(id);
+  if (!meeting) return res.redirect('/admin/meetings');
+
+  const nominees = meetings.getNominees(id);
+  const voteCount = getVoteCount(id);
+  let results = null;
+  if (meeting.status === 'voting' || meeting.status === 'results') {
+    results = calculateResults(id);
+  }
+
+  const qrCodes = await generateQrCodes(id, meeting.status);
+
+  res.render('admin/meeting-detail', {
+    pageTitle: meeting.month_year,
+    pageScript: '/js/admin-meetings.js',
+    meeting,
+    nominees,
+    voteCount,
+    results,
+    qrCodes,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------
 router.get('/settings', (req, res) => {
-  res.render('admin/overview', { pageTitle: 'Settings' });
+  const admins = db.prepare("SELECT id, email, display_name FROM users WHERE role = 'admin' ORDER BY id").all();
+
+  res.render('admin/settings', {
+    pageTitle: 'Settings',
+    admins,
+  });
 });
 
 module.exports = router;

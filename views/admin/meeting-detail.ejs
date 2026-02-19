@@ -1,0 +1,159 @@
+<section class="admin-page">
+  <% if (!meeting) { %>
+    <!-- Create new meeting form -->
+    <h1 class="t-section admin-page__heading">New Meeting</h1>
+
+    <form id="create-meeting-form" class="admin-form">
+      <label class="form-label">
+        Month / Year
+        <input type="text" name="month_year" class="form-input" required
+               placeholder="e.g. January 2025" autofocus>
+      </label>
+
+      <label class="form-label">
+        Meetup Event URL <span class="text-secondary">(optional)</span>
+        <input type="url" name="meetup_event_url" class="form-input"
+               placeholder="https://www.meetup.com/...">
+      </label>
+
+      <label class="form-label">
+        Meeting Time <span class="text-secondary">(optional)</span>
+        <input type="text" name="meeting_time" class="form-input"
+               placeholder="e.g. 2025-01-15T19:00">
+      </label>
+
+      <label class="form-label">
+        Location <span class="text-secondary">(optional)</span>
+        <input type="text" name="location_text" class="form-input"
+               placeholder="e.g. The Interval, San Francisco">
+      </label>
+
+      <div id="create-message" hidden></div>
+
+      <button type="submit" class="btn btn--primary" id="create-submit">
+        Create Meeting
+      </button>
+    </form>
+
+  <% } else { %>
+    <!-- Existing meeting detail -->
+    <div class="admin-page__header-row">
+      <h1 class="t-section"><%= meeting.month_year %></h1>
+      <span class="status-pill status-pill--<%= meeting.status %>"><%= meeting.status %></span>
+    </div>
+
+    <!-- Status transition -->
+    <div class="admin-actions">
+      <% if (meeting.status === 'reading') { %>
+        <button class="btn btn--primary btn--sm js-advance-status"
+                data-meeting-id="<%= meeting.id %>"
+                data-new-status="nominations">Open Nominations</button>
+      <% } else if (meeting.status === 'nominations') { %>
+        <button class="btn btn--primary btn--sm js-advance-status"
+                data-meeting-id="<%= meeting.id %>"
+                data-new-status="voting">Start Voting</button>
+      <% } else if (meeting.status === 'voting') { %>
+        <button class="btn btn--primary btn--sm js-advance-status"
+                data-meeting-id="<%= meeting.id %>"
+                data-new-status="results">Finalize Results</button>
+      <% } %>
+
+      <span class="t-caption text-secondary">
+        <%= voteCount %> vote<%= voteCount === 1 ? '' : 's' %>
+      </span>
+    </div>
+
+    <%- include('../partials/qr-panel') %>
+
+    <!-- Meeting details -->
+    <% if (meeting.meetup_event_url || meeting.meeting_time || meeting.location_text) { %>
+      <div class="admin-detail-meta">
+        <% if (meeting.location_text) { %>
+          <p class="t-caption text-secondary">Location: <%= meeting.location_text %></p>
+        <% } %>
+        <% if (meeting.meeting_time) { %>
+          <p class="t-caption text-secondary">Time: <%= meeting.meeting_time %></p>
+        <% } %>
+        <% if (meeting.meetup_event_url) { %>
+          <p class="t-caption"><a href="<%= meeting.meetup_event_url %>" target="_blank" rel="noopener">Meetup Event &rarr;</a></p>
+        <% } %>
+      </div>
+    <% } %>
+
+    <!-- Winner callout -->
+    <% if (meeting.status === 'results' && meeting.winning_book_id && results && results.rankings.length > 0) { %>
+      <div class="admin-winner">
+        <span class="t-caption-bold">Winner:</span>
+        <span class="t-body-bold"><%= results.rankings[0].title %></span>
+        <span class="t-caption text-secondary">by <%= results.rankings[0].author %> &mdash; <%= results.rankings[0].points %> pts</span>
+      </div>
+    <% } %>
+
+    <!-- Nominees -->
+    <h2 class="t-body-bold admin-page__subheading">
+      Nominees (<%= nominees.length %>)
+    </h2>
+
+    <% if (nominees.length > 0) { %>
+      <div class="admin-nominees">
+        <% nominees.forEach(function(nom) { %>
+          <div class="admin-nominee" data-book-id="<%= nom.book_id %>">
+            <div class="admin-nominee__info">
+              <span class="t-body"><%= nom.title %></span>
+              <span class="t-caption text-secondary"><%= nom.author %></span>
+              <% if (nom.nominator_name) { %>
+                <span class="t-caption text-secondary">by <%= nom.nominator_name %></span>
+              <% } %>
+              <span class="t-caption text-secondary" style="opacity: 0.6;"><%= nom.source %></span>
+            </div>
+            <% if (meeting.status !== 'results') { %>
+              <button class="btn btn--danger btn--sm js-remove-nominee"
+                      data-meeting-id="<%= meeting.id %>"
+                      data-book-id="<%= nom.book_id %>"
+                      data-title="<%= nom.title %>">Remove</button>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p class="t-body text-secondary">No nominees yet.</p>
+    <% } %>
+
+    <!-- Add nominee (only if not in results) -->
+    <% if (meeting.status !== 'results') { %>
+      <h2 class="t-body-bold admin-page__subheading">Add Nominee</h2>
+      <form id="add-nominee-form" class="admin-form admin-form--inline"
+            data-meeting-id="<%= meeting.id %>">
+        <input type="text" name="title" class="form-input" placeholder="Title" required>
+        <input type="text" name="author" class="form-input" placeholder="Author" required>
+        <button type="submit" class="btn btn--secondary btn--sm" id="add-nominee-submit">Add</button>
+      </form>
+      <div id="nominee-message" hidden></div>
+    <% } %>
+
+    <!-- Results table -->
+    <% if (results && results.rankings.length > 0) { %>
+      <h2 class="t-body-bold admin-page__subheading">Results</h2>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th class="t-caption">Rank</th>
+            <th class="t-caption">Title</th>
+            <th class="t-caption">Author</th>
+            <th class="t-caption" style="text-align: right;">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% results.rankings.forEach(function(r) { %>
+            <tr>
+              <td class="t-body"><%= r.rank %></td>
+              <td class="t-body"><%= r.title %></td>
+              <td class="t-body text-secondary"><%= r.author %></td>
+              <td class="t-body" style="text-align: right;"><%= r.points %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } %>
+  <% } %>
+</section>

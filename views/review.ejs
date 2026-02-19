@@ -1,4 +1,114 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="review-form-page">
+  <!-- Book header -->
+  <div class="review-form-page__book">
+    <div class="book-cover book-cover--sm">
+      <% const coverUrl = getCoverUrl(book); %>
+      <% if (coverUrl) { %>
+        <img src="<%= coverUrl %>" alt="Cover of <%= book.title %>">
+      <% } else { %>
+        <div class="placeholder-cover">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+          </svg>
+        </div>
+      <% } %>
+    </div>
+    <div>
+      <h1 class="t-section"><%= book.title %></h1>
+      <p class="t-body text-secondary"><%= book.author %></p>
+    </div>
+  </div>
+
+  <!-- Review form -->
+  <form id="review-form" class="review-form" method="POST"
+        action="/api/books/<%= book.id %>/reviews"
+        data-book-path="<%= bookPath(book.title, book.author) %>">
+    <% if (review) { %>
+      <input type="hidden" name="_method" value="PUT">
+    <% } %>
+
+    <label class="form-label">
+      Grade
+      <select name="grade" class="form-select grade-select" required>
+        <option value="">Choose a grade&hellip;</option>
+        <% for (const g of grades) { %>
+          <option value="<%= g.grade %>" <%= review && review.grade === g.grade ? 'selected' : '' %>>
+            <%= g.grade %>
+          </option>
+        <% } %>
+      </select>
+    </label>
+
+    <label class="form-label">
+      Review <span class="text-secondary">(optional)</span>
+      <textarea name="body" class="form-textarea" rows="8"
+                placeholder="What did you think of this book?"><%= review ? review.body_markdown : '' %></textarea>
+    </label>
+
+    <div id="review-message" hidden></div>
+
+    <div class="review-form__actions">
+      <button type="submit" class="btn btn--primary" id="review-submit">
+        <%= review ? 'Update Review' : 'Submit Review' %>
+      </button>
+      <a href="<%= bookPath(book.title, book.author) %>" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
 </section>
+
+<script>
+(function () {
+  'use strict';
+
+  var form = document.getElementById('review-form');
+  if (!form) return;
+
+  var submitBtn = document.getElementById('review-submit');
+  var messageEl = document.getElementById('review-message');
+  var methodField = form.querySelector('[name="_method"]');
+  var isPut = methodField && methodField.value === 'PUT';
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var grade = form.querySelector('[name="grade"]').value;
+    if (!grade) return;
+
+    var body = form.querySelector('[name="body"]').value.trim();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = isPut ? 'Updating\u2026' : 'Submitting\u2026';
+
+    try {
+      var action = form.getAttribute('action');
+      var res = await fetch(action, {
+        method: isPut ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ grade: grade, body: body }),
+      });
+
+      var data = await res.json();
+
+      if (res.ok && data.success) {
+        var bookPath = form.dataset.bookPath;
+        window.location.href = bookPath;
+        return;
+      }
+
+      messageEl.hidden = false;
+      messageEl.className = 'nom-message nom-message--error';
+      messageEl.textContent = data.error || 'Something went wrong.';
+    } catch (err) {
+      messageEl.hidden = false;
+      messageEl.className = 'nom-message nom-message--error';
+      messageEl.textContent = 'Network error. Please try again.';
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = isPut ? 'Update Review' : 'Submit Review';
+  });
+})();
+</script>

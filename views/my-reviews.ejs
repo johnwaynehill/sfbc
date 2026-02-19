@@ -1,4 +1,36 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="section">
+  <h1 class="t-section" style="margin-bottom: var(--s-4);">My Reviews</h1>
+
+  <% if (reviews.length > 0) { %>
+    <div class="my-reviews-list">
+      <% for (const r of reviews) { %>
+        <div class="review-card review-card--linked">
+          <span class="grade-badge"><%= r.grade %></span>
+          <div class="review-card__body">
+            <a href="<%= bookPath(r.title, r.author) %>" class="review-card__book-link">
+              <strong class="t-body"><%= r.title %></strong>
+              <span class="text-secondary">by <%= r.author %></span>
+            </a>
+            <% if (r.body_markdown) { %>
+              <p class="review-card__text"><%= r.body_markdown.length > 180 ? r.body_markdown.slice(0, 180) + '\u2026' : r.body_markdown %></p>
+            <% } %>
+            <div class="review-card__meta">
+              <span class="review-card__date">
+                <%= new Date(r.updated_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+              </span>
+              <a href="/books/<%= r.author_slug %>/<%= r.title_slug %>/review"
+                 class="btn btn--ghost btn--sm">Edit</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <p class="empty-state__message">You haven't written any reviews yet.</p>
+      <div class="empty-state__cta">
+        <a href="/history" class="btn btn--primary">Browse Past Books</a>
+      </div>
+    </div>
+  <% } %>
 </section>

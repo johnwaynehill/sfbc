@@ -1,4 +1,79 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="nom-page">
+  <h1 class="t-section nom-page__heading"><%= pageTitle %></h1>
+  <p class="t-body text-secondary nom-page__subheading">for <%= meeting.month_year %></p>
+  <% if (user) { %>
+    <p class="t-caption text-secondary">Nominating as <strong><%= user.display_name %></strong></p>
+  <% } %>
+
+  <% if (alreadyNominated) { %>
+    <div class="nom-submitted">
+      <p class="t-body">
+        You've already nominated
+        <strong><%= existingNomination.title %></strong>
+        by <%= existingNomination.author %>.
+      </p>
+      <a href="/results/<%= meeting.id %>" class="btn btn--primary">View Live Results &rarr;</a>
+    </div>
+  <% } else { %>
+    <div id="nom-message" hidden></div>
+
+    <form id="nom-form"
+          class="nom-form"
+          method="POST"
+          action="/api/meetings/<%= meeting.id %>/nominations"
+          data-meeting-id="<%= meeting.id %>">
+
+      <div class="nom-form__fields">
+        <label class="form-label">
+          Book Title <span class="text-secondary">*</span>
+          <input type="text"
+                 name="title"
+                 id="nom-title"
+                 required
+                 autocomplete="off"
+                 class="form-input"
+                 placeholder="e.g. The Left Hand of Darkness">
+        </label>
+
+        <label class="form-label">
+          Author <span class="text-secondary">*</span>
+          <input type="text"
+                 name="author"
+                 id="nom-author"
+                 required
+                 autocomplete="off"
+                 class="form-input"
+                 placeholder="e.g. Ursula K. Le Guin">
+        </label>
+
+        <label class="form-label">
+          Why this book? <span class="text-secondary">(optional, 280 chars)</span>
+          <textarea name="reason"
+                    id="nom-reason"
+                    maxlength="280"
+                    rows="2"
+                    class="form-input"
+                    placeholder="A quick pitch for why the club should read this&hellip;"></textarea>
+          <span class="char-counter" id="reason-counter">0 / 280</span>
+        </label>
+      </div>
+
+      <!-- Live cover preview (populated by JS) -->
+      <div id="cover-preview" class="nom-preview" hidden>
+        <div class="book-cover book-cover--sm">
+          <img id="preview-img" src="" alt="Cover preview">
+        </div>
+        <div class="nom-preview__info">
+          <span id="preview-title" class="nom-preview__title"></span>
+          <span id="preview-author" class="nom-preview__author"></span>
+          <span id="preview-year" class="nom-preview__year"></span>
+        </div>
+      </div>
+      <div id="cover-searching" class="nom-preview" hidden>
+        <span class="nom-preview__searching">Searching for cover&hellip;</span>
+      </div>
+
+      <button type="submit" class="btn btn--primary" id="nom-submit">Submit Nomination</button>
+    </form>
+  <% } %>
 </section>

@@ -8,6 +8,14 @@ module.exports = {
   databasePath: process.env.DATABASE_PATH || './data/bookclub.sqlite',
   bootstrapKey: process.env.BOOTSTRAP_KEY || '',
   googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '',
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: parseInt(process.env.SMTP_PORT, 10) || 465,
+    secure: (parseInt(process.env.SMTP_PORT, 10) || 465) === 465,
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.SMTP_FROM || '',
+  },
   club: {
     name: process.env.CLUB_NAME || 'SF Fantasy & Sci-Fi Book Club',
     tagline: process.env.CLUB_TAGLINE || 'A San Francisco sci-fi & fantasy book club exploring worlds beyond.',

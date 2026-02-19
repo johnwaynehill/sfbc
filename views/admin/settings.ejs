@@ -1,0 +1,117 @@
+<section class="admin-page">
+  <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
+
+  <!-- Account info -->
+  <div class="admin-settings-card">
+    <h2 class="t-body-bold">Your Account</h2>
+    <p class="t-body"><%= user.email %></p>
+    <% if (user.display_name) { %>
+      <p class="t-caption text-secondary"><%= user.display_name %></p>
+    <% } %>
+  </div>
+
+  <!-- Admin accounts -->
+  <div class="admin-settings-card">
+    <h2 class="t-body-bold">Admin Accounts</h2>
+    <div class="admin-user-list">
+      <% for (const admin of admins) { %>
+        <div class="admin-user-row">
+          <div>
+            <span class="t-body"><%= admin.email %></span>
+            <% if (admin.display_name) { %>
+              <span class="t-caption text-secondary">&middot; <%= admin.display_name %></span>
+            <% } %>
+          </div>
+          <% if (admin.id === user.id) { %>
+            <span class="t-caption text-secondary">(you)</span>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+
+    <h3 class="t-caption-bold" style="margin-top: var(--s-4);">Add Admin</h3>
+    <form id="add-admin-form" class="admin-form admin-form--inline" style="margin-top: var(--s-2);">
+      <input type="email" name="email" class="form-input" placeholder="Email" required>
+      <input type="password" name="password" class="form-input" placeholder="Password (8+ chars)" required minlength="8">
+      <button type="submit" class="btn btn--secondary btn--sm" id="add-admin-submit">Add</button>
+    </form>
+    <div id="admin-user-message" hidden></div>
+  </div>
+
+  <!-- Links -->
+  <div class="admin-settings-card">
+    <h2 class="t-body-bold">Links</h2>
+    <p><a href="/" class="t-body" style="color: var(--accent);">View public site &rarr;</a></p>
+  </div>
+
+  <!-- Logout -->
+  <div class="admin-settings-card">
+    <button id="admin-logout-btn" class="btn btn--danger btn--sm">Log Out</button>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  // Logout
+  var logoutBtn = document.getElementById('admin-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async function () {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = 'Logging out\u2026';
+      try {
+        var res = await fetch('/api/auth/admin-logout', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+        });
+        var data = await res.json();
+        window.location.href = data.redirect || '/admin/login';
+      } catch (err) {
+        window.location.href = '/admin/login';
+      }
+    });
+  }
+
+  // Add admin
+  var form = document.getElementById('add-admin-form');
+  var msg = document.getElementById('admin-user-message');
+  if (!form) return;
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var email = form.querySelector('[name="email"]').value.trim();
+    var password = form.querySelector('[name="password"]').value;
+    if (!email || !password) return;
+
+    var btn = document.getElementById('add-admin-submit');
+    btn.disabled = true;
+    btn.textContent = 'Adding\u2026';
+
+    try {
+      var res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email: email, password: password }),
+      });
+      var data = await res.json();
+
+      if (res.ok && data.success) {
+        window.location.reload();
+        return;
+      }
+
+      msg.hidden = false;
+      msg.className = 'nom-message nom-message--error';
+      msg.textContent = data.error || 'Something went wrong.';
+    } catch (err) {
+      msg.hidden = false;
+      msg.className = 'nom-message nom-message--error';
+      msg.textContent = 'Network error.';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Add';
+  });
+})();
+</script>

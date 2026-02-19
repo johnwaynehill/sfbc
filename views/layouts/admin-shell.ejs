@@ -6,16 +6,16 @@
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | Admin' : 'Admin' %></title>
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
   <nav class="admin-nav" role="navigation" aria-label="Admin navigation">
     <div class="page-container">
       <a href="/admin" class="nav-brand t-brand">Admin</a>
       <ul class="nav-links">
-        <li><a href="/admin" class="t-nav">Overview</a></li>
-        <li><a href="/admin/nominations" class="t-nav">Nominations</a></li>
-        <li><a href="/admin/results" class="t-nav">Results</a></li>
-        <li><a href="/admin/settings" class="t-nav">Settings</a></li>
+        <li><a href="/admin" class="t-nav<%= adminPath === '/' ? ' is-active' : '' %>">Overview</a></li>
+        <li><a href="/admin/meetings" class="t-nav<%= adminPath && adminPath.startsWith('/meetings') ? ' is-active' : '' %>">Meetings</a></li>
+        <li><a href="/admin/settings" class="t-nav<%= adminPath === '/settings' ? ' is-active' : '' %>">Settings</a></li>
       </ul>
     </div>
   </nav>
@@ -25,5 +25,9 @@
       <%- body %>
     </div>
   </main>
+
+  <% if (typeof pageScript !== 'undefined' && pageScript) { %>
+    <script src="<%= pageScript %>" defer></script>
+  <% } %>
 </body>
 </html>

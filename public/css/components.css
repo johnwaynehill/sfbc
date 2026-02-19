@@ -453,3 +453,1153 @@
   height: 32px;
   opacity: 0.25;
 }
+
+/* ============================================
+   NOMINATION FORM — Phase 3
+   ============================================ */
+
+/* ---- Form Elements (reusable) ---- */
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-input {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-base);
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 150ms ease;
+}
+
+.form-input:focus {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.form-input::placeholder {
+  color: var(--text3);
+}
+
+textarea.form-input {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.char-counter {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--text3);
+  text-align: right;
+  margin-top: 2px;
+}
+
+.char-counter--warn {
+  color: var(--danger);
+}
+
+/* ---- Buttons (reusable) ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-2) var(--s-4);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--cta-bg);
+  color: var(--cta-text);
+}
+
+.btn--secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ---- Nomination Page ---- */
+.nom-page {
+  padding: var(--s-6) 0;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.nom-page__heading {
+  margin-bottom: var(--s-1);
+}
+
+.nom-page__subheading {
+  margin-bottom: var(--s-5);
+}
+
+.nom-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.nom-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+/* ---- Cover Preview ---- */
+.nom-preview {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  padding: var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  animation: fadeIn 200ms ease;
+}
+
+.nom-preview__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--s-1);
+}
+
+.nom-preview__title {
+  font-family: var(--font-brand);
+  font-size: var(--t-sm);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.nom-preview__author {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: var(--t-xs);
+  color: var(--text2);
+}
+
+.nom-preview__year {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.nom-preview__searching {
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--text3);
+  font-style: italic;
+}
+
+/* ---- Already Nominated ---- */
+.nom-submitted {
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.nom-submitted p {
+  margin-bottom: var(--s-3);
+}
+
+/* ---- Inline Messages ---- */
+.nom-message {
+  padding: var(--s-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+}
+
+.nom-message--success {
+  background: #E0F2F1;
+  color: var(--accent2);
+  border: 1px solid #B2DFDB;
+}
+
+.nom-message--error {
+  background: #FEF2F2;
+  color: var(--danger);
+  border: 1px solid #FECACA;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============================================
+   VOTING BALLOT — Phase 4
+   ============================================ */
+
+/* ---- Vote Page ---- */
+.vote-page {
+  padding: var(--s-6) 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.vote-page__header {
+  text-align: center;
+  margin-bottom: var(--s-3);
+}
+
+.vote-page__heading {
+  margin-bottom: var(--s-1);
+}
+
+.vote-page__count {
+  margin-top: var(--s-1);
+}
+
+.vote-page__instructions {
+  text-align: center;
+  margin-bottom: var(--s-4);
+}
+
+.vote-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.vote-form__submit {
+  align-self: center;
+  min-width: 200px;
+}
+
+/* ---- Ballot List ---- */
+.ballot-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+/* ---- Ballot Card ---- */
+.ballot-card {
+  display: grid;
+  grid-template-columns: 36px 80px 1fr 40px;
+  gap: var(--s-3);
+  align-items: center;
+  padding: var(--s-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 150ms ease, opacity 150ms ease;
+}
+
+.ballot-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ballot-card:active {
+  cursor: grabbing;
+}
+
+.ballot-card--dragging {
+  opacity: 0.35;
+}
+
+.ballot-card--ghost {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--text);
+}
+
+/* Rank badge */
+.ballot-card__rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+/* Cover */
+.ballot-card__cover {
+  width: 80px;
+}
+
+/* Body */
+.ballot-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ballot-card__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ballot-card__reason {
+  font-style: italic;
+  color: var(--text2);
+  margin: 2px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ballot-card__links {
+  display: flex;
+  gap: var(--s-2);
+  margin-top: 2px;
+}
+
+.ballot-card__link {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Controls column (up/down + drag handle) */
+.ballot-card__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ballot-card__move {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.ballot-card__move:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.ballot-card__move:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+/* Drag handle */
+.ballot-card__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  cursor: grab;
+  padding: 2px 0;
+  touch-action: none;
+}
+
+.ballot-card__handle:active {
+  cursor: grabbing;
+}
+
+/* ---- No-JS Rank Selects ---- */
+.vote-nojs-ranks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-3);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+}
+
+.form-input--sm {
+  padding: var(--s-1) var(--s-2);
+  font-size: var(--t-xs);
+  width: auto;
+  display: inline-flex;
+}
+
+/* Mobile: compact ballot card */
+@media (max-width: 480px) {
+  .ballot-card {
+    grid-template-columns: 32px 60px 1fr 36px;
+    gap: var(--s-2);
+    padding: var(--s-2);
+  }
+
+  .ballot-card__cover {
+    width: 60px;
+  }
+
+  .ballot-card__rank {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
+
+
+/* ============================================
+   RESULTS — Phase 4
+   ============================================ */
+
+/* ---- Results Page ---- */
+.results-page {
+  padding: var(--s-6) 0;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.results-page__header {
+  text-align: center;
+  margin-bottom: var(--s-5);
+}
+
+.results-page__heading {
+  margin-bottom: var(--s-1);
+}
+
+.results-page__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+
+.results-page__note {
+  text-align: center;
+  margin-top: var(--s-5);
+  font-style: italic;
+}
+
+/* ---- Status Pills (Open/Closed) ---- */
+.status-pill--open {
+  background: #FFF8E1;
+  color: #92400e;
+}
+
+.status-pill--closed {
+  background: #E0F2F1;
+  color: var(--accent2);
+}
+
+/* ---- Winner Callout ---- */
+.results-winner {
+  text-align: center;
+  padding: var(--s-4);
+  margin-bottom: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  animation: fadeIn 300ms ease;
+}
+
+.results-winner__label {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+  margin-bottom: var(--s-3);
+}
+
+.results-winner__card {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  justify-content: center;
+}
+
+.results-winner__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.results-winner__link {
+  margin-top: var(--s-2);
+}
+
+.btn--sm {
+  padding: var(--s-1) var(--s-3);
+  font-size: var(--t-xs);
+}
+
+/* ---- Bar Chart ---- */
+.results-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-bottom: var(--s-5);
+}
+
+.results-bar {
+  display: grid;
+  grid-template-columns: 48px 1fr 64px;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+.results-bar__cover {
+  width: 48px;
+}
+
+.book-cover--xs {
+  width: 48px;
+}
+
+.placeholder-cover--xs {
+  width: 48px;
+}
+
+.placeholder-cover--xs .placeholder-cover__title {
+  font-size: 8px;
+}
+
+.placeholder-cover--sm .placeholder-cover__title {
+  font-size: 10px;
+}
+
+.results-bar__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.results-bar__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.results-bar__author {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: -2px;
+}
+
+.results-bar__track {
+  height: 12px;
+  background: var(--surface2, var(--surface));
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.results-bar__fill {
+  height: 100%;
+  border-radius: 6px;
+  min-width: 4px;
+  transition: width 300ms ease;
+}
+
+.results-bar__points {
+  text-align: right;
+  white-space: nowrap;
+  color: var(--text2);
+}
+
+/* ---- Ranked List ---- */
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.results-item {
+  display: grid;
+  grid-template-columns: 40px 1fr auto auto;
+  gap: var(--s-2);
+  align-items: center;
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-item__rank {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--t-sm);
+  color: var(--text2);
+}
+
+.results-item__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.results-item__points {
+  white-space: nowrap;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .results-bar {
+    grid-template-columns: 40px 1fr 52px;
+    gap: var(--s-1);
+  }
+
+  .results-bar__cover {
+    width: 40px;
+  }
+
+  .book-cover--xs {
+    width: 40px;
+  }
+
+  .results-item {
+    grid-template-columns: 32px 1fr auto;
+  }
+
+  .results-item__author {
+    display: none;
+  }
+
+  .results-winner__card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .results-winner__info {
+    text-align: center;
+    align-items: center;
+  }
+}
+
+/* ==================================================================
+   Phase 5 — Admin, Auth, Reviews
+   ================================================================== */
+
+/* ---- Button: Ghost ---- */
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn--ghost:hover {
+  background: var(--surface);
+}
+
+/* ---- Form Select & Textarea ---- */
+.form-select {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-base);
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 150ms ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--s-2) center;
+  padding-right: var(--s-5);
+}
+
+.form-select:focus {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.form-textarea {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-base);
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 150ms ease;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-textarea:focus {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.form-textarea::placeholder {
+  color: var(--text3);
+}
+
+/* ---- Grade Select ---- */
+.grade-select {
+  max-width: 200px;
+}
+
+/* ---- Admin: Stats Row ---- */
+.admin-stats {
+  display: flex;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.admin-stat-card {
+  flex: 1;
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.admin-stat-card__value {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--t-xl);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admin-stat-card__label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+/* ---- Admin: Meeting Card ---- */
+.admin-meeting-card {
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--s-4);
+}
+
+.admin-meeting-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-bottom: var(--s-3);
+}
+
+/* ---- Admin: Actions Row ---- */
+.admin-actions {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-top: var(--s-3);
+}
+
+/* ---- Admin: Table ---- */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: var(--s-2) var(--s-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+}
+
+/* ---- Admin: Nominees ---- */
+.admin-nominees {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.admin-nominee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-2) var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.admin-nominee-form {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-end;
+  margin-top: var(--s-3);
+}
+
+.admin-nominee-form .form-input {
+  flex: 1;
+}
+
+/* ---- Login Page ---- */
+.login-page {
+  max-width: 380px;
+  margin: 0 auto;
+  padding: var(--s-7) var(--s-3);
+}
+
+.login-page__heading {
+  margin-bottom: var(--s-2);
+}
+
+.login-page__subtitle {
+  margin-bottom: var(--s-4);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.login-sent {
+  text-align: center;
+}
+
+.login-sent p {
+  margin-bottom: var(--s-2);
+}
+
+/* ---- Nav User ---- */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+}
+
+.nav-user__name {
+  color: var(--text2);
+}
+
+.nav-user__link {
+  color: var(--text2);
+  text-decoration: none;
+}
+
+.nav-user__link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* ---- Review Form Page ---- */
+.review-form-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--s-6) var(--s-3);
+}
+
+.review-form-page__book {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.review-form__actions {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+/* ---- Review Card: Author Name ---- */
+.review-card__author {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+
+/* ---- Review Card: Book Link (My Reviews) ---- */
+.review-card__book-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  color: inherit;
+  margin-bottom: var(--s-1);
+}
+
+.review-card__book-link:hover strong {
+  text-decoration: underline;
+}
+
+.review-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-1);
+}
+
+/* ---- My Reviews List ---- */
+.my-reviews-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-card--linked {
+  padding: var(--s-4) 0;
+  border-top: 1px solid var(--border);
+}
+
+.review-card--linked:first-child {
+  border-top: none;
+}
+
+/* ---- Status Pill (admin) ---- */
+.status-pill {
+  display: inline-block;
+  padding: 2px var(--s-2);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-pill--reading { background: #e3f2fd; color: #1565c0; }
+.status-pill--nominations { background: #fff3e0; color: #e65100; }
+.status-pill--voting { background: #f3e5f5; color: #7b1fa2; }
+.status-pill--results { background: #e8f5e9; color: #2e7d32; }
+
+/* ---- Responsive: Admin ---- */
+@media (max-width: 480px) {
+  .admin-stats {
+    flex-direction: column;
+  }
+
+  .admin-nominee-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-table {
+    font-size: var(--t-xs);
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: var(--s-1) var(--s-2);
+  }
+}
+
+/* ==================================================================
+   Phase 6 — QR Codes, Display Name, Admin Settings
+   ================================================================== */
+
+/* ---- QR Panel ---- */
+.qr-panel {
+  margin: var(--s-4) 0;
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.qr-panel__heading {
+  margin-bottom: var(--s-3);
+}
+
+.qr-panel__grid {
+  display: flex;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.qr-panel__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.qr-panel__code {
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-sm);
+}
+
+.qr-panel__label {
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.qr-panel__url {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--text3);
+  word-break: break-all;
+  max-width: 160px;
+  text-align: center;
+}
+
+/* ---- Display Name Form (nav) ---- */
+.display-name-form {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.display-name-form__input {
+  padding: 2px var(--s-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-xs);
+  color: var(--text);
+  background: var(--bg);
+  width: 120px;
+}
+
+.display-name-form__input:focus {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+/* ---- Admin: User List ---- */
+.admin-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+}
+
+.admin-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-2) var(--s-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Admin: Settings Card ---- */
+.admin-settings-card {
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--s-3);
+}
+
+/* ---- Admin: Inline Form ---- */
+.admin-form--inline {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.admin-form--inline .form-input {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ---- Print styles for QR panel ---- */
+@media print {
+  .global-nav,
+  .admin-shell__nav,
+  .admin-actions,
+  .admin-nominees,
+  .admin-form,
+  .admin-settings-card:last-child {
+    display: none;
+  }
+
+  .qr-panel {
+    border: none;
+    padding: 0;
+    background: none;
+    break-inside: avoid;
+  }
+
+  .qr-panel__code {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .ballot-card,
+  .results-bar__fill,
+  .grade-row__fill {
+    transition: none;
+  }
+
+  .nom-preview,
+  .results-winner {
+    animation: none;
+  }
+}

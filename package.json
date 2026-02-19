@@ -24,11 +24,13 @@
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
     "better-sqlite3-session-store": "^0.1.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.19.0",
-    "nodemailer": "^8.0.1"
+    "nodemailer": "^8.0.1",
+    "qrcode": "^1.5.4"
   }
 }

@@ -1,0 +1,43 @@
+<section class="admin-page">
+  <div class="admin-page__header-row">
+    <h1 class="t-section"><%= pageTitle %></h1>
+    <a href="/admin/meetings/new" class="btn btn--primary btn--sm">New Meeting</a>
+  </div>
+
+  <% if (meetings.length > 0) { %>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th class="t-caption">Month / Year</th>
+          <th class="t-caption">Status</th>
+          <th class="t-caption">Winner</th>
+          <th class="t-caption"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% meetings.forEach(function(m) { %>
+          <tr>
+            <td class="t-body"><%= m.month_year %></td>
+            <td>
+              <span class="status-pill status-pill--<%= m.status %>"><%= m.status %></span>
+            </td>
+            <td class="t-body text-secondary">
+              <% if (m.book_title) { %>
+                <%= m.book_title %>
+              <% } else { %>
+                &mdash;
+              <% } %>
+            </td>
+            <td>
+              <a href="/admin/meetings/<%= m.id %>" class="btn btn--secondary btn--sm">Manage</a>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <div class="admin-empty">
+      <p class="t-body text-secondary">No meetings yet. Create your first one.</p>
+    </div>
+  <% } %>
+</section>

@@ -1,4 +1,115 @@
-<section style="padding: var(--s-7) 0; text-align: center;">
-  <h1 class="t-section" style="margin-bottom: var(--s-3);"><%= pageTitle %></h1>
-  <p class="t-body text-secondary">This page is coming soon.</p>
+<section class="vote-page">
+  <header class="vote-page__header">
+    <h1 class="t-section vote-page__heading"><%= pageTitle %></h1>
+    <p class="t-body text-secondary">for <%= meeting.month_year %></p>
+    <p class="t-caption text-secondary vote-page__count">
+      <span id="vote-count"><%= voteCount %></span> vote<%= voteCount === 1 ? '' : 's' %> counted
+    </p>
+    <% if (user) { %>
+      <p class="t-caption text-secondary">Voting as <strong><%= user.display_name %></strong></p>
+    <% } %>
+  </header>
+
+  <p class="t-body vote-page__instructions">
+    Rank the books from <strong>most</strong> to <strong>least</strong> wanted.
+    Use the arrows or drag to reorder. Your top pick gets the most points.
+  </p>
+
+  <form id="vote-form"
+        class="vote-form"
+        method="POST"
+        action="/api/meetings/<%= meeting.id %>/votes"
+        data-meeting-id="<%= meeting.id %>">
+
+    <ol id="ballot-list" class="ballot-list">
+      <% nominees.forEach(function(nom, i) { %>
+        <li class="ballot-card" data-book-id="<%= nom.book_id %>" draggable="true">
+          <span class="ballot-card__rank" aria-label="Rank <%= i + 1 %>"><%= i + 1 %></span>
+
+          <div class="book-cover book-cover--sm ballot-card__cover">
+            <% if (nom.cover_url) { %>
+              <img src="<%= nom.cover_url %>" alt="<%= nom.title %> cover" loading="lazy">
+            <% } else { %>
+              <div class="placeholder-cover placeholder-cover--sm">
+                <span class="placeholder-cover__title"><%= nom.title %></span>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="ballot-card__body">
+            <span class="ballot-card__title t-body-bold"><%= nom.title %></span>
+            <span class="ballot-card__author t-caption text-secondary"><%= nom.author %><% if (nom.publication_year) { %> (<%= nom.publication_year %>)<% } %></span>
+            <% if (nom.page_count) { %>
+              <span class="ballot-card__pages t-caption text-secondary"><%= nom.page_count %> pages</span>
+            <% } %>
+            <% if (nom.reason) { %>
+              <p class="ballot-card__reason t-caption">&ldquo;<%= nom.reason %>&rdquo;</p>
+            <% } %>
+            <% if (nom.nominator_name) { %>
+              <span class="ballot-card__nominator t-caption text-secondary">Nominated by <%= nom.nominator_name %></span>
+            <% } %>
+            <div class="ballot-card__links">
+              <% if (nom.google_books_id) { %>
+                <a href="https://books.google.com/books?id=<%= nom.google_books_id %>"
+                   target="_blank" rel="noopener" class="ballot-card__link t-caption">Google Books</a>
+              <% } %>
+              <% if (nom.open_library_id) { %>
+                <a href="https://openlibrary.org/works/<%= nom.open_library_id %>"
+                   target="_blank" rel="noopener" class="ballot-card__link t-caption">Open Library</a>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="ballot-card__controls">
+            <button type="button" class="ballot-card__move ballot-card__move--up"
+                    aria-label="Move up"<%= i === 0 ? ' disabled' : '' %>>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M7 11V3M3 6l4-4 4 4"/>
+              </svg>
+            </button>
+            <div class="ballot-card__handle" aria-label="Drag to reorder">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <circle cx="5" cy="3" r="1.5"/><circle cx="11" cy="3" r="1.5"/>
+                <circle cx="5" cy="8" r="1.5"/><circle cx="11" cy="8" r="1.5"/>
+                <circle cx="5" cy="13" r="1.5"/><circle cx="11" cy="13" r="1.5"/>
+              </svg>
+            </div>
+            <button type="button" class="ballot-card__move ballot-card__move--down"
+                    aria-label="Move down"<%= i === nominees.length - 1 ? ' disabled' : '' %>>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M7 3v8M3 8l4 4 4-4"/>
+              </svg>
+            </button>
+          </div>
+        </li>
+      <% }); %>
+    </ol>
+
+    <!-- Hidden field keeps ranking in sync for no-JS form POST fallback -->
+    <input type="hidden" name="ranking" id="ranking-input"
+           value="<%= nominees.map(function(n) { return n.book_id; }).join(',') %>">
+
+    <!-- No-JS fallback: rank select dropdowns -->
+    <noscript>
+      <div class="vote-nojs-ranks">
+        <p class="t-caption text-secondary">Drag &amp; drop requires JavaScript. Use the dropdowns below to set your ranking:</p>
+        <% nominees.forEach(function(nom) { %>
+          <label class="form-label t-caption">
+            <%= nom.title %> &mdash; Rank:
+            <select name="rank_<%= nom.book_id %>" class="form-input form-input--sm">
+              <% for (var r = 1; r <= nominees.length; r++) { %>
+                <option value="<%= r %>"><%= r %></option>
+              <% } %>
+            </select>
+          </label>
+        <% }); %>
+      </div>
+    </noscript>
+
+    <div id="vote-message" hidden></div>
+
+    <button type="submit" class="btn btn--primary vote-form__submit" id="vote-submit">
+      Submit Vote
+    </button>
+  </form>
 </section>
