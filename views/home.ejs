@@ -19,9 +19,7 @@
       <span class="t-label text-tertiary"><%= formatMonthYear(currentMeeting.month_year) %></span>
       <span class="status-pill status-pill--<%= currentMeeting.status %>">
         <span class="status-pill__dot"></span>
-        <%= currentMeeting.status === 'reading' ? 'Currently Reading' :
-            currentMeeting.status === 'nominations' ? 'Nominations Open' :
-            currentMeeting.status === 'voting' ? 'Voting Open' : 'Finished' %>
+        <%= formatStatus(currentMeeting.status) %>
       </span>
     </div>
     <h1 class="t-display book-hero__title"><%= currentMeeting.title %></h1>

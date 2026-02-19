@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const db = require('../db');
 const { slugify, bookPath } = require('../utils/slug');
+const { formatMonthYear } = require('../utils/format');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -43,21 +44,6 @@ function weightToGrade(weight) {
     }
   }
   return closest.grade;
-}
-
-/**
- * "2026-01" → "January 2026"
- */
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-function formatMonthYear(monthYear) {
-  if (!monthYear) return '';
-  const [year, month] = monthYear.split('-');
-  const idx = parseInt(month, 10) - 1;
-  return `${MONTH_NAMES[idx] || month} ${year}`;
 }
 
 // ---------------------------------------------------------------------------
