@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#000"/>
+  <!-- Open book shape -->
+  <g transform="translate(256,270)">
+    <!-- Left page -->
+    <path d="M-10,-100 C-10,-100 -140,-110 -160,-80 L-160,80 C-140,50 -10,60 -10,60 Z" fill="#fff" opacity="0.95"/>
+    <!-- Right page -->
+    <path d="M10,-100 C10,-100 140,-110 160,-80 L160,80 C140,50 10,60 10,60 Z" fill="#fff" opacity="0.85"/>
+    <!-- Spine -->
+    <line x1="0" y1="-105" x2="0" y2="65" stroke="#b45309" stroke-width="6" stroke-linecap="round"/>
+    <!-- Text lines on left page -->
+    <line x1="-130" y1="-50" x2="-30" y2="-50" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-130" y1="-30" x2="-50" y2="-30" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-130" y1="-10" x2="-40" y2="-10" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-130" y1="10" x2="-60" y2="10" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <!-- Star on right page -->
+    <polygon points="70,-30 78,-5 105,-5 83,10 91,35 70,20 49,35 57,10 35,-5 62,-5" fill="#b45309"/>
+  </g>
+  <!-- SF initials -->
+  <text x="256" y="430" text-anchor="middle" fill="#b45309" font-family="Georgia,serif" font-size="48" font-weight="700" letter-spacing="8">SFBC</text>
+</svg>
