@@ -7,14 +7,36 @@ const { calculateResults } = require('./voting');
 /*  Prepared statements                                                */
 /* ------------------------------------------------------------------ */
 
+// Current meeting = the active one (reading, nominations, or voting status)
+// Falls back to most recent non-results meeting, then most recent overall
 const getCurrentStmt = db.prepare(`
   SELECT m.*, b.title AS book_title, b.author AS book_author
   FROM meetings m
   LEFT JOIN books b ON b.id = m.winning_book_id
-  ORDER BY m.created_at DESC LIMIT 1
+  WHERE m.status IN ('reading', 'nominations', 'voting')
+  ORDER BY m.month_year DESC LIMIT 1
 `);
 
-const getByIdStmt = db.prepare('SELECT * FROM meetings WHERE id = ?');
+const getUpcomingStmt = db.prepare(`
+  SELECT m.*, b.title AS book_title, b.author AS book_author
+  FROM meetings m
+  LEFT JOIN books b ON b.id = m.winning_book_id
+  WHERE m.status = 'upcoming'
+  ORDER BY m.month_year ASC
+`);
+
+const getByIdStmt = db.prepare(`
+  SELECT m.*, b.title AS book_title, b.author AS book_author, b.cover_url AS book_cover_url
+  FROM meetings m
+  LEFT JOIN books b ON b.id = m.winning_book_id
+  WHERE m.id = ?
+`);
+const getByMonthYearStmt = db.prepare(`
+  SELECT m.*, b.title AS book_title, b.author AS book_author, b.cover_url AS book_cover_url
+  FROM meetings m
+  LEFT JOIN books b ON b.id = m.winning_book_id
+  WHERE m.month_year = ?
+`);
 
 const getAllStmt = db.prepare(`
   SELECT m.*, b.title AS book_title, b.author AS book_author
@@ -25,7 +47,7 @@ const getAllStmt = db.prepare(`
 
 const createStmt = db.prepare(`
   INSERT INTO meetings (month_year, meetup_event_url, meeting_time, location_text, status)
-  VALUES (?, ?, ?, ?, 'reading')
+  VALUES (?, ?, ?, ?, 'upcoming')
 `);
 
 const updateStmt = db.prepare(`
@@ -97,6 +119,7 @@ const countMembersStmt = db.prepare("SELECT COUNT(*) AS cnt FROM users WHERE rol
 /* ------------------------------------------------------------------ */
 
 const TRANSITIONS = {
+  upcoming: 'reading',
   reading: 'nominations',
   nominations: 'voting',
   voting: 'results',
@@ -110,8 +133,16 @@ function getCurrent() {
   return getCurrentStmt.get() || null;
 }
 
+function getUpcoming() {
+  return getUpcomingStmt.all();
+}
+
 function getById(id) {
   return getByIdStmt.get(id) || null;
+}
+
+function getByMonthYear(monthYear) {
+  return getByMonthYearStmt.get(monthYear) || null;
 }
 
 function getAll() {
@@ -142,13 +173,21 @@ function update(id, { month_year, meetup_event_url, meeting_time, location_text 
 /**
  * Advance a meeting's status to the next valid state.
  * Returns { meeting } on success or { error } on failure.
+ *
+ * Normal flow:  upcoming → reading → nominations → voting → results
+ * Shortcut:     reading → voting  (when book is pre-selected, skip nominations)
  */
 function advanceStatus(id, newStatus) {
   const meeting = getByIdStmt.get(id);
   if (!meeting) return { error: 'Meeting not found.' };
 
   const expected = TRANSITIONS[meeting.status];
-  if (!expected || expected !== newStatus) {
+
+  // Allow the normal transition, the reading→results shortcut (close meeting),
+  // or the reading→voting shortcut (skip nominations)
+  const isCloseReading = meeting.status === 'reading' && newStatus === 'results';
+  const isSkipToVoting = meeting.status === 'reading' && newStatus === 'voting';
+  if (!isCloseReading && !isSkipToVoting && (!expected || expected !== newStatus)) {
     return { error: `Cannot transition from "${meeting.status}" to "${newStatus}".` };
   }
 
@@ -160,7 +199,7 @@ function advanceStatus(id, newStatus) {
     }
   }
 
-  if (newStatus === 'results') {
+  if (newStatus === 'results' && !isCloseReading) {
     const count = voteCountStmt.get(id).cnt;
     if (count < 1) {
       return { error: 'Need at least 1 vote before finalizing results.' };
@@ -173,15 +212,21 @@ function advanceStatus(id, newStatus) {
     if (newStatus === 'nominations') {
       setNominationsOpenStmt.run(id);
     } else if (newStatus === 'voting') {
-      setNominationsCloseStmt.run(id);
+      if (!isSkipToVoting) {
+        setNominationsCloseStmt.run(id);
+      }
       setVotingOpenStmt.run(id);
     } else if (newStatus === 'results') {
-      setVotingCloseStmt.run(id);
+      if (!isCloseReading) {
+        setVotingCloseStmt.run(id);
+      }
 
-      // Auto-set winning book
-      const results = calculateResults(id);
-      if (results.rankings.length > 0) {
-        setWinnerStmt.run(results.rankings[0].book_id, id);
+      // Auto-set winning book from voting results (only if voting occurred)
+      if (!isCloseReading) {
+        const results = calculateResults(id);
+        if (results.rankings.length > 0) {
+          setWinnerStmt.run(results.rankings[0].book_id, id);
+        }
       }
     }
 
@@ -217,7 +262,9 @@ function getStats() {
 
 module.exports = {
   getCurrent,
+  getUpcoming,
   getById,
+  getByMonthYear,
   getAll,
   create,
   update,

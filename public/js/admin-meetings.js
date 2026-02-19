@@ -13,6 +13,16 @@
   // Helpers
   // -----------------------------------------------------------------------
 
+  var MONTH_NAMES = ['january','february','march','april','may','june',
+    'july','august','september','october','november','december'];
+
+  function monthYearSlug(my) {
+    if (!my) return '';
+    var parts = my.split('-');
+    var idx = parseInt(parts[1], 10) - 1;
+    return (MONTH_NAMES[idx] || parts[1]) + '-' + parts[0];
+  }
+
   function showMessage(el, msg, isError) {
     if (!el) return;
     el.hidden = false;
@@ -50,7 +60,7 @@
         var data = await res.json();
 
         if (res.ok && data.success) {
-          window.location.href = '/admin/meetings/' + data.meeting.id;
+          window.location.href = '/admin/meetings/' + monthYearSlug(data.meeting.month_year);
           return;
         }
 
@@ -73,9 +83,10 @@
       var meetingId = btn.dataset.meetingId;
       var newStatus = btn.dataset.newStatus;
       var labels = {
+        reading: 'mark as reading',
         nominations: 'open nominations',
         voting: 'start voting',
-        results: 'finalize results',
+        results: 'close this meeting',
       };
 
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
@@ -147,6 +158,72 @@
       btn.textContent = 'Remove';
     });
   });
+
+  // -----------------------------------------------------------------------
+  // Edit meeting details (toggle + form)
+  // -----------------------------------------------------------------------
+
+  var toggleEditBtn = document.getElementById('toggle-edit-btn');
+  var cancelEditBtn = document.getElementById('cancel-edit-btn');
+  var detailsView = document.getElementById('meeting-details-view');
+  var detailsEdit = document.getElementById('meeting-details-edit');
+  var editForm = document.getElementById('edit-meeting-form');
+
+  if (toggleEditBtn && detailsView && detailsEdit) {
+    toggleEditBtn.addEventListener('click', function () {
+      detailsView.hidden = true;
+      detailsEdit.hidden = false;
+      toggleEditBtn.hidden = true;
+    });
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener('click', function () {
+        detailsView.hidden = false;
+        detailsEdit.hidden = true;
+        toggleEditBtn.hidden = false;
+      });
+    }
+  }
+
+  if (editForm) {
+    var editBtn = document.getElementById('edit-submit');
+    var editMsg = document.getElementById('edit-message');
+
+    editForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      var formData = new FormData(editForm);
+      var body = {};
+      formData.forEach(function (val, key) { body[key] = val; });
+      var meetingId = editForm.dataset.meetingId;
+
+      editBtn.disabled = true;
+      editBtn.textContent = 'Saving\u2026';
+
+      try {
+        var res = await fetch('/api/admin/meetings/' + meetingId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        var data = await res.json();
+
+        if (res.ok && data.success) {
+          // Redirect to the new slug URL (month_year might have changed)
+          window.location.href = '/admin/meetings/' + monthYearSlug(data.meeting.month_year);
+          return;
+        }
+
+        showMessage(editMsg, data.error || 'Something went wrong.', true);
+      } catch (err) {
+        showMessage(editMsg, 'Network error. Please try again.', true);
+      }
+
+      editBtn.disabled = false;
+      editBtn.textContent = 'Save Changes';
+    });
+  }
 
   // -----------------------------------------------------------------------
   // Add nominee form

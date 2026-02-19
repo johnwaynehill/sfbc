@@ -17,9 +17,9 @@
       <tbody>
         <% meetings.forEach(function(m) { %>
           <tr>
-            <td class="t-body"><%= m.month_year %></td>
+            <td class="t-body"><%= formatMonthYear(m.month_year) %></td>
             <td>
-              <span class="status-pill status-pill--<%= m.status %>"><%= m.status %></span>
+              <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
             </td>
             <td class="t-body text-secondary">
               <% if (m.book_title) { %>
@@ -29,7 +29,7 @@
               <% } %>
             </td>
             <td>
-              <a href="/admin/meetings/<%= m.id %>" class="btn btn--secondary btn--sm">Manage</a>
+              <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
             </td>
           </tr>
         <% }); %>

@@ -1,5 +1,8 @@
 <section class="admin-page">
-  <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
+  <div class="admin-page__header-row">
+    <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
+    <a href="/admin/meetings/new" class="btn btn--primary btn--sm">+ New Meeting</a>
+  </div>
 
   <!-- Stats row -->
   <div class="admin-stats">
@@ -19,27 +22,27 @@
   <% if (current) { %>
     <div class="admin-meeting-card">
       <div class="admin-meeting-card__header">
-        <span class="t-body-bold"><%= current.month_year %></span>
-        <span class="status-pill status-pill--<%= current.status %>"><%= current.status %></span>
+        <span class="t-body-bold"><%= formatMonthYear(current.month_year) %></span>
+        <span class="status-pill status-pill--<%= current.status %>"><%= formatStatus(current.status) %></span>
       </div>
 
       <div class="admin-meeting-card__body">
         <p class="t-caption text-secondary">
+          <% if (current.book_title) { %>
+            <strong><%= current.book_title %></strong> &middot;
+          <% } %>
           <%= nominees.length %> nominee<%= nominees.length === 1 ? '' : 's' %>
           &middot; <%= voteCount %> vote<%= voteCount === 1 ? '' : 's' %>
-          <% if (current.status === 'results' && current.book_title) { %>
-            &middot; Winner: <strong><%= current.book_title %></strong>
-          <% } %>
         </p>
       </div>
 
       <div class="admin-meeting-card__actions">
-        <a href="/admin/meetings/<%= current.id %>" class="btn btn--primary btn--sm">Manage</a>
+        <a href="/admin/meetings/<%= monthYearSlug(current.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
 
         <% if (current.status === 'reading') { %>
           <button class="btn btn--secondary btn--sm js-advance-status"
                   data-meeting-id="<%= current.id %>"
-                  data-new-status="nominations">Open Nominations</button>
+                  data-new-status="results">Close Meeting</button>
         <% } else if (current.status === 'nominations') { %>
           <button class="btn btn--secondary btn--sm js-advance-status"
                   data-meeting-id="<%= current.id %>"
@@ -53,8 +56,7 @@
     </div>
   <% } else { %>
     <div class="admin-empty">
-      <p class="t-body text-secondary">No meetings yet.</p>
-      <a href="/admin/meetings/new" class="btn btn--primary btn--sm">Create Meeting</a>
+      <p class="t-body text-secondary">No active meeting. Create one or mark an upcoming meeting as reading.</p>
     </div>
   <% } %>
 
@@ -83,6 +85,31 @@
       </tbody>
     </table>
   <% } %>
+
+  <!-- Upcoming meetings -->
+  <% if (upcoming.length > 0) { %>
+    <h2 class="t-body-bold admin-page__subheading">Upcoming Meetings</h2>
+
+    <% upcoming.forEach(function(m) { %>
+      <div class="admin-meeting-card">
+        <div class="admin-meeting-card__header">
+          <span class="t-body-bold"><%= formatMonthYear(m.month_year) %></span>
+          <span class="status-pill status-pill--upcoming"><%= formatStatus(m.status) %></span>
+        </div>
+        <% if (m.book_title) { %>
+          <div class="admin-meeting-card__body">
+            <p class="t-caption text-secondary"><strong><%= m.book_title %></strong> by <%= m.book_author %></p>
+          </div>
+        <% } %>
+        <div class="admin-meeting-card__actions">
+          <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
+          <button class="btn btn--secondary btn--sm js-advance-status"
+                  data-meeting-id="<%= m.id %>"
+                  data-new-status="reading">Mark as Reading</button>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
 </section>
 
 <script>
@@ -93,9 +120,10 @@
       var meetingId = btn.dataset.meetingId;
       var newStatus = btn.dataset.newStatus;
       var labels = {
+        reading: 'mark as reading',
         nominations: 'open nominations',
         voting: 'start voting',
-        results: 'finalize results',
+        results: 'close this meeting',
       };
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
 
@@ -114,8 +142,8 @@
         } else {
           alert(data.error || 'Something went wrong.');
           btn.disabled = false;
-          btn.textContent = btn.dataset.newStatus === 'nominations' ? 'Open Nominations'
-            : btn.dataset.newStatus === 'voting' ? 'Start Voting' : 'Finalize Results';
+          btn.textContent = btn.dataset.newStatus === 'reading' ? 'Mark as Reading'
+            : btn.dataset.newStatus === 'results' ? 'Close Meeting' : 'Finalize Results';
         }
       } catch (err) {
         alert('Network error.');

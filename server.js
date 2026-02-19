@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require('path');
+const compression = require('compression');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const config = require('./config');
+const { formatMonthYear, formatStatus, monthYearSlug } = require('./utils/format');
 
 // ---------------------------------------------------------------------------
 // Database & migrations
@@ -28,9 +30,17 @@ app.set('layout', 'layouts/app-shell');
 app.use(expressLayouts);
 
 // ---------------------------------------------------------------------------
+// Compression
+// ---------------------------------------------------------------------------
+app.use(compression());
+
+// ---------------------------------------------------------------------------
 // Static files & body parsing
 // ---------------------------------------------------------------------------
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: config.nodeEnv === 'production' ? '7d' : 0,
+  etag: true,
+}));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
@@ -80,7 +90,17 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.locals.club = config.club;
   res.locals.currentPath = req.path;
+  res.locals.formatMonthYear = formatMonthYear;
+  res.locals.formatStatus = formatStatus;
+  res.locals.monthYearSlug = monthYearSlug;
   next();
+});
+
+// ---------------------------------------------------------------------------
+// Health check
+// ---------------------------------------------------------------------------
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
 });
 
 // ---------------------------------------------------------------------------

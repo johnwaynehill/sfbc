@@ -5,9 +5,8 @@
 
     <form id="create-meeting-form" class="admin-form">
       <label class="form-label">
-        Month / Year
-        <input type="text" name="month_year" class="form-input" required
-               placeholder="e.g. January 2025" autofocus>
+        Meeting Month
+        <input type="month" name="month_year" class="form-input" required autofocus>
       </label>
 
       <label class="form-label">
@@ -17,9 +16,8 @@
       </label>
 
       <label class="form-label">
-        Meeting Time <span class="text-secondary">(optional)</span>
-        <input type="text" name="meeting_time" class="form-input"
-               placeholder="e.g. 2025-01-15T19:00">
+        Meeting Date &amp; Time <span class="text-secondary">(optional)</span>
+        <input type="datetime-local" name="meeting_time" class="form-input">
       </label>
 
       <label class="form-label">
@@ -38,16 +36,20 @@
   <% } else { %>
     <!-- Existing meeting detail -->
     <div class="admin-page__header-row">
-      <h1 class="t-section"><%= meeting.month_year %></h1>
-      <span class="status-pill status-pill--<%= meeting.status %>"><%= meeting.status %></span>
+      <h1 class="t-section"><%= formatMonthYear(meeting.month_year) %></h1>
+      <span class="status-pill status-pill--<%= meeting.status %>"><%= formatStatus(meeting.status) %></span>
     </div>
 
     <!-- Status transition -->
     <div class="admin-actions">
-      <% if (meeting.status === 'reading') { %>
+      <% if (meeting.status === 'upcoming') { %>
         <button class="btn btn--primary btn--sm js-advance-status"
                 data-meeting-id="<%= meeting.id %>"
-                data-new-status="nominations">Open Nominations</button>
+                data-new-status="reading">Mark as Reading</button>
+      <% } else if (meeting.status === 'reading') { %>
+        <button class="btn btn--primary btn--sm js-advance-status"
+                data-meeting-id="<%= meeting.id %>"
+                data-new-status="results">Close Meeting</button>
       <% } else if (meeting.status === 'nominations') { %>
         <button class="btn btn--primary btn--sm js-advance-status"
                 data-meeting-id="<%= meeting.id %>"
@@ -58,36 +60,79 @@
                 data-new-status="results">Finalize Results</button>
       <% } %>
 
-      <span class="t-caption text-secondary">
-        <%= voteCount %> vote<%= voteCount === 1 ? '' : 's' %>
-      </span>
+      <button type="button" class="btn btn--secondary btn--sm" id="toggle-edit-btn">Edit Details</button>
     </div>
 
     <%- include('../partials/qr-panel') %>
 
-    <!-- Meeting details -->
-    <% if (meeting.meetup_event_url || meeting.meeting_time || meeting.location_text) { %>
-      <div class="admin-detail-meta">
-        <% if (meeting.location_text) { %>
-          <p class="t-caption text-secondary">Location: <%= meeting.location_text %></p>
-        <% } %>
-        <% if (meeting.meeting_time) { %>
-          <p class="t-caption text-secondary">Time: <%= meeting.meeting_time %></p>
-        <% } %>
-        <% if (meeting.meetup_event_url) { %>
-          <p class="t-caption"><a href="<%= meeting.meetup_event_url %>" target="_blank" rel="noopener">Meetup Event &rarr;</a></p>
+    <!-- Selected book / Winner callout -->
+    <% if (meeting.winning_book_id && meeting.book_title) { %>
+      <div class="admin-winner">
+        <span class="t-caption-bold"><%= meeting.status === 'results' ? 'Winner:' : 'Selected Book:' %></span>
+        <span class="t-body-bold"><%= meeting.book_title %></span>
+        <span class="t-caption text-secondary">by <%= meeting.book_author %></span>
+        <% if (meeting.status === 'results' && results && results.rankings.length > 0) { %>
+          <span class="t-caption text-secondary">&mdash; <%= results.rankings[0].points %> pts</span>
         <% } %>
       </div>
     <% } %>
 
-    <!-- Winner callout -->
-    <% if (meeting.status === 'results' && meeting.winning_book_id && results && results.rankings.length > 0) { %>
-      <div class="admin-winner">
-        <span class="t-caption-bold">Winner:</span>
-        <span class="t-body-bold"><%= results.rankings[0].title %></span>
-        <span class="t-caption text-secondary">by <%= results.rankings[0].author %> &mdash; <%= results.rankings[0].points %> pts</span>
-      </div>
-    <% } %>
+    <!-- Meeting details (read-only view) -->
+    <div id="meeting-details-view">
+      <% if (meeting.meetup_event_url || meeting.meeting_time || meeting.location_text) { %>
+        <div class="admin-detail-meta">
+          <% if (meeting.location_text) { %>
+            <p class="t-caption text-secondary">📍 <%= meeting.location_text %></p>
+          <% } %>
+          <% if (meeting.meeting_time) { %>
+            <p class="t-caption text-secondary">🕐 <%= meeting.meeting_time %></p>
+          <% } %>
+          <% if (meeting.meetup_event_url) { %>
+            <p class="t-caption"><a href="<%= meeting.meetup_event_url %>" target="_blank" rel="noopener">Meetup Event &rarr;</a></p>
+          <% } %>
+        </div>
+      <% } else { %>
+        <p class="t-caption text-secondary" style="margin-top: var(--s-2);">No meeting details set. Click "Edit Details" to add.</p>
+      <% } %>
+    </div>
+
+    <!-- Meeting details (edit form, hidden by default) -->
+    <div id="meeting-details-edit" hidden>
+      <form id="edit-meeting-form" class="admin-form" data-meeting-id="<%= meeting.id %>">
+        <label class="form-label">
+          Meeting Month
+          <input type="month" name="month_year" class="form-input"
+                 value="<%= meeting.month_year %>">
+        </label>
+
+        <label class="form-label">
+          Meetup Event URL <span class="text-secondary">(optional)</span>
+          <input type="url" name="meetup_event_url" class="form-input"
+                 value="<%= meeting.meetup_event_url || '' %>"
+                 placeholder="https://www.meetup.com/...">
+        </label>
+
+        <label class="form-label">
+          Meeting Date &amp; Time <span class="text-secondary">(optional)</span>
+          <input type="datetime-local" name="meeting_time" class="form-input"
+                 value="<%= meeting.meeting_time || '' %>">
+        </label>
+
+        <label class="form-label">
+          Location <span class="text-secondary">(optional)</span>
+          <input type="text" name="location_text" class="form-input"
+                 value="<%= meeting.location_text || '' %>"
+                 placeholder="e.g. The Interval, San Francisco">
+        </label>
+
+        <div id="edit-message" hidden></div>
+
+        <div style="display: flex; gap: var(--s-2);">
+          <button type="submit" class="btn btn--primary btn--sm" id="edit-submit">Save Changes</button>
+          <button type="button" class="btn btn--secondary btn--sm" id="cancel-edit-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
 
     <!-- Nominees -->
     <h2 class="t-body-bold admin-page__subheading">
@@ -106,7 +151,7 @@
               <% } %>
               <span class="t-caption text-secondary" style="opacity: 0.6;"><%= nom.source %></span>
             </div>
-            <% if (meeting.status !== 'results') { %>
+            <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading') { %>
               <button class="btn btn--danger btn--sm js-remove-nominee"
                       data-meeting-id="<%= meeting.id %>"
                       data-book-id="<%= nom.book_id %>"
@@ -119,8 +164,8 @@
       <p class="t-body text-secondary">No nominees yet.</p>
     <% } %>
 
-    <!-- Add nominee (only if not in results) -->
-    <% if (meeting.status !== 'results') { %>
+    <!-- Add nominee (only during nominations) -->
+    <% if (meeting.status === 'nominations') { %>
       <h2 class="t-body-bold admin-page__subheading">Add Nominee</h2>
       <form id="add-nominee-form" class="admin-form admin-form--inline"
             data-meeting-id="<%= meeting.id %>">

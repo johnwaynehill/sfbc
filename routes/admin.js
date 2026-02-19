@@ -7,6 +7,7 @@ const config = require('../config');
 const { requireAdmin } = require('../middleware/auth');
 const meetings = require('../services/meetings');
 const { calculateResults, getVoteCount } = require('../services/voting');
+const { formatMonthYear, parseMonthYearSlug, monthYearSlug } = require('../utils/format');
 
 /* ------------------------------------------------------------------ */
 /*  QR code helper                                                     */
@@ -65,6 +66,7 @@ router.use((req, res, next) => {
 // ---------------------------------------------------------------------------
 router.get('/', async (req, res) => {
   const current = meetings.getCurrent();
+  const upcoming = meetings.getUpcoming();
   const stats = meetings.getStats();
 
   let nominees = [];
@@ -84,6 +86,7 @@ router.get('/', async (req, res) => {
   res.render('admin/overview', {
     pageTitle: 'Admin Overview',
     current,
+    upcoming,
     stats,
     nominees,
     voteCount,
@@ -119,26 +122,41 @@ router.get('/meetings/new', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Meeting detail
+// Meeting detail (supports slug like "february-2026" or numeric ID for backward compat)
 // ---------------------------------------------------------------------------
-router.get('/meetings/:id', async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id)) return res.redirect('/admin/meetings');
+router.get('/meetings/:slug', async (req, res) => {
+  const slug = req.params.slug;
+  let meeting;
 
-  const meeting = meetings.getById(id);
-  if (!meeting) return res.redirect('/admin/meetings');
-
-  const nominees = meetings.getNominees(id);
-  const voteCount = getVoteCount(id);
-  let results = null;
-  if (meeting.status === 'voting' || meeting.status === 'results') {
-    results = calculateResults(id);
+  // Try slug format first (e.g. "february-2026")
+  const monthYear = parseMonthYearSlug(slug);
+  if (monthYear) {
+    meeting = meetings.getByMonthYear(monthYear);
+  } else {
+    // Fall back to numeric ID for backward compatibility
+    const id = parseInt(slug, 10);
+    if (!isNaN(id)) {
+      meeting = meetings.getById(id);
+      // Redirect numeric ID to slug URL
+      if (meeting) {
+        return res.redirect(`/admin/meetings/${monthYearSlug(meeting.month_year)}`);
+      }
+    }
   }
 
-  const qrCodes = await generateQrCodes(id, meeting.status);
+  if (!meeting) return res.redirect('/admin/meetings');
+
+  const nominees = meetings.getNominees(meeting.id);
+  const voteCount = getVoteCount(meeting.id);
+  let results = null;
+  if (meeting.status === 'voting' || meeting.status === 'results') {
+    results = calculateResults(meeting.id);
+  }
+
+  const qrCodes = await generateQrCodes(meeting.id, meeting.status);
 
   res.render('admin/meeting-detail', {
-    pageTitle: meeting.month_year,
+    pageTitle: formatMonthYear(meeting.month_year),
     pageScript: '/js/admin-meetings.js',
     meeting,
     nominees,

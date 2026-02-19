@@ -5,9 +5,14 @@
   <div class="admin-settings-card">
     <h2 class="t-body-bold">Your Account</h2>
     <p class="t-body"><%= user.email %></p>
-    <% if (user.display_name) { %>
-      <p class="t-caption text-secondary"><%= user.display_name %></p>
-    <% } %>
+
+    <form id="display-name-form" class="admin-form admin-form--inline" style="margin-top: var(--s-2);">
+      <input type="text" name="display_name" class="form-input"
+             value="<%= user.display_name || '' %>"
+             placeholder="Display Name" maxlength="40" required>
+      <button type="submit" class="btn btn--secondary btn--sm" id="display-name-submit">Save</button>
+    </form>
+    <div id="display-name-message" hidden></div>
   </div>
 
   <!-- Admin accounts -->
@@ -70,6 +75,44 @@
       } catch (err) {
         window.location.href = '/admin/login';
       }
+    });
+  }
+
+  // Display name
+  var dnForm = document.getElementById('display-name-form');
+  var dnMsg = document.getElementById('display-name-message');
+  if (dnForm) {
+    dnForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var name = dnForm.querySelector('[name="display_name"]').value.trim();
+      if (!name) return;
+      var btn = document.getElementById('display-name-submit');
+      btn.disabled = true;
+      btn.textContent = 'Saving\u2026';
+      try {
+        var res = await fetch('/api/auth/display-name', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ display_name: name }),
+        });
+        var data = await res.json();
+        if (res.ok && data.success) {
+          dnMsg.hidden = false;
+          dnMsg.className = 'nom-message nom-message--success';
+          dnMsg.textContent = 'Display name updated.';
+          setTimeout(function () { dnMsg.hidden = true; }, 2000);
+        } else {
+          dnMsg.hidden = false;
+          dnMsg.className = 'nom-message nom-message--error';
+          dnMsg.textContent = data.error || 'Something went wrong.';
+        }
+      } catch (err) {
+        dnMsg.hidden = false;
+        dnMsg.className = 'nom-message nom-message--error';
+        dnMsg.textContent = 'Network error.';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save';
     });
   }
 
