@@ -64,15 +64,29 @@ function formatMonthYear(monthYear) {
 // GET / — Home page
 // ---------------------------------------------------------------------------
 router.get('/', (req, res) => {
-  // Current or most recent meeting with its book
-  const currentMeeting = db.prepare(`
-    SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
-           b.publication_year, b.page_count, b.author_slug, b.title_slug
-    FROM meetings m
-    JOIN books b ON b.id = m.winning_book_id
-    ORDER BY m.month_year DESC
-    LIMIT 1
-  `).get();
+  // Current meeting: prefer the nearest active (non-results) meeting,
+  // fall back to the most recent completed one
+  const currentMeeting = (
+    db.prepare(`
+      SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
+             b.publication_year, b.page_count, b.author_slug, b.title_slug
+      FROM meetings m
+      JOIN books b ON b.id = m.winning_book_id
+      WHERE m.status != 'results'
+      ORDER BY m.month_year ASC
+      LIMIT 1
+    `).get()
+    ||
+    db.prepare(`
+      SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
+             b.publication_year, b.page_count, b.author_slug, b.title_slug
+      FROM meetings m
+      JOIN books b ON b.id = m.winning_book_id
+      WHERE m.status = 'results'
+      ORDER BY m.month_year DESC
+      LIMIT 1
+    `).get()
+  );
 
   // Last 6 finished books (skip the current one)
   const recentBooks = db.prepare(`
