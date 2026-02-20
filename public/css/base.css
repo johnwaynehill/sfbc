@@ -152,6 +152,31 @@ p {
   line-height: 1.5;
 }
 
+/* Body bold */
+.t-body-bold {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Caption: small descriptive text */
+.t-caption {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Caption bold */
+.t-caption-bold {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
 /* Text color helpers */
 .text-secondary { color: var(--text2); }
 .text-tertiary { color: var(--text3); }
@@ -317,8 +342,8 @@ button {
    ============================================ */
 .admin-nav {
   padding: var(--s-3) 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  border-bottom: 1px solid var(--admin-border);
+  background: var(--admin-surface);
 }
 
 .admin-nav .page-container {
@@ -327,8 +352,79 @@ button {
   gap: var(--s-4);
 }
 
+.admin-nav .nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
 .admin-nav .nav-links {
+  display: flex;
+  gap: 0;
   margin-left: auto;
+  align-items: center;
+}
+
+.admin-nav .nav-links li {
+  position: relative;
+}
+
+.admin-nav .nav-links a {
+  display: block;
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.admin-nav .nav-links a:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.admin-nav .nav-links a.is-active {
+  color: var(--text);
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 2px solid var(--accent);
+}
+
+/* Admin nav: View Site link */
+.admin-nav__site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: var(--s-3);
+  padding: var(--s-1) var(--s-2);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text3);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.admin-nav__site-link:hover {
+  color: var(--text);
+  border-color: var(--text3);
+  text-decoration: none;
+}
+
+/* Admin nav: Avatar circle */
+.admin-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 
 /* ============================================

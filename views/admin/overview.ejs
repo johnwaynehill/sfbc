@@ -8,11 +8,11 @@
   <div class="admin-stats">
     <div class="admin-stat-card">
       <span class="admin-stat-card__value"><%= stats.totalBooks %></span>
-      <span class="admin-stat-card__label t-caption text-secondary">Books</span>
+      <span class="admin-stat-card__label">Books</span>
     </div>
     <div class="admin-stat-card">
       <span class="admin-stat-card__value"><%= stats.totalMembers %></span>
-      <span class="admin-stat-card__label t-caption text-secondary">Members</span>
+      <span class="admin-stat-card__label">Members</span>
     </div>
   </div>
 
@@ -20,38 +20,47 @@
   <h2 class="t-body-bold admin-page__subheading">Current Meeting</h2>
 
   <% if (current) { %>
-    <div class="admin-meeting-card">
-      <div class="admin-meeting-card__header">
-        <span class="t-body-bold"><%= formatMonthYear(current.month_year) %></span>
-        <span class="status-pill status-pill--<%= current.status %>"><%= formatStatus(current.status) %></span>
-      </div>
+    <div class="admin-meeting-card<%= current.book_cover_url ? ' admin-meeting-card--with-cover' : '' %>">
+      <% if (current.book_cover_url) { %>
+        <div class="admin-meeting-card__cover">
+          <div class="book-cover">
+            <img src="<%= current.book_cover_url %>" alt="<%= current.book_title %>" loading="lazy">
+          </div>
+        </div>
+      <% } %>
+      <div class="admin-meeting-card__content">
+        <div class="admin-meeting-card__header">
+          <span class="t-body-bold"><%= formatMonthYear(current.month_year) %></span>
+          <span class="status-pill status-pill--<%= current.status %>"><%= formatStatus(current.status) %></span>
+        </div>
 
-      <div class="admin-meeting-card__body">
-        <p class="t-caption text-secondary">
-          <% if (current.book_title) { %>
-            <strong><%= current.book_title %></strong> &middot;
+        <div class="admin-meeting-card__body">
+          <p class="t-caption text-secondary">
+            <% if (current.book_title) { %>
+              <strong><%= current.book_title %></strong> &middot;
+            <% } %>
+            <%= nominees.length %> nominee<%= nominees.length === 1 ? '' : 's' %>
+            &middot; <%= voteCount %> vote<%= voteCount === 1 ? '' : 's' %>
+          </p>
+        </div>
+
+        <div class="admin-meeting-card__actions">
+          <a href="/admin/meetings/<%= monthYearSlug(current.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
+
+          <% if (current.status === 'reading') { %>
+            <button class="btn btn--secondary btn--sm js-advance-status"
+                    data-meeting-id="<%= current.id %>"
+                    data-new-status="results">Close Meeting</button>
+          <% } else if (current.status === 'nominations') { %>
+            <button class="btn btn--secondary btn--sm js-advance-status"
+                    data-meeting-id="<%= current.id %>"
+                    data-new-status="voting">Start Voting</button>
+          <% } else if (current.status === 'voting') { %>
+            <button class="btn btn--secondary btn--sm js-advance-status"
+                    data-meeting-id="<%= current.id %>"
+                    data-new-status="results">Finalize Results</button>
           <% } %>
-          <%= nominees.length %> nominee<%= nominees.length === 1 ? '' : 's' %>
-          &middot; <%= voteCount %> vote<%= voteCount === 1 ? '' : 's' %>
-        </p>
-      </div>
-
-      <div class="admin-meeting-card__actions">
-        <a href="/admin/meetings/<%= monthYearSlug(current.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
-
-        <% if (current.status === 'reading') { %>
-          <button class="btn btn--secondary btn--sm js-advance-status"
-                  data-meeting-id="<%= current.id %>"
-                  data-new-status="results">Close Meeting</button>
-        <% } else if (current.status === 'nominations') { %>
-          <button class="btn btn--secondary btn--sm js-advance-status"
-                  data-meeting-id="<%= current.id %>"
-                  data-new-status="voting">Start Voting</button>
-        <% } else if (current.status === 'voting') { %>
-          <button class="btn btn--secondary btn--sm js-advance-status"
-                  data-meeting-id="<%= current.id %>"
-                  data-new-status="results">Finalize Results</button>
-        <% } %>
+        </div>
       </div>
     </div>
   <% } else { %>
@@ -91,21 +100,30 @@
     <h2 class="t-body-bold admin-page__subheading">Upcoming Meetings</h2>
 
     <% upcoming.forEach(function(m) { %>
-      <div class="admin-meeting-card">
-        <div class="admin-meeting-card__header">
-          <span class="t-body-bold"><%= formatMonthYear(m.month_year) %></span>
-          <span class="status-pill status-pill--upcoming"><%= formatStatus(m.status) %></span>
-        </div>
-        <% if (m.book_title) { %>
-          <div class="admin-meeting-card__body">
-            <p class="t-caption text-secondary"><strong><%= m.book_title %></strong> by <%= m.book_author %></p>
+      <div class="admin-meeting-card<%= m.book_cover_url ? ' admin-meeting-card--with-cover' : '' %>">
+        <% if (m.book_cover_url) { %>
+          <div class="admin-meeting-card__cover">
+            <div class="book-cover">
+              <img src="<%= m.book_cover_url %>" alt="<%= m.book_title %>" loading="lazy">
+            </div>
           </div>
         <% } %>
-        <div class="admin-meeting-card__actions">
-          <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
-          <button class="btn btn--secondary btn--sm js-advance-status"
-                  data-meeting-id="<%= m.id %>"
-                  data-new-status="reading">Mark as Reading</button>
+        <div class="admin-meeting-card__content">
+          <div class="admin-meeting-card__header">
+            <span class="t-body-bold"><%= formatMonthYear(m.month_year) %></span>
+            <span class="status-pill status-pill--upcoming"><%= formatStatus(m.status) %></span>
+          </div>
+          <% if (m.book_title) { %>
+            <div class="admin-meeting-card__body">
+              <p class="t-caption text-secondary"><strong><%= m.book_title %></strong> by <%= m.book_author %></p>
+            </div>
+          <% } %>
+          <div class="admin-meeting-card__actions">
+            <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
+            <button class="btn btn--secondary btn--sm js-advance-status"
+                    data-meeting-id="<%= m.id %>"
+                    data-new-status="reading">Mark as Reading</button>
+          </div>
         </div>
       </div>
     <% }); %>

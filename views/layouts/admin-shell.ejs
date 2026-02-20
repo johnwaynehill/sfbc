@@ -9,19 +9,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16x16.png">
-  <link rel="stylesheet" href="/css/tokens.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/tokens.css?v=2">
+  <link rel="stylesheet" href="/css/base.css?v=2">
+  <link rel="stylesheet" href="/css/components.css?v=2">
 </head>
 <body>
   <nav class="admin-nav" role="navigation" aria-label="Admin navigation">
     <div class="page-container">
-      <a href="/admin" class="nav-brand t-brand">Admin</a>
+      <a href="/admin" class="nav-brand t-brand">
+        <% if (user && user.display_name) { %>
+          <span class="admin-avatar"><%= user.display_name.charAt(0).toUpperCase() %></span>
+        <% } %>
+        Admin
+      </a>
       <ul class="nav-links">
         <li><a href="/admin" class="t-nav<%= adminPath === '/' ? ' is-active' : '' %>">Overview</a></li>
         <li><a href="/admin/meetings" class="t-nav<%= adminPath && adminPath.startsWith('/meetings') ? ' is-active' : '' %>">Meetings</a></li>
         <li><a href="/admin/settings" class="t-nav<%= adminPath === '/settings' ? ' is-active' : '' %>">Settings</a></li>
       </ul>
+      <a href="/" class="admin-nav__site-link" target="_blank" rel="noopener">View Site &rarr;</a>
     </div>
   </nav>
 
@@ -32,7 +38,7 @@
   </main>
 
   <% if (typeof pageScript !== 'undefined' && pageScript) { %>
-    <script src="<%= pageScript %>?v=2" defer></script>
+    <script src="<%= pageScript %>?v=3" defer></script>
   <% } %>
 </body>
 </html>

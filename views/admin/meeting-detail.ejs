@@ -40,6 +40,24 @@
       <span class="status-pill status-pill--<%= meeting.status %>"><%= formatStatus(meeting.status) %></span>
     </div>
 
+    <!-- Lifecycle stepper -->
+    <%
+      var steps = ['upcoming', 'reading', 'nominations', 'voting', 'results'];
+      var stepLabels = { upcoming: 'Upcoming', reading: 'Reading', nominations: 'Nominations', voting: 'Voting', results: 'Finished' };
+      var currentIdx = steps.indexOf(meeting.status);
+    %>
+    <div class="lifecycle-stepper">
+      <% steps.forEach(function(step, i) { %>
+        <% if (i > 0) { %>
+          <span class="lifecycle-step__connector"></span>
+        <% } %>
+        <span class="lifecycle-step<%= i < currentIdx ? ' lifecycle-step--done' : '' %><%= i === currentIdx ? ' lifecycle-step--active' : '' %>">
+          <span class="lifecycle-step__dot"></span>
+          <%= stepLabels[step] %>
+        </span>
+      <% }); %>
+    </div>
+
     <!-- Status transition -->
     <div class="admin-actions">
       <% if (meeting.status === 'upcoming') { %>
@@ -67,13 +85,22 @@
 
     <!-- Selected book / Winner callout -->
     <% if (meeting.winning_book_id && meeting.book_title) { %>
-      <div class="admin-winner">
-        <span class="t-caption-bold"><%= meeting.status === 'results' ? 'Winner:' : 'Selected Book:' %></span>
-        <span class="t-body-bold"><%= meeting.book_title %></span>
-        <span class="t-caption text-secondary">by <%= meeting.book_author %></span>
-        <% if (meeting.status === 'results' && results && results.rankings.length > 0) { %>
-          <span class="t-caption text-secondary">&mdash; <%= results.rankings[0].points %> pts</span>
+      <div class="admin-winner<%= meeting.book_cover_url ? ' admin-winner--with-cover' : '' %>">
+        <% if (meeting.book_cover_url) { %>
+          <div class="admin-winner__cover">
+            <div class="book-cover">
+              <img src="<%= meeting.book_cover_url %>" alt="<%= meeting.book_title %>" loading="lazy">
+            </div>
+          </div>
         <% } %>
+        <div class="admin-winner__info">
+          <span class="t-caption-bold"><%= meeting.status === 'results' ? 'Winner:' : 'Selected Book:' %></span>
+          <span class="t-body-bold"><%= meeting.book_title %></span>
+          <span class="t-caption text-secondary">by <%= meeting.book_author %></span>
+          <% if (meeting.status === 'results' && results && results.rankings.length > 0) { %>
+            <span class="t-caption text-secondary">&mdash; <%= results.rankings[0].points %> pts</span>
+          <% } %>
+        </div>
       </div>
     <% } %>
 
@@ -96,8 +123,8 @@
       <% } %>
     </div>
 
-    <!-- Meeting details (edit form, hidden by default) -->
-    <div id="meeting-details-edit" hidden>
+    <!-- Meeting details (edit form, animated reveal) -->
+    <div id="meeting-details-edit" class="admin-edit-reveal">
       <form id="edit-meeting-form" class="admin-form" data-meeting-id="<%= meeting.id %>">
         <label class="form-label">
           Meeting Month

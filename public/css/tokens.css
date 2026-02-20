@@ -62,4 +62,8 @@
   --font-body: 'Inter', -apple-system, sans-serif;
   --font-ui: 'IBM Plex Sans', -apple-system, sans-serif;
   --font-secondary: 'Source Sans 3', -apple-system, sans-serif;
+
+  /* === Admin-specific === */
+  --admin-surface: #F8F6F2;
+  --admin-border: #E8E4DC;
 }

@@ -172,14 +172,14 @@
   if (toggleEditBtn && detailsView && detailsEdit) {
     toggleEditBtn.addEventListener('click', function () {
       detailsView.hidden = true;
-      detailsEdit.hidden = false;
+      detailsEdit.classList.add('is-open');
       toggleEditBtn.hidden = true;
     });
 
     if (cancelEditBtn) {
       cancelEditBtn.addEventListener('click', function () {
         detailsView.hidden = false;
-        detailsEdit.hidden = true;
+        detailsEdit.classList.remove('is-open');
         toggleEditBtn.hidden = false;
       });
     }

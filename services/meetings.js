@@ -10,7 +10,7 @@ const { calculateResults } = require('./voting');
 // Current meeting = the active one (reading, nominations, or voting status)
 // Falls back to most recent non-results meeting, then most recent overall
 const getCurrentStmt = db.prepare(`
-  SELECT m.*, b.title AS book_title, b.author AS book_author
+  SELECT m.*, b.title AS book_title, b.author AS book_author, b.cover_url AS book_cover_url
   FROM meetings m
   LEFT JOIN books b ON b.id = m.winning_book_id
   WHERE m.status IN ('reading', 'nominations', 'voting')
@@ -18,7 +18,7 @@ const getCurrentStmt = db.prepare(`
 `);
 
 const getUpcomingStmt = db.prepare(`
-  SELECT m.*, b.title AS book_title, b.author AS book_author
+  SELECT m.*, b.title AS book_title, b.author AS book_author, b.cover_url AS book_cover_url
   FROM meetings m
   LEFT JOIN books b ON b.id = m.winning_book_id
   WHERE m.status = 'upcoming'
@@ -39,7 +39,7 @@ const getByMonthYearStmt = db.prepare(`
 `);
 
 const getAllStmt = db.prepare(`
-  SELECT m.*, b.title AS book_title, b.author AS book_author
+  SELECT m.*, b.title AS book_title, b.author AS book_author, b.cover_url AS book_cover_url
   FROM meetings m
   LEFT JOIN books b ON b.id = m.winning_book_id
   ORDER BY m.created_at DESC

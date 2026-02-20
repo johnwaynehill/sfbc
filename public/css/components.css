@@ -481,9 +481,9 @@
 }
 
 .form-input:focus {
-  outline: 2px solid var(--text);
-  outline-offset: 1px;
-  border-color: transparent;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
 }
 
 .form-input::placeholder {
@@ -1147,9 +1147,9 @@ textarea.form-input {
 }
 
 .form-select:focus {
-  outline: 2px solid var(--text);
-  outline-offset: 1px;
-  border-color: transparent;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
 }
 
 .form-textarea {
@@ -1166,9 +1166,9 @@ textarea.form-input {
 }
 
 .form-textarea:focus {
-  outline: 2px solid var(--text);
-  outline-offset: 1px;
-  border-color: transparent;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
 }
 
 .form-textarea::placeholder {
@@ -1190,42 +1190,84 @@ textarea.form-input {
 .admin-stat-card {
   flex: 1;
   padding: var(--s-4);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
   border-radius: var(--radius-md);
   text-align: center;
 }
 
 .admin-stat-card__value {
   display: block;
-  font-family: var(--font-ui);
-  font-size: var(--t-xl);
+  font-family: var(--font-display);
+  font-size: 32px;
   font-weight: 700;
   color: var(--text);
+  line-height: 1.1;
 }
 
 .admin-stat-card__label {
   display: block;
-  font-family: var(--font-body);
-  font-size: var(--t-xs);
-  color: var(--text2);
-  margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 6px;
 }
 
 /* ---- Admin: Meeting Card ---- */
 .admin-meeting-card {
   padding: var(--s-4);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  margin-bottom: var(--s-4);
+  margin-bottom: var(--s-3);
+  transition: border-color 150ms ease;
+}
+
+.admin-meeting-card:hover {
+  border-color: var(--text3);
 }
 
 .admin-meeting-card__header {
   display: flex;
   align-items: center;
   gap: var(--s-2);
-  margin-bottom: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+
+.admin-meeting-card__body {
+  margin-bottom: var(--s-2);
+}
+
+.admin-meeting-card__actions {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Meeting card with book cover */
+.admin-meeting-card--with-cover {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--s-3);
+}
+
+.admin-meeting-card__cover {
+  width: 80px;
+  flex-shrink: 0;
+  grid-row: 1 / -1;
+}
+
+.admin-meeting-card__cover .book-cover {
+  width: 80px;
+  aspect-ratio: 2 / 3;
+}
+
+.admin-meeting-card__content {
+  min-width: 0;
 }
 
 /* ---- Admin: Actions Row ---- */
@@ -1424,11 +1466,11 @@ textarea.form-input {
   letter-spacing: 0.04em;
 }
 
-.status-pill--upcoming { background: #f5f5f5; color: #616161; }
-.status-pill--reading { background: #e3f2fd; color: #1565c0; }
-.status-pill--nominations { background: #fff3e0; color: #e65100; }
-.status-pill--voting { background: #f3e5f5; color: #7b1fa2; }
-.status-pill--results { background: #e8f5e9; color: #2e7d32; }
+.status-pill--upcoming { background: #EFECE6; color: #57534E; }
+.status-pill--reading { background: #DBEAFE; color: #1D4ED8; }
+.status-pill--nominations { background: #FFEDD5; color: #C2410C; }
+.status-pill--voting { background: #F3E8FF; color: #7C3AED; }
+.status-pill--results { background: #D1FAE5; color: #059669; }
 
 /* ---- Responsive: Admin ---- */
 @media (max-width: 480px) {
@@ -1548,7 +1590,7 @@ textarea.form-input {
 /* ---- Admin: Settings Card ---- */
 .admin-settings-card {
   padding: var(--s-4);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   margin-bottom: var(--s-3);
@@ -1603,4 +1645,223 @@ textarea.form-input {
   .results-winner {
     animation: none;
   }
+}
+
+/* ==================================================================
+   ADMIN DESIGN POLISH — Visual refinements
+   ================================================================== */
+
+/* ---- Admin Page Layout ---- */
+.admin-page {
+  padding: var(--s-5) 0 var(--s-7);
+}
+
+.admin-page__heading {
+  margin-bottom: var(--s-1);
+}
+
+.admin-page__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.admin-page__subheading {
+  margin-top: var(--s-5);
+  margin-bottom: var(--s-3);
+  padding-bottom: var(--s-1);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---- Admin Empty State ---- */
+.admin-empty {
+  padding: var(--s-5) var(--s-4);
+  background: var(--admin-surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+/* ---- Admin Winner / Selected Book Callout ---- */
+.admin-winner {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-md);
+}
+
+.admin-winner--with-cover {
+  align-items: flex-start;
+}
+
+.admin-winner__cover {
+  width: 64px;
+  flex-shrink: 0;
+}
+
+.admin-winner__cover .book-cover {
+  width: 64px;
+  aspect-ratio: 2 / 3;
+}
+
+.admin-winner__info {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- Admin Detail Meta ---- */
+.admin-detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--admin-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* ---- Admin Nominee Row (refined) ---- */
+.admin-nominee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 150ms ease;
+}
+
+.admin-nominee:hover {
+  border-color: var(--text3);
+}
+
+.admin-nominee__info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+/* ---- Admin Form ---- */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+
+/* ---- Lifecycle Stepper ---- */
+.lifecycle-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: var(--s-3) 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+}
+
+.lifecycle-step {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+.lifecycle-step--active {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.lifecycle-step--done {
+  color: #059669;
+}
+
+.lifecycle-step__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.lifecycle-step--active .lifecycle-step__dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15);
+}
+
+.lifecycle-step--done .lifecycle-step__dot {
+  background: #059669;
+}
+
+.lifecycle-step__connector {
+  width: 24px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 var(--s-1);
+  flex-shrink: 0;
+}
+
+.lifecycle-step--done + .lifecycle-step__connector,
+.lifecycle-step--done ~ .lifecycle-step__connector {
+  background: #059669;
+}
+
+@media (max-width: 480px) {
+  .lifecycle-stepper {
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    justify-content: center;
+  }
+
+  .lifecycle-step__connector {
+    width: 12px;
+  }
+}
+
+/* ---- Edit Form Slide Animation ---- */
+.admin-edit-reveal {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 300ms ease, opacity 200ms ease 50ms;
+}
+
+.admin-edit-reveal.is-open {
+  max-height: 600px;
+  opacity: 1;
+}
+
+/* ---- Button: Danger ---- */
+.btn--danger {
+  background: var(--danger);
+  color: #fff;
+  border: 1px solid var(--danger);
+}
+
+.btn--danger:hover {
+  opacity: 0.9;
 }
