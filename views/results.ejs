@@ -56,7 +56,12 @@
           <% } %>
         </div>
         <div class="results-bar__info">
-          <span class="results-bar__title t-caption-bold"><%= r.title %></span>
+          <div class="results-bar__meta">
+            <span class="results-bar__title t-caption-bold"><%= r.title %></span>
+            <% if (r.nominator_name) { %>
+              <span class="results-bar__nominator t-caption text-tertiary">nominated by <%= r.nominator_name %></span>
+            <% } %>
+          </div>
           <span class="results-bar__author t-caption text-secondary"><%= r.author %></span>
           <div class="results-bar__track">
             <div class="results-bar__fill"
@@ -71,21 +76,9 @@
     <% }); %>
   </div>
 
-  <!-- Ranked list -->
-  <ol class="results-list" id="results-list">
-    <% results.rankings.forEach(function(r) { %>
-      <li class="results-item" data-book-id="<%= r.book_id %>">
-        <span class="results-item__rank">#<%= r.rank %></span>
-        <span class="results-item__title t-body"><%= r.title %></span>
-        <span class="results-item__author t-caption text-secondary"><%= r.author %></span>
-        <span class="results-item__points t-caption"><%= r.points %> pt<%= r.points === 1 ? '' : 's' %></span>
-      </li>
-    <% }); %>
-  </ol>
-
   <% if (isVotingOpen) { %>
-    <p class="t-caption text-secondary results-page__note">
-      Results update in real time as votes come in.
+    <p class="t-caption text-tertiary results-page__updated" id="results-last-updated">
+      Last updated just now
     </p>
   <% } %>
 </section>

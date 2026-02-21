@@ -1320,10 +1320,25 @@ textarea.form-input {
   min-width: 0;
 }
 
+.results-bar__meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
 .results-bar__title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.results-bar__nominator {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-style: italic;
 }
 
 .results-bar__author {
@@ -1344,7 +1359,7 @@ textarea.form-input {
   height: 100%;
   border-radius: 6px;
   min-width: 4px;
-  transition: width 300ms ease;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .results-bar__points {
@@ -1353,40 +1368,39 @@ textarea.form-input {
   color: var(--text2);
 }
 
-/* ---- Ranked List ---- */
-.results-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--border);
+/* ---- Results: "Last updated" label ---- */
+.results-page__updated {
+  text-align: center;
+  margin-top: var(--s-3);
+  font-style: italic;
 }
 
-.results-item {
-  display: grid;
-  grid-template-columns: 40px 1fr auto auto;
-  gap: var(--s-2);
-  align-items: center;
-  padding: var(--s-2) 0;
-  border-bottom: 1px solid var(--border);
+/* ---- Results: Live-update animations ---- */
+
+/* Pop + glow for points / vote count when values change */
+@keyframes results-pop {
+  0%   { transform: scale(1); color: inherit; }
+  15%  { transform: scale(1.5); color: var(--star, #F5A623); text-shadow: 0 0 8px rgba(245, 166, 35, 0.6); }
+  40%  { transform: scale(0.9); color: var(--star, #F5A623); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); color: inherit; text-shadow: none; }
 }
 
-.results-item__rank {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: var(--t-sm);
-  color: var(--text2);
+.is-pop {
+  display: inline-block; /* scale needs a block-like context */
+  animation: results-pop 1s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.results-item__title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Amber glow row highlight when a bar's data changes */
+@keyframes results-row-highlight {
+  0%   { background-color: rgba(245, 166, 35, 0.25); box-shadow: 0 0 12px rgba(245, 166, 35, 0.2); }
+  40%  { background-color: rgba(245, 166, 35, 0.12); box-shadow: 0 0 6px rgba(245, 166, 35, 0.1); }
+  100% { background-color: transparent; box-shadow: none; }
 }
 
-.results-item__points {
-  white-space: nowrap;
+.results-bar.is-updated {
+  animation: results-row-highlight 2s ease-out;
+  border-radius: var(--radius-sm);
 }
 
 /* Mobile adjustments */
@@ -1404,11 +1418,7 @@ textarea.form-input {
     width: 40px;
   }
 
-  .results-item {
-    grid-template-columns: 32px 1fr auto;
-  }
-
-  .results-item__author {
+  .results-bar__nominator {
     display: none;
   }
 
@@ -2159,8 +2169,14 @@ textarea.form-input {
   }
 
   .nom-preview,
-  .results-winner {
+  .results-winner,
+  .is-pop,
+  .results-bar.is-updated {
     animation: none;
+  }
+
+  .results-bar {
+    transition: none;
   }
 }
 
