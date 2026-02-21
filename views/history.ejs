@@ -1,10 +1,42 @@
 <section class="section">
-  <h1 class="t-section" style="margin-bottom: var(--s-4);">History</h1>
+  <div class="history-header">
+    <h1 class="t-section">History</h1>
+
+    <% if (books.length > 1) { %>
+    <div class="history-controls">
+      <div class="sort-dropdown" id="sortDropdown">
+        <button type="button" class="history-btn" id="sortBtn" aria-label="Sort books" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
+        </button>
+        <ul class="sort-dropdown__menu" id="sortMenu" role="listbox" aria-label="Sort order">
+          <li class="sort-dropdown__item is-selected" role="option" data-sort="newest" aria-selected="true">Newest first</li>
+          <li class="sort-dropdown__item" role="option" data-sort="oldest" aria-selected="false">Oldest first</li>
+          <li class="sort-dropdown__item" role="option" data-sort="alpha" aria-selected="false">Title A &rarr; Z</li>
+          <li class="sort-dropdown__item" role="option" data-sort="alpha-desc" aria-selected="false">Title Z &rarr; A</li>
+        </ul>
+      </div>
+      <button type="button" class="history-btn" id="searchBtn" aria-label="Search books" title="Search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <div class="history-search" id="searchWrap">
+        <svg class="history-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" class="history-search__input" placeholder="Search title or author…" autocomplete="off">
+        <button type="button" class="history-search__close" id="searchClose" aria-label="Close search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <% } %>
+  </div>
 
   <% if (books.length > 0) { %>
-  <div class="history-grid">
+  <div class="history-grid" id="historyGrid">
     <% for (const book of books) { %>
-      <a href="<%= bookPath(book.title, book.author) %>" class="book-card book-card--grid">
+      <a href="<%= bookPath(book.title, book.author) %>"
+         class="book-card book-card--grid"
+         data-title="<%= book.title.toLowerCase() %>"
+         data-author="<%= book.author.toLowerCase() %>"
+         data-date="<%= book.month_year %>">
         <div class="book-card__cover">
           <% const coverUrl = getCoverUrl(book); %>
           <% if (coverUrl) { %>
@@ -25,6 +57,8 @@
       </a>
     <% } %>
   </div>
+
+  <p class="history-no-results" id="noResults" hidden>No books match your search.</p>
   <% } else { %>
   <div class="empty-state">
     <p class="empty-state__message">No books have been read yet. Check back soon!</p>
