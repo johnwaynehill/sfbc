@@ -48,6 +48,12 @@ async function searchGoogleBooks(title, author) {
     // zoom=1 gives a reasonable thumbnail for previews (~200px)
     const coverUrl = `https://books.google.com/books/content?id=${vol.id}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
 
+    // Strip HTML tags from description
+    let description = null;
+    if (info.description) {
+      description = info.description.replace(/<[^>]+>/g, '').trim();
+    }
+
     return {
       googleBooksId: vol.id,
       title: info.title || title,
@@ -56,6 +62,8 @@ async function searchGoogleBooks(title, author) {
       isbn,
       publicationYear,
       pageCount: info.pageCount || null,
+      description,
+      categories: info.categories || [],
     };
   } catch {
     return null;
@@ -108,4 +116,131 @@ function findOrCreateBook(title, author, metadata = {}) {
   return findBookStmt.get(trimTitle, trimAuthor);
 }
 
-module.exports = { searchGoogleBooks, findOrCreateBook };
+/* ------------------------------------------------------------------ */
+/*  Enrich a book with description & subjects from external APIs       */
+/* ------------------------------------------------------------------ */
+
+// Lazy-prepared statements (description/subjects columns added by migration 006)
+let _getBookByIdStmt = null;
+let _updateMetadataStmt = null;
+
+function getBookByIdStmt() {
+  if (!_getBookByIdStmt) {
+    _getBookByIdStmt = db.prepare('SELECT * FROM books WHERE id = ?');
+  }
+  return _getBookByIdStmt;
+}
+
+function updateMetadataStmt() {
+  if (!_updateMetadataStmt) {
+    _updateMetadataStmt = db.prepare(`
+      UPDATE books SET
+        description = COALESCE(?, description),
+        subjects = COALESCE(?, subjects),
+        google_books_id = COALESCE(?, google_books_id),
+        updated_at = datetime('now')
+      WHERE id = ?
+    `);
+  }
+  return _updateMetadataStmt;
+}
+
+/**
+ * Fetch description and subjects from Google Books (and optionally Open Library)
+ * for a specific book. Stores results in the DB.
+ * Returns the updated book row, or null if enrichment failed.
+ */
+async function enrichBookMetadata(bookId) {
+  const book = getBookByIdStmt().get(bookId);
+  if (!book) return null;
+
+  let description = null;
+  let subjects = [];
+  let googleBooksId = book.google_books_id;
+
+  // Try Google Books first
+  if (API_KEY) {
+    try {
+      // If we have a google_books_id, fetch directly; otherwise search
+      let info = null;
+      if (googleBooksId) {
+        const url = `https://www.googleapis.com/books/v1/volumes/${googleBooksId}?key=${API_KEY}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          info = data.volumeInfo || null;
+        }
+      }
+
+      if (!info) {
+        const result = await searchGoogleBooks(book.title, book.author);
+        if (result) {
+          description = result.description;
+          subjects = result.categories || [];
+          googleBooksId = result.googleBooksId;
+        }
+      } else {
+        if (info.description) {
+          description = info.description.replace(/<[^>]+>/g, '').trim();
+        }
+        subjects = info.categories || [];
+      }
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  // Try Open Library as fallback/supplement for subjects
+  try {
+    const olUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}&limit=1&fields=key,subject`;
+    const olRes = await fetch(olUrl);
+    if (olRes.ok) {
+      const olData = await olRes.json();
+      if (olData.docs && olData.docs.length > 0) {
+        const doc = olData.docs[0];
+        if (doc.subject && Array.isArray(doc.subject)) {
+          // Merge unique subjects (take first 8 most relevant)
+          const olSubjects = doc.subject
+            .filter(s => s.length < 40) // skip overly long subjects
+            .slice(0, 8);
+          const combined = new Set([...subjects, ...olSubjects]);
+          subjects = [...combined].slice(0, 10);
+        }
+
+        // If no description from Google, try Open Library Works API
+        if (!description && doc.key) {
+          try {
+            const worksRes = await fetch(`https://openlibrary.org${doc.key}.json`);
+            if (worksRes.ok) {
+              const worksData = await worksRes.json();
+              if (worksData.description) {
+                description = typeof worksData.description === 'string'
+                  ? worksData.description
+                  : worksData.description.value || null;
+              }
+            }
+          } catch {
+            // Non-fatal
+          }
+        }
+      }
+    }
+  } catch {
+    // Non-fatal
+  }
+
+  // Store whatever we found
+  if (description || subjects.length > 0) {
+    updateMetadataStmt().run(
+      description || null,
+      subjects.length > 0 ? JSON.stringify(subjects) : null,
+      googleBooksId || null,
+      bookId
+    );
+    return getBookByIdStmt().get(bookId);
+  }
+
+  return null;
+}
+
+module.exports = { searchGoogleBooks, findOrCreateBook, enrichBookMetadata };

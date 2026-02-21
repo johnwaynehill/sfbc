@@ -1,0 +1,103 @@
+<section class="profile-page">
+  <h1 class="t-section profile-page__heading">Your Profile</h1>
+
+  <div class="profile-card">
+    <div class="profile-card__avatar">
+      <%
+        var dn = user.display_name || user.email;
+        var words = dn.trim().split(/\s+/);
+        var initials = words.length >= 2
+          ? words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
+          : words[0].charAt(0).toUpperCase();
+      %>
+      <span class="profile-avatar"><%= initials %></span>
+    </div>
+
+    <form class="profile-form" id="profile-form">
+      <label class="form-label">
+        Display Name
+        <input type="text" name="display_name" class="form-input"
+               value="<%= user.display_name || '' %>" maxlength="40"
+               placeholder="How you appear to others" required autofocus>
+      </label>
+
+      <label class="form-label">
+        Email
+        <input type="email" class="form-input" value="<%= user.email %>" disabled>
+        <span class="t-caption text-tertiary">Email cannot be changed.</span>
+      </label>
+
+      <div id="profile-message" hidden></div>
+
+      <button type="submit" class="btn btn--primary" id="profile-submit">Save Changes</button>
+    </form>
+  </div>
+
+  <div class="profile-logout">
+    <a href="/auth/logout" class="btn btn--ghost">Log Out</a>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var form = document.getElementById('profile-form');
+  var btn = document.getElementById('profile-submit');
+  var msg = document.getElementById('profile-message');
+  if (!form) return;
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var name = form.querySelector('[name="display_name"]').value.trim();
+    if (!name) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Saving\u2026';
+
+    try {
+      var res = await fetch('/api/auth/display-name', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ display_name: name }),
+      });
+      var data = await res.json();
+      if (res.ok && data.success) {
+        msg.hidden = false;
+        msg.className = 'nom-message nom-message--success';
+        msg.textContent = 'Display name updated!';
+
+        // Update the nav avatar if visible
+        var navAvatar = document.querySelector('.nav-avatar');
+        if (navAvatar) {
+          var words = name.trim().split(/\s+/);
+          var initials = words.length >= 2
+            ? words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
+            : words[0].charAt(0).toUpperCase();
+          navAvatar.textContent = initials;
+        }
+
+        // Update the profile avatar
+        var profileAvatar = document.querySelector('.profile-avatar');
+        if (profileAvatar) {
+          var words2 = name.trim().split(/\s+/);
+          var initials2 = words2.length >= 2
+            ? words2[0].charAt(0).toUpperCase() + words2[1].charAt(0).toUpperCase()
+            : words2[0].charAt(0).toUpperCase();
+          profileAvatar.textContent = initials2;
+        }
+      } else {
+        msg.hidden = false;
+        msg.className = 'nom-message nom-message--error';
+        msg.textContent = data.error || 'Something went wrong.';
+      }
+    } catch (err) {
+      msg.hidden = false;
+      msg.className = 'nom-message nom-message--error';
+      msg.textContent = 'Network error. Please try again.';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Save Changes';
+  });
+})();
+</script>

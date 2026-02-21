@@ -1,3 +1,21 @@
+<%
+  /**
+   * Map a grade letter to its CSS tier class for colored badge.
+   * S/A grades → gold, B → green, C → neutral, D/F → red
+   */
+  function gradeTier(grade) {
+    if (!grade) return '';
+    var letter = grade.charAt(0).toUpperCase();
+    if (letter === 'S') return 'grade-badge--s';
+    if (letter === 'A') return 'grade-badge--a';
+    if (letter === 'B') return 'grade-badge--b';
+    if (letter === 'C') return 'grade-badge--c';
+    if (letter === 'D') return 'grade-badge--d';
+    if (letter === 'F') return 'grade-badge--f';
+    return '';
+  }
+%>
+
 <!-- ===== Book Hero ===== -->
 <section class="book-hero">
   <div class="book-cover book-cover--lg">
@@ -19,10 +37,39 @@
     <% } %>
     <h1 class="t-display book-hero__title"><%= book.title %></h1>
     <p class="t-author"><%= book.author %></p>
+
+    <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+      <div class="book-hero__tags">
+        <% subjects.slice(0, 6).forEach(function(tag) { %>
+          <span class="book-tag"><%= tag %></span>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <% if (book.publication_year || book.page_count) { %>
+      <div class="book-hero__meta-inline">
+        <% if (book.publication_year) { %>
+          <span><%= book.publication_year %></span>
+        <% } %>
+        <% if (book.page_count) { %>
+          <span><%= book.page_count %> pages</span>
+        <% } %>
+      </div>
+    <% } %>
+
     <% if (avgGrade) { %>
       <div style="display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-1);">
-        <span class="grade-badge"><%= avgGrade %></span>
+        <span class="grade-badge <%= gradeTier(avgGrade) %>"><%= avgGrade %></span>
         <span class="t-body text-secondary"><%= reviews.length %> review<%= reviews.length !== 1 ? 's' : '' %></span>
+      </div>
+    <% } %>
+
+    <% if (book.description) { %>
+      <div class="book-description">
+        <p class="book-description__text" id="book-desc-text"><%= book.description %></p>
+        <% if (book.description.length > 200) { %>
+          <button class="book-description__toggle" id="book-desc-toggle">Read more</button>
+        <% } %>
       </div>
     <% } %>
   </div>
@@ -87,10 +134,12 @@
   <div class="review-list">
     <% for (const review of reviews) { %>
       <div class="review-card">
-        <span class="grade-badge"><%= review.grade %></span>
+        <span class="grade-badge grade-badge--sm <%= gradeTier(review.grade) %>"><%= review.grade %></span>
         <div class="review-card__body">
-          <% if (review.display_name) { %>
+          <% if (user && review.display_name) { %>
             <span class="review-card__author"><%= review.display_name %></span>
+          <% } else if (!user) { %>
+            <span class="review-card__author" style="font-style: italic; opacity: 0.7;">Anonymous</span>
           <% } %>
           <% if (review.body_markdown) { %>
             <p class="review-card__text"><%= review.body_markdown %></p>
@@ -103,11 +152,22 @@
   <% } else { %>
   <div class="empty-state">
     <p class="empty-state__message">No reviews yet.</p>
-    <% if (user) { %>
-      <div class="empty-state__cta">
-        <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--primary">Write a Review</a>
-      </div>
-    <% } %>
   </div>
   <% } %>
 </section>
+
+<% if (book.description && book.description.length > 200) { %>
+<script>
+(function () {
+  'use strict';
+  var text = document.getElementById('book-desc-text');
+  var toggle = document.getElementById('book-desc-toggle');
+  if (!text || !toggle) return;
+
+  toggle.addEventListener('click', function () {
+    var expanded = text.classList.toggle('is-expanded');
+    toggle.textContent = expanded ? 'Show less' : 'Read more';
+  });
+})();
+</script>
+<% } %>

@@ -1,20 +1,29 @@
 <nav class="global-nav" role="navigation" aria-label="Main navigation">
   <div class="page-container">
     <a href="/" class="nav-brand t-brand"><%= club.name %></a>
+
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/>
+        <line x1="3" y1="10" x2="17" y2="10"/>
+        <line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+
     <ul class="nav-links">
       <li><a href="/" class="t-nav<%= currentPath === '/' ? ' is-active' : '' %>">Home</a></li>
       <li><a href="/history" class="t-nav<%= currentPath === '/history' ? ' is-active' : '' %>">History</a></li>
       <% if (user) { %>
         <li><a href="/my-reviews" class="t-nav<%= currentPath === '/my-reviews' ? ' is-active' : '' %>">My Reviews</a></li>
-        <li class="nav-user">
-          <span class="nav-user__name t-caption text-secondary" id="nav-display-name" title="Click to edit"><%= user.display_name || user.email %></span>
-          <form class="display-name-form" id="display-name-form" hidden>
-            <input type="text" class="display-name-form__input" id="display-name-input"
-                   value="<%= user.display_name || '' %>" maxlength="40" placeholder="Display name">
-            <button type="submit" class="btn btn--primary btn--sm">Save</button>
-            <button type="button" class="btn btn--ghost btn--sm" id="display-name-cancel">Cancel</button>
-          </form>
-          <a href="/auth/logout" class="t-nav">Log out</a>
+        <li class="nav-links__avatar">
+          <%
+            var dn = user.display_name || user.email;
+            var words = dn.trim().split(/\s+/);
+            var initials = words.length >= 2
+              ? words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
+              : words[0].charAt(0).toUpperCase();
+          %>
+          <a href="/profile" class="nav-avatar" title="Profile"><%= initials %></a>
         </li>
       <% } else { %>
         <li><a href="/login" class="t-nav<%= currentPath === '/login' ? ' is-active' : '' %>">Sign in</a></li>
@@ -22,49 +31,3 @@
     </ul>
   </div>
 </nav>
-
-<% if (user) { %>
-<script>
-(function () {
-  'use strict';
-  var nameEl = document.getElementById('nav-display-name');
-  var form = document.getElementById('display-name-form');
-  var input = document.getElementById('display-name-input');
-  var cancel = document.getElementById('display-name-cancel');
-  if (!nameEl || !form) return;
-
-  nameEl.style.cursor = 'pointer';
-  nameEl.addEventListener('click', function () {
-    nameEl.hidden = true;
-    form.hidden = false;
-    input.focus();
-    input.select();
-  });
-
-  cancel.addEventListener('click', function () {
-    form.hidden = true;
-    nameEl.hidden = false;
-  });
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var name = input.value.trim();
-    if (!name) return;
-
-    try {
-      var res = await fetch('/api/auth/display-name', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ display_name: name }),
-      });
-      var data = await res.json();
-      if (res.ok && data.success) {
-        nameEl.textContent = data.display_name;
-        form.hidden = true;
-        nameEl.hidden = false;
-      }
-    } catch (err) { /* ignore */ }
-  });
-})();
-</script>
-<% } %>

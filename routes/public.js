@@ -4,6 +4,8 @@ const router = require('express').Router();
 const db = require('../db');
 const { slugify, bookPath } = require('../utils/slug');
 const { formatMonthYear } = require('../utils/format');
+const { requireMember } = require('../middleware/auth');
+const { enrichBookMetadata } = require('../services/books');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -132,10 +134,19 @@ router.get('/history', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /profile — User profile page
+// ---------------------------------------------------------------------------
+router.get('/profile', requireMember, (req, res) => {
+  res.render('profile', {
+    pageTitle: 'Profile',
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /books/:authorSlug/:titleSlug — Book detail
 // ---------------------------------------------------------------------------
-router.get('/books/:authorSlug/:titleSlug', (req, res) => {
-  const book = db.prepare(`
+router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
+  let book = db.prepare(`
     SELECT b.*, m.month_year, m.meeting_time, m.location_text,
            m.meetup_event_url, m.status AS meeting_status
     FROM books b
@@ -151,6 +162,36 @@ router.get('/books/:authorSlug/:titleSlug', (req, res) => {
       errorCode: 404,
       errorMessage: 'Book not found.',
     });
+  }
+
+  // Lazy-enrich metadata if description is missing
+  if (book.description == null) {
+    try {
+      const enriched = await enrichBookMetadata(book.id);
+      if (enriched) {
+        // Re-fetch with meeting join to keep all fields
+        book = db.prepare(`
+          SELECT b.*, m.month_year, m.meeting_time, m.location_text,
+                 m.meetup_event_url, m.status AS meeting_status
+          FROM books b
+          LEFT JOIN meetings m ON m.winning_book_id = b.id
+          WHERE b.id = ?
+          ORDER BY m.month_year DESC
+          LIMIT 1
+        `).get(book.id) || book;
+      }
+    } catch (err) {
+      // Enrichment failure is non-fatal
+      console.error('Book enrichment error:', err.message);
+    }
+  }
+
+  // Parse subjects JSON
+  let subjects = [];
+  if (book.subjects) {
+    try {
+      subjects = JSON.parse(book.subjects);
+    } catch { /* ignore */ }
   }
 
   // Reviews with display names
@@ -201,6 +242,7 @@ router.get('/books/:authorSlug/:titleSlug', (req, res) => {
   res.render('book-detail', {
     pageTitle: `${book.title} by ${book.author}`,
     book,
+    subjects,
     reviews,
     userReview,
     avgGrade,

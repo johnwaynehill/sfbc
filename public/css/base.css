@@ -309,6 +309,7 @@ button {
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: var(--s-4);
 }
 
@@ -327,6 +328,94 @@ button {
 .nav-links a.is-active {
   color: var(--text);
   font-weight: 500;
+}
+
+/* Nav avatar (public) */
+.nav-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: opacity 180ms ease;
+}
+
+.nav-avatar:hover {
+  opacity: 0.85;
+  text-decoration: none;
+  color: #fff;
+}
+
+.nav-links__avatar {
+  display: flex;
+  align-items: center;
+}
+
+/* Hamburger toggle — hidden on desktop */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.nav-toggle:hover {
+  border-color: var(--text3);
+}
+
+/* Mobile nav */
+@media (max-width: 640px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .global-nav .page-container {
+    flex-wrap: wrap;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--border);
+    margin-top: var(--s-3);
+  }
+
+  .global-nav.is-open .nav-links {
+    display: flex;
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: var(--s-2) 0;
+  }
+
+  .nav-links__avatar {
+    padding: var(--s-2) 0;
+  }
 }
 
 /* ============================================
