@@ -57,9 +57,49 @@ router.get('/books/:authorSlug/:titleSlug/review', requireMember, (req, res) => 
 router.get('/my-reviews', requireMember, (req, res) => {
   const userReviews = reviews.getByUser(req.user.id);
 
+  // Compute grade stats for the summary bar
+  let avgGrade = null;
+  const gradeDistribution = [];
+
+  if (userReviews.length > 0) {
+    const avgWeight = userReviews.reduce((sum, r) => sum + r.weight, 0) / userReviews.length;
+
+    // Convert average weight to closest letter grade
+    const allGrades = reviews.getAllGrades();
+    let closest = allGrades[0];
+    let minDiff = Math.abs(avgWeight - closest.weight);
+    for (const g of allGrades) {
+      const diff = Math.abs(avgWeight - g.weight);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = g;
+      }
+    }
+    avgGrade = closest.grade;
+
+    // Build distribution: count per grade
+    const counts = {};
+    for (const r of userReviews) {
+      counts[r.grade] = (counts[r.grade] || 0) + 1;
+    }
+    const maxCount = Math.max(...Object.values(counts));
+    for (const g of allGrades) {
+      const count = counts[g.grade] || 0;
+      if (count > 0) {
+        gradeDistribution.push({
+          grade: g.grade,
+          count,
+          pct: Math.round((count / maxCount) * 100),
+        });
+      }
+    }
+  }
+
   res.render('my-reviews', {
     pageTitle: 'My Reviews',
     reviews: userReviews,
+    avgGrade,
+    gradeDistribution,
     getCoverUrl,
     bookPath,
     stripMarkdown,

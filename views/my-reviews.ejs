@@ -1,11 +1,56 @@
+<%
+  /**
+   * Map a grade letter to its CSS tier class for colored badge.
+   * S/A grades → gold, B → green, C → neutral, D/F → red
+   */
+  function gradeTier(grade) {
+    if (!grade) return '';
+    var letter = grade.charAt(0).toUpperCase();
+    if (letter === 'S') return 'grade-badge--s';
+    if (letter === 'A') return 'grade-badge--a';
+    if (letter === 'B') return 'grade-badge--b';
+    if (letter === 'C') return 'grade-badge--c';
+    if (letter === 'D') return 'grade-badge--d';
+    if (letter === 'F') return 'grade-badge--f';
+    return '';
+  }
+%>
+
 <section class="section">
   <h1 class="t-section" style="margin-bottom: var(--s-4);">My Reviews</h1>
 
   <% if (reviews.length > 0) { %>
+    <!-- Grade Summary -->
+    <div class="my-reviews-summary">
+      <div class="my-reviews-summary__stat">
+        <span class="my-reviews-summary__value"><%= reviews.length %></span>
+        <span class="my-reviews-summary__label">Review<%= reviews.length !== 1 ? 's' : '' %></span>
+      </div>
+      <% if (avgGrade) { %>
+        <div class="my-reviews-summary__stat">
+          <span class="grade-badge <%= gradeTier(avgGrade) %>"><%= avgGrade %></span>
+          <span class="my-reviews-summary__label">Average</span>
+        </div>
+      <% } %>
+      <% if (gradeDistribution.length > 1) { %>
+        <div class="my-reviews-summary__chart">
+          <% for (const row of gradeDistribution) { %>
+            <div class="grade-mini-row">
+              <span class="grade-mini-row__label"><%= row.grade %></span>
+              <div class="grade-mini-row__track">
+                <div class="grade-mini-row__fill" style="width: <%= row.pct %>%;"></div>
+              </div>
+              <span class="grade-mini-row__count"><%= row.count %></span>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+
     <div class="my-reviews-list">
       <% for (const r of reviews) { %>
         <div class="review-card review-card--linked">
-          <span class="grade-badge"><%= r.grade %></span>
+          <span class="grade-badge <%= gradeTier(r.grade) %>"><%= r.grade %></span>
           <div class="review-card__body">
             <a href="<%= bookPath(r.title, r.author) %>" class="review-card__book-link">
               <strong class="t-body"><%= r.title %></strong>
