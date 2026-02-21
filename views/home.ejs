@@ -66,31 +66,51 @@
 </section>
 
 <!-- ===== Banner CTA ===== -->
-<% if (currentMeeting.status === 'nominations') { %>
+<% if (activeMeeting && activeMeeting.status === 'nominations') { %>
 <section class="section" style="padding-top: 0;">
   <div class="banner">
     <div class="banner__text">
-      <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(currentMeeting.month_year) %>. Submit your pick!</p>
+      <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Submit your pick!</p>
     </div>
-    <a href="/nominate/<%= currentMeeting.id %>" class="btn-primary">Nominate a Book</a>
+    <a href="/nominate/<%= activeMeeting.id %>" class="btn-primary">Nominate a Book</a>
   </div>
 </section>
-<% } else if (currentMeeting.status === 'voting') { %>
+<% } else if (activeMeeting && activeMeeting.status === 'voting') { %>
 <section class="section" style="padding-top: 0;">
   <div class="banner">
     <div class="banner__text">
-      <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(currentMeeting.month_year) %>. Cast your vote!</p>
+      <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Cast your vote!</p>
     </div>
-    <a href="/vote/<%= currentMeeting.id %>" class="btn-primary">Vote Now</a>
+    <a href="/vote/<%= activeMeeting.id %>" class="btn-primary">Vote Now</a>
   </div>
 </section>
 <% } %>
 
 <% } else { %>
-<!-- ===== Empty State (no meetings yet) ===== -->
+<!-- ===== Empty State (no reading book) ===== -->
+<% if (activeMeeting && activeMeeting.status === 'nominations') { %>
+<section class="section">
+  <div class="banner">
+    <div class="banner__text">
+      <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Submit your pick!</p>
+    </div>
+    <a href="/nominate/<%= activeMeeting.id %>" class="btn-primary">Nominate a Book</a>
+  </div>
+</section>
+<% } else if (activeMeeting && activeMeeting.status === 'voting') { %>
+<section class="section">
+  <div class="banner">
+    <div class="banner__text">
+      <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Cast your vote!</p>
+    </div>
+    <a href="/vote/<%= activeMeeting.id %>" class="btn-primary">Vote Now</a>
+  </div>
+</section>
+<% } else { %>
 <div class="empty-state" style="padding: var(--s-7) 0;">
   <p class="empty-state__message">No books selected yet. Check back soon!</p>
 </div>
+<% } %>
 <% } %>
 
 <!-- ===== Recent History Strip ===== -->

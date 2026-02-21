@@ -42,7 +42,9 @@
 
     <!-- Lifecycle stepper -->
     <%
-      var steps = ['upcoming', 'reading', 'nominations', 'voting', 'results'];
+      var steps = meeting.winning_book_id
+        ? ['upcoming', 'reading', 'nominations', 'voting', 'results']
+        : ['upcoming', 'nominations', 'voting', 'results'];
       var stepLabels = { upcoming: 'Upcoming', reading: 'Reading', nominations: 'Nominations', voting: 'Voting', results: 'Finished' };
       var currentIdx = steps.indexOf(meeting.status);
     %>
@@ -60,10 +62,14 @@
 
     <!-- Status transition -->
     <div class="admin-actions">
-      <% if (meeting.status === 'upcoming') { %>
+      <% if (meeting.status === 'upcoming' && meeting.winning_book_id) { %>
         <button class="btn btn--primary btn--sm js-advance-status"
                 data-meeting-id="<%= meeting.id %>"
                 data-new-status="reading">Mark as Reading</button>
+      <% } else if (meeting.status === 'upcoming') { %>
+        <button class="btn btn--primary btn--sm js-advance-status"
+                data-meeting-id="<%= meeting.id %>"
+                data-new-status="nominations">Open Nominations</button>
       <% } else if (meeting.status === 'reading') { %>
         <button class="btn btn--primary btn--sm js-advance-status"
                 data-meeting-id="<%= meeting.id %>"

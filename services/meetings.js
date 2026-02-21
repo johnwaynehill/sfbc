@@ -78,6 +78,12 @@ const setVotingCloseStmt = db.prepare(
   "UPDATE meetings SET voting_close_at = datetime('now') WHERE id = ?"
 );
 
+const getNextUpcomingWithBookStmt = db.prepare(`
+  SELECT id FROM meetings
+  WHERE status = 'upcoming' AND winning_book_id IS NOT NULL
+  ORDER BY month_year ASC LIMIT 1
+`);
+
 const getNomineesStmt = db.prepare(`
   SELECT mn.id AS nominee_id, mn.book_id, mn.source,
          b.title, b.author, b.cover_url, b.author_slug, b.title_slug,
@@ -119,10 +125,10 @@ const countMembersStmt = db.prepare("SELECT COUNT(*) AS cnt FROM users WHERE rol
 /* ------------------------------------------------------------------ */
 
 const TRANSITIONS = {
-  upcoming: 'reading',
-  reading: 'nominations',
-  nominations: 'voting',
-  voting: 'results',
+  upcoming: ['reading', 'nominations'],
+  reading: ['nominations'],
+  nominations: ['voting'],
+  voting: ['results'],
 };
 
 /* ------------------------------------------------------------------ */
@@ -175,19 +181,23 @@ function update(id, { month_year, meetup_event_url, meeting_time, location_text 
  * Returns { meeting } on success or { error } on failure.
  *
  * Normal flow:  upcoming → reading → nominations → voting → results
- * Shortcut:     reading → voting  (when book is pre-selected, skip nominations)
+ * Alt flow:     upcoming → nominations → voting → results  (no pre-selected book)
+ * Shortcut:     reading → voting  (skip nominations when book is pre-selected)
+ *
+ * When finalized to results, the next upcoming meeting with a pre-selected
+ * book is automatically advanced to "reading".
  */
 function advanceStatus(id, newStatus) {
   const meeting = getByIdStmt.get(id);
   if (!meeting) return { error: 'Meeting not found.' };
 
-  const expected = TRANSITIONS[meeting.status];
+  const allowed = TRANSITIONS[meeting.status] || [];
 
-  // Allow the normal transition, the reading→results shortcut (close meeting),
-  // or the reading→voting shortcut (skip nominations)
+  // Allow the normal transitions, plus reading→results shortcut (close meeting)
+  // and reading→voting shortcut (skip nominations)
   const isCloseReading = meeting.status === 'reading' && newStatus === 'results';
   const isSkipToVoting = meeting.status === 'reading' && newStatus === 'voting';
-  if (!isCloseReading && !isSkipToVoting && (!expected || expected !== newStatus)) {
+  if (!isCloseReading && !isSkipToVoting && !allowed.includes(newStatus)) {
     return { error: `Cannot transition from "${meeting.status}" to "${newStatus}".` };
   }
 
@@ -231,6 +241,15 @@ function advanceStatus(id, newStatus) {
     }
 
     updateStatusStmt.run(newStatus, id);
+
+    // When a meeting is finalized, auto-advance the next upcoming meeting
+    // to "reading" if it already has a book selected.
+    if (newStatus === 'results') {
+      const next = getNextUpcomingWithBookStmt.get();
+      if (next) {
+        updateStatusStmt.run('reading', next.id);
+      }
+    }
   })();
 
   return { meeting: getByIdStmt.get(id) };

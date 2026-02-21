@@ -32,7 +32,13 @@ app.use(expressLayouts);
 // ---------------------------------------------------------------------------
 // Compression
 // ---------------------------------------------------------------------------
-app.use(compression());
+app.use(compression({
+  filter: (req, res) => {
+    // Don't compress SSE streams — compression buffers the response
+    if (req.headers.accept === 'text/event-stream') return false;
+    return compression.filter(req, res);
+  },
+}));
 
 // ---------------------------------------------------------------------------
 // Static files & body parsing

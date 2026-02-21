@@ -97,6 +97,15 @@ router.get('/', (req, res) => {
 
   const totalBooks = db.prepare('SELECT COUNT(*) AS count FROM books').get().count;
 
+  // Active participation meeting (nominations or voting) — may or may not have a book
+  const activeMeeting = db.prepare(`
+    SELECT id, month_year, status
+    FROM meetings
+    WHERE status IN ('nominations', 'voting')
+    ORDER BY month_year ASC
+    LIMIT 1
+  `).get() || null;
+
   // Parse subjects JSON for hero display
   let heroSubjects = [];
   if (currentMeeting && currentMeeting.subjects) {
@@ -106,6 +115,7 @@ router.get('/', (req, res) => {
   res.render('home', {
     pageTitle: 'Home',
     currentMeeting,
+    activeMeeting,
     recentBooks,
     totalBooks,
     heroSubjects,

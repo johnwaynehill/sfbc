@@ -65,7 +65,7 @@
     </div>
   <% } else { %>
     <div class="admin-empty">
-      <p class="t-body text-secondary">No active meeting. Create one or mark an upcoming meeting as reading.</p>
+      <p class="t-body text-secondary">No active meeting. Create one or open nominations on an upcoming meeting.</p>
     </div>
   <% } %>
 
@@ -120,9 +120,15 @@
           <% } %>
           <div class="admin-meeting-card__actions">
             <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
-            <button class="btn btn--secondary btn--sm js-advance-status"
-                    data-meeting-id="<%= m.id %>"
-                    data-new-status="reading">Mark as Reading</button>
+            <% if (m.winning_book_id) { %>
+              <button class="btn btn--secondary btn--sm js-advance-status"
+                      data-meeting-id="<%= m.id %>"
+                      data-new-status="reading">Mark as Reading</button>
+            <% } else { %>
+              <button class="btn btn--secondary btn--sm js-advance-status"
+                      data-meeting-id="<%= m.id %>"
+                      data-new-status="nominations">Open Nominations</button>
+            <% } %>
           </div>
         </div>
       </div>
@@ -160,8 +166,8 @@
         } else {
           alert(data.error || 'Something went wrong.');
           btn.disabled = false;
-          btn.textContent = btn.dataset.newStatus === 'reading' ? 'Mark as Reading'
-            : btn.dataset.newStatus === 'results' ? 'Close Meeting' : 'Finalize Results';
+          var labelMap = { reading: 'Mark as Reading', nominations: 'Open Nominations', voting: 'Start Voting', results: 'Close Meeting' };
+          btn.textContent = labelMap[btn.dataset.newStatus] || btn.dataset.newStatus;
         }
       } catch (err) {
         alert('Network error.');
