@@ -72,6 +72,17 @@
       }
     };
 
+    // When voting closes, reload to show final results + winner card
+    es.addEventListener('status', function (e) {
+      try {
+        var data = JSON.parse(e.data);
+        if (data.status === 'results') {
+          es.close();
+          window.location.reload();
+        }
+      } catch (err) {}
+    });
+
     es.onerror = function () {
       es.close();
       setTimeout(connect, delay);

@@ -209,6 +209,11 @@ router.put('/admin/meetings/:id/status', requireAdmin, (req, res) => {
     return res.status(400).json({ error: result.error });
   }
 
+  // When voting closes, notify all SSE clients so they reload
+  if (newStatus === 'results') {
+    broadcastStatusChange(id, 'results');
+  }
+
   res.json({ success: true, meeting: result.meeting });
 });
 
@@ -453,6 +458,17 @@ function broadcastResults(meetingId) {
 
   const data = calculateResults(meetingId);
   const payload = `data: ${JSON.stringify(data)}\n\n`;
+
+  for (const client of clients) {
+    client.write(payload);
+  }
+}
+
+function broadcastStatusChange(meetingId, status) {
+  const clients = sseClients.get(meetingId);
+  if (!clients || clients.size === 0) return;
+
+  const payload = `event: status\ndata: ${JSON.stringify({ status })}\n\n`;
 
   for (const client of clients) {
     client.write(payload);
