@@ -84,6 +84,26 @@
   margin-top: var(--s-3);
 }
 
+/* Meeting info — time & location */
+.book-hero__meeting-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+  margin-top: var(--s-2);
+}
+.meeting-info__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text2);
+}
+.meeting-info__item svg {
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
 /* Grade row — more breathing room */
 .book-hero__grade {
   display: flex;
@@ -95,8 +115,6 @@
 @media (max-width: 640px) {
   .book-hero {
     grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
     gap: var(--s-3);
     padding: var(--s-4) 0 var(--s-5);
   }
@@ -107,20 +125,7 @@
   }
 
   .book-hero__body {
-    align-items: center;
     padding: 0;
-  }
-
-  .book-hero__meta {
-    justify-content: center;
-  }
-
-  .book-hero__meta--stacked {
-    align-items: center;
-  }
-
-  .book-hero__actions {
-    justify-content: center;
   }
 }
 
@@ -2193,16 +2198,3 @@ textarea.form-input {
   font-style: italic;
 }
 
-@media (max-width: 640px) {
-  .book-hero__tags {
-    justify-content: center;
-  }
-
-  .book-description {
-    text-align: left;
-  }
-
-  .book-hero__meta-inline {
-    justify-content: center;
-  }
-}
