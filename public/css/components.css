@@ -1369,6 +1369,18 @@ textarea.form-input {
   background: var(--surface);
 }
 
+/* ---- Button: Tertiary (text-only) ---- */
+.btn--tertiary {
+  background: transparent;
+  color: var(--text2);
+  border: none;
+  padding: var(--s-1) 0;
+}
+.btn--tertiary:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
 /* ---- Form Select & Textarea ---- */
 .form-select {
   padding: var(--s-2) var(--s-3);
@@ -1672,6 +1684,24 @@ textarea.form-input {
   text-decoration: underline;
 }
 
+.review-card__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-1);
+}
+.review-card__heading .review-card__book-link {
+  margin-bottom: 0;
+}
+.review-card__heading .grade-badge {
+  margin-top: 2px;
+}
+
+.review-card__actions {
+  margin-top: var(--s-2);
+}
+
 .review-card__meta {
   display: flex;
   align-items: center;
@@ -1682,86 +1712,36 @@ textarea.form-input {
 /* ---- My Reviews Summary ---- */
 .my-reviews-summary {
   display: flex;
-  align-items: flex-start;
-  gap: var(--s-5);
-  padding: var(--s-4);
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-3) var(--s-4);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   margin-bottom: var(--s-5);
 }
 .my-reviews-summary__stat {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s-1);
-  min-width: 64px;
-}
-.my-reviews-summary__value {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text-primary);
-}
-.my-reviews-summary__label {
-  font-family: var(--font-ui);
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-tertiary);
-}
-.my-reviews-summary__chart {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.grade-mini-row {
-  display: flex;
   align-items: center;
   gap: var(--s-2);
 }
-.grade-mini-row__label {
-  font-family: var(--font-ui);
-  font-size: 0.75rem;
-  font-weight: 600;
-  width: 24px;
-  text-align: right;
-  color: var(--text-secondary);
+.my-reviews-summary__value {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
 }
-.grade-mini-row__track {
-  flex: 1;
-  height: 8px;
+.my-reviews-summary__label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text3);
+}
+.my-reviews-summary__divider {
+  width: 1px;
+  height: 32px;
   background: var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.grade-mini-row__fill {
-  height: 100%;
-  background: var(--text-primary);
-  border-radius: 4px;
-  min-width: 4px;
-}
-.grade-mini-row__count {
-  font-family: var(--font-ui);
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  width: 20px;
-}
-
-@media (max-width: 480px) {
-  .my-reviews-summary {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--s-3);
-  }
-  .my-reviews-summary__stat {
-    flex-direction: row;
-    gap: var(--s-2);
-  }
 }
 
 /* ---- My Reviews List ---- */
@@ -1777,6 +1757,31 @@ textarea.form-input {
 
 .review-card--linked:first-child {
   border-top: none;
+}
+
+/* ---- Review Card: Cover Thumbnail ---- */
+.review-card__cover {
+  flex-shrink: 0;
+  width: 60px;
+  align-self: flex-start;
+}
+.review-card__cover-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.review-card__cover:hover .review-card__cover-img {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+@media (max-width: 480px) {
+  .review-card__cover {
+    width: 48px;
+  }
 }
 
 /* ---- Status Pill (admin) ---- */
