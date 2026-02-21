@@ -10,7 +10,7 @@
 
 'use strict';
 
-const CACHE_VERSION = 'sfbc-v6';
+const CACHE_VERSION = 'sfbc-v7';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const PAGE_CACHE = CACHE_VERSION + '-pages';
 const IMAGE_CACHE = CACHE_VERSION + '-images';
@@ -18,9 +18,9 @@ const IMAGE_CACHE = CACHE_VERSION + '-images';
 // Static assets to pre-cache on install
 const PRECACHE_URLS = [
   '/',
-  '/css/tokens.css?v=6',
-  '/css/base.css?v=6',
-  '/css/components.css?v=6',
+  '/css/tokens.css?v=7',
+  '/css/base.css?v=7',
+  '/css/components.css?v=7',
   '/img/placeholder-cover.svg',
   '/manifest.json',
 ];

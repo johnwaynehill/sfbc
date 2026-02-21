@@ -106,30 +106,52 @@
 
 <!-- ===== Reviews ===== -->
 <section class="section">
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-3);">
+  <div class="reviews-header">
     <h2 class="t-section">Reviews</h2>
-    <% if (user && userReview) { %>
-      <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--ghost btn--sm">Edit My Review</a>
-    <% } else if (user) { %>
-      <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--primary btn--sm">Write a Review</a>
-    <% } %>
+    <div class="reviews-header__actions">
+      <% if (reviews.length > 1) { %>
+        <div class="sort-dropdown" id="reviewSortDropdown">
+          <button type="button" class="history-btn" id="reviewSortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
+          </button>
+          <ul class="sort-dropdown__menu" id="reviewSortMenu" role="listbox" aria-label="Sort order">
+            <li class="sort-dropdown__item is-selected" role="option" data-sort="newest" aria-selected="true">Newest first</li>
+            <li class="sort-dropdown__item" role="option" data-sort="oldest" aria-selected="false">Oldest first</li>
+            <li class="sort-dropdown__item" role="option" data-sort="highest" aria-selected="false">Highest grade</li>
+            <li class="sort-dropdown__item" role="option" data-sort="lowest" aria-selected="false">Lowest grade</li>
+          </ul>
+        </div>
+      <% } %>
+      <% if (user && userReview) { %>
+        <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--ghost btn--sm">Edit My Review</a>
+      <% } else if (user) { %>
+        <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--primary btn--sm">Write a Review</a>
+      <% } %>
+    </div>
   </div>
 
   <% if (reviews.length > 0) { %>
-  <div class="review-list">
+  <div class="review-list" id="reviewList">
     <% for (const review of reviews) { %>
-      <div class="review-card">
+      <div class="review-card" data-review-id="<%= review.id %>" data-date="<%= review.created_at %>" data-weight="<%= review.weight %>">
         <span class="grade-badge grade-badge--sm <%= gradeTier(review.grade) %>"><%= review.grade %></span>
         <div class="review-card__body">
-          <% if (user && review.display_name) { %>
-            <span class="review-card__author"><%= review.display_name %></span>
-          <% } else if (!user) { %>
-            <span class="review-card__author" style="font-style: italic; opacity: 0.7;">Anonymous</span>
-          <% } %>
+          <div class="review-card__meta">
+            <% if (user && review.display_name) { %>
+              <span class="review-card__author"><%= review.display_name %></span>
+            <% } else if (!user) { %>
+              <span class="review-card__author" style="font-style: italic; opacity: 0.7;">Anonymous</span>
+            <% } %>
+            <span class="review-card__date">
+              <%= new Date(review.created_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %><% if (review.updated_at && review.updated_at !== review.created_at) { %><span class="review-card__edited" title="Edited <%= new Date(review.updated_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>">&nbsp;(edited)</span><% } %>
+            </span>
+          </div>
           <% if (review.body_markdown) { %>
             <div class="review-card__text"><%- renderMarkdown(review.body_markdown) %></div>
           <% } %>
-          <span class="review-card__date"><%= new Date(review.created_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></span>
+          <% if (user && user.id === review.user_id) { %>
+            <button type="button" class="review-card__delete" data-book-id="<%= book.id %>" aria-label="Delete my review">Delete</button>
+          <% } %>
         </div>
       </div>
     <% } %>

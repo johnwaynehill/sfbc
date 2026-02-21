@@ -311,6 +311,23 @@ router.put('/books/:bookId/reviews', requireMember, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Delete review
+// DELETE /api/books/:bookId/reviews
+// ---------------------------------------------------------------------------
+router.delete('/books/:bookId/reviews', requireMember, (req, res) => {
+  const bookId = parseInt(req.params.bookId, 10);
+  if (isNaN(bookId)) return res.status(400).json({ error: 'Invalid book ID.' });
+
+  const existing = reviewsService.getByBookAndUser(bookId, req.user.id);
+  if (!existing) {
+    return res.status(404).json({ error: 'No review found to delete.' });
+  }
+
+  reviewsService.deleteByBookAndUser(bookId, req.user.id);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
 // Book search (for live cover preview)
 // GET /api/books/search?title=...&author=...
 // ---------------------------------------------------------------------------

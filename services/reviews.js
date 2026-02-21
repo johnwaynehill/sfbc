@@ -36,6 +36,10 @@ const stmts = {
     WHERE book_id = ? AND user_id = ?
   `),
 
+  deleteByBookAndUser: db.prepare(`
+    DELETE FROM reviews WHERE book_id = ? AND user_id = ?
+  `),
+
   getAllGrades: db.prepare(`
     SELECT grade, weight FROM grade_weights ORDER BY weight DESC
   `),
@@ -77,9 +81,14 @@ function update(bookId, userId, grade, body) {
   return stmts.update.run(grade, body || null, bookId, userId);
 }
 
+/** Delete a user's review for a specific book. Returns the change info. */
+function deleteByBookAndUser(bookId, userId) {
+  return stmts.deleteByBookAndUser.run(bookId, userId);
+}
+
 /** Get all 16 grades from S to F-, ordered by weight DESC. */
 function getAllGrades() {
   return stmts.getAllGrades.all();
 }
 
-module.exports = { getByBookAndUser, getByUser, create, update, getAllGrades };
+module.exports = { getByBookAndUser, getByUser, create, update, deleteByBookAndUser, getAllGrades };
