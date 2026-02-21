@@ -1,0 +1,54 @@
+<section class="section">
+  <h1 class="t-section">About the Club</h1>
+
+  <div class="about-intro">
+    <p class="about-intro__tagline"><%= club.tagline %></p>
+    <p class="about-intro__desc">
+      We meet monthly to discuss sci-fi and fantasy books chosen by our members.
+      Everyone is welcome, whether you're a lifelong genre reader or just getting started.
+    </p>
+  </div>
+
+  <div class="about-stats">
+    <div class="about-stats__item">
+      <span class="about-stats__value"><%= totalBooks %></span>
+      <span class="about-stats__label">Books Read</span>
+    </div>
+    <div class="about-stats__item">
+      <span class="about-stats__value"><%= totalMembers %></span>
+      <span class="about-stats__label">Members</span>
+    </div>
+    <div class="about-stats__item">
+      <span class="about-stats__value"><%= totalReviews %></span>
+      <span class="about-stats__label">Reviews</span>
+    </div>
+  </div>
+
+  <div class="about-section">
+    <h2 class="t-section-sm">How It Works</h2>
+    <ol class="about-steps">
+      <li class="about-steps__item">
+        <strong>Nominate</strong> &mdash; Members suggest books for the upcoming month.
+      </li>
+      <li class="about-steps__item">
+        <strong>Vote</strong> &mdash; Everyone votes on their favorites and we pick a winner.
+      </li>
+      <li class="about-steps__item">
+        <strong>Read</strong> &mdash; We all read the winning book at our own pace.
+      </li>
+      <li class="about-steps__item">
+        <strong>Discuss</strong> &mdash; We meet up to share thoughts, reviews, and grades.
+      </li>
+    </ol>
+  </div>
+
+  <div class="about-section">
+    <h2 class="t-section-sm">Join Us</h2>
+    <p class="about-section__text">
+      Find our next meeting, RSVP, and connect with other members on Meetup.
+    </p>
+    <a href="<%= club.meetupUrl %>" class="btn btn--primary" target="_blank" rel="noopener">
+      Join on Meetup
+    </a>
+  </div>
+</section>

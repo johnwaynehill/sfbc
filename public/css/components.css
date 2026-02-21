@@ -1784,6 +1784,122 @@ textarea.form-input {
   }
 }
 
+/* ---- About Page ---- */
+.about-intro {
+  margin-bottom: var(--s-6);
+}
+.about-intro__tagline {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+  margin-bottom: var(--s-2);
+}
+.about-intro__desc {
+  font-family: var(--font-reading);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text2);
+  max-width: 600px;
+}
+
+.about-stats {
+  display: flex;
+  gap: var(--s-5);
+  margin-bottom: var(--s-6);
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.about-stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  min-width: 72px;
+}
+.about-stats__value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+}
+.about-stats__label {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text3);
+}
+
+.about-section {
+  margin-bottom: var(--s-6);
+}
+.t-section-sm {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: var(--s-3);
+  color: var(--text);
+}
+.about-section__text {
+  font-family: var(--font-reading);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text2);
+  margin-bottom: var(--s-3);
+}
+
+.about-steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+}
+.about-steps__item {
+  position: relative;
+  padding-left: 36px;
+  margin-bottom: var(--s-3);
+  font-family: var(--font-reading);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text2);
+  counter-increment: step;
+}
+.about-steps__item::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.about-steps__item strong {
+  color: var(--text);
+}
+
+@media (max-width: 480px) {
+  .about-stats {
+    gap: var(--s-3);
+    padding: var(--s-3);
+  }
+  .about-stats__value {
+    font-size: 1.5rem;
+  }
+}
+
 /* ---- Status Pill (admin) ---- */
 .status-pill {
   display: inline-block;

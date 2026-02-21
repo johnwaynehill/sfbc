@@ -144,6 +144,22 @@ router.get('/history', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /about — About the club
+// ---------------------------------------------------------------------------
+router.get('/about', (req, res) => {
+  const totalBooks = db.prepare('SELECT COUNT(*) AS count FROM books').get().count;
+  const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+  const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
+
+  res.render('about', {
+    pageTitle: 'About',
+    totalBooks,
+    totalMembers,
+    totalReviews,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /profile — User profile page
 // ---------------------------------------------------------------------------
 router.get('/profile', requireMember, (req, res) => {
