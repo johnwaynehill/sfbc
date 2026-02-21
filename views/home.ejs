@@ -1,7 +1,7 @@
 <% if (currentMeeting) { %>
 <!-- ===== Book Hero ===== -->
 <section class="book-hero">
-  <div class="book-cover book-cover--lg">
+  <a href="<%= bookPath(currentMeeting.title, currentMeeting.author) %>" class="book-cover book-cover--lg">
     <% const heroUrl = getCoverUrl(currentMeeting); %>
     <% if (heroUrl) { %>
       <img src="<%= heroUrl %>" alt="Cover of <%= currentMeeting.title %>">
@@ -12,20 +12,38 @@
         </svg>
       </div>
     <% } %>
-  </div>
+  </a>
 
   <div class="book-hero__body">
-    <div class="book-hero__meta">
-      <span class="t-label text-tertiary"><%= formatMonthYear(currentMeeting.month_year) %></span>
+    <div class="book-hero__meta book-hero__meta--stacked">
       <span class="status-pill status-pill--<%= currentMeeting.status %>">
         <span class="status-pill__dot"></span>
         <%= formatStatus(currentMeeting.status) %>
       </span>
+      <span class="t-label text-tertiary"><%= formatMonthYear(currentMeeting.month_year) %></span>
     </div>
     <h1 class="t-display book-hero__title"><%= currentMeeting.title %></h1>
     <p class="t-author"><%= currentMeeting.author %></p>
+
+    <% if (typeof heroSubjects !== 'undefined' && heroSubjects.length > 0) { %>
+      <div class="book-hero__tags">
+        <% heroSubjects.slice(0, 5).forEach(function(tag) { %>
+          <span class="book-tag"><%= tag %></span>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <% if (currentMeeting.description) { %>
+      <div class="book-description">
+        <p class="book-description__text"><%= currentMeeting.description %></p>
+      </div>
+    <% } %>
+
     <div class="book-hero__actions">
       <a href="<%= bookPath(currentMeeting.title, currentMeeting.author) %>" class="btn-primary">View Details</a>
+      <% if (currentMeeting.page_count) { %>
+        <span class="t-body text-tertiary"><%= currentMeeting.page_count %> pages</span>
+      <% } %>
     </div>
   </div>
 </section>
@@ -83,9 +101,6 @@
         <div class="book-card__title"><%= book.title %></div>
         <div class="book-card__author"><%= book.author %></div>
         <div class="book-card__footer">
-          <% if (book.avg_weight != null) { %>
-            <span class="grade-badge grade-badge--sm"><%= weightToGrade(book.avg_weight) %></span>
-          <% } %>
           <span class="t-label text-tertiary"><%= formatMonthYear(book.month_year) %></span>
         </div>
       </a>

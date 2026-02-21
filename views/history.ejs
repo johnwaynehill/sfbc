@@ -20,9 +20,6 @@
         <div class="book-card__title"><%= book.title %></div>
         <div class="book-card__author"><%= book.author %></div>
         <div class="book-card__footer">
-          <% if (book.avg_weight != null) { %>
-            <span class="grade-badge grade-badge--sm"><%= weightToGrade(book.avg_weight) %></span>
-          <% } %>
           <span class="t-label text-tertiary"><%= formatMonthYear(book.month_year) %></span>
         </div>
       </a>

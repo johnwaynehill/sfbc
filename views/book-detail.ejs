@@ -46,19 +46,8 @@
       </div>
     <% } %>
 
-    <% if (book.publication_year || book.page_count) { %>
-      <div class="book-hero__meta-inline">
-        <% if (book.publication_year) { %>
-          <span><%= book.publication_year %></span>
-        <% } %>
-        <% if (book.page_count) { %>
-          <span><%= book.page_count %> pages</span>
-        <% } %>
-      </div>
-    <% } %>
-
     <% if (avgGrade) { %>
-      <div style="display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-1);">
+      <div class="book-hero__grade">
         <span class="grade-badge <%= gradeTier(avgGrade) %>"><%= avgGrade %></span>
         <span class="t-body text-secondary"><%= reviews.length %> review<%= reviews.length !== 1 ? 's' : '' %></span>
       </div>
@@ -85,10 +74,6 @@
     <% if (book.page_count) { %>
       <dt>Pages</dt>
       <dd><%= book.page_count %></dd>
-    <% } %>
-    <% if (book.month_year) { %>
-      <dt>Club Date</dt>
-      <dd><%= formatMonthYear(book.month_year) %></dd>
     <% } %>
     <dt>Goodreads</dt>
     <dd><a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener">Search on Goodreads</a></dd>

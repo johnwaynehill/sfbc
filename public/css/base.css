@@ -331,6 +331,7 @@ button {
 }
 
 /* Nav avatar (public) */
+.nav-links a.nav-avatar,
 .nav-avatar {
   display: inline-flex;
   align-items: center;

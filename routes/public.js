@@ -57,7 +57,8 @@ router.get('/', (req, res) => {
   const currentMeeting = (
     db.prepare(`
       SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
-             b.publication_year, b.page_count, b.author_slug, b.title_slug
+             b.publication_year, b.page_count, b.author_slug, b.title_slug,
+             b.description, b.subjects
       FROM meetings m
       JOIN books b ON b.id = m.winning_book_id
       WHERE m.status != 'results'
@@ -67,7 +68,8 @@ router.get('/', (req, res) => {
     ||
     db.prepare(`
       SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
-             b.publication_year, b.page_count, b.author_slug, b.title_slug
+             b.publication_year, b.page_count, b.author_slug, b.title_slug,
+             b.description, b.subjects
       FROM meetings m
       JOIN books b ON b.id = m.winning_book_id
       WHERE m.status = 'results'
@@ -94,11 +96,18 @@ router.get('/', (req, res) => {
 
   const totalBooks = db.prepare('SELECT COUNT(*) AS count FROM books').get().count;
 
+  // Parse subjects JSON for hero display
+  let heroSubjects = [];
+  if (currentMeeting && currentMeeting.subjects) {
+    try { heroSubjects = JSON.parse(currentMeeting.subjects); } catch { /* ignore */ }
+  }
+
   res.render('home', {
     pageTitle: 'Home',
     currentMeeting,
     recentBooks,
     totalBooks,
+    heroSubjects,
     getCoverUrl,
     weightToGrade,
     formatMonthYear,
