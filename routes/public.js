@@ -6,6 +6,7 @@ const { slugify, bookPath } = require('../utils/slug');
 const { formatMonthYear } = require('../utils/format');
 const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
+const { renderMarkdown } = require('../utils/markdown');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -259,6 +260,7 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     getCoverUrl,
     formatMonthYear,
     bookPath,
+    renderMarkdown,
   });
 });
 

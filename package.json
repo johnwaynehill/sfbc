@@ -31,6 +31,8 @@
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.19.0",
+    "isomorphic-dompurify": "^2.36.0",
+    "marked": "^17.0.3",
     "nodemailer": "^8.0.1",
     "qrcode": "^1.5.4"
   },

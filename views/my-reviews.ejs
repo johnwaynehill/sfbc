@@ -12,7 +12,8 @@
               <span class="text-secondary">by <%= r.author %></span>
             </a>
             <% if (r.body_markdown) { %>
-              <p class="review-card__text"><%= r.body_markdown.length > 180 ? r.body_markdown.slice(0, 180) + '\u2026' : r.body_markdown %></p>
+              <% var excerpt = stripMarkdown(r.body_markdown); %>
+              <p class="review-card__text"><%= excerpt.length > 180 ? excerpt.slice(0, 180) + '\u2026' : excerpt %></p>
             <% } %>
             <div class="review-card__meta">
               <span class="review-card__date">

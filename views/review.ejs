@@ -44,6 +44,20 @@
       <textarea name="body" class="form-textarea" rows="8"
                 placeholder="What did you think of this book?"><%= review ? review.body_markdown : '' %></textarea>
     </label>
+    <div class="formatting-help">
+      <p class="formatting-help__label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+        Markdown supported
+      </p>
+      <div class="formatting-help__examples">
+        <span class="formatting-help__item"><code>**bold**</code> &rarr; <strong>bold</strong></span>
+        <span class="formatting-help__item"><code>*italic*</code> &rarr; <em>italic</em></span>
+        <span class="formatting-help__item"><code>- item</code> &rarr; list</span>
+        <span class="formatting-help__item"><code>> quote</code> &rarr; blockquote</span>
+        <span class="formatting-help__item"><code>||spoiler||</code> &rarr; <span class="spoiler-example">hidden</span></span>
+      </div>
+    </div>
 
     <div id="review-message" hidden></div>
 

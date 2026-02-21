@@ -127,7 +127,7 @@
             <span class="review-card__author" style="font-style: italic; opacity: 0.7;">Anonymous</span>
           <% } %>
           <% if (review.body_markdown) { %>
-            <p class="review-card__text"><%= review.body_markdown %></p>
+            <div class="review-card__text"><%- renderMarkdown(review.body_markdown) %></div>
           <% } %>
           <span class="review-card__date"><%= new Date(review.created_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></span>
         </div>

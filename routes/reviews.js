@@ -5,6 +5,7 @@ const db = require('../db');
 const { requireMember } = require('../middleware/auth');
 const reviews = require('../services/reviews');
 const { bookPath } = require('../utils/slug');
+const { stripMarkdown } = require('../utils/markdown');
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -61,6 +62,7 @@ router.get('/my-reviews', requireMember, (req, res) => {
     reviews: userReviews,
     getCoverUrl,
     bookPath,
+    stripMarkdown,
   });
 });
 
