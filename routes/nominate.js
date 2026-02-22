@@ -21,7 +21,7 @@ router.get('/nominate/:meetingId', (req, res) => {
 
   // Check if this visitor has already nominated
   const existing = db.prepare(`
-    SELECT n.*, b.title, b.author
+    SELECT n.*, b.title, b.author, b.cover_url
     FROM nominations n
     JOIN books b ON b.id = n.book_id
     WHERE n.meeting_id = ? AND n.submitted_fingerprint = ?

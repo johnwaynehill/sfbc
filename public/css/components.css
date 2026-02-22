@@ -891,17 +891,71 @@ textarea.form-input {
   margin-top: var(--s-1);
 }
 
-/* ---- Already Nominated ---- */
-.nom-submitted {
+/* ---- Nomination Confirmed ---- */
+.nom-confirmed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.nom-confirmed__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--success, #16a34a);
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-radius: var(--radius-sm);
+  padding: var(--s-2) var(--s-3);
+  align-self: flex-start;
+}
+
+.nom-confirmed__card {
+  display: flex;
+  gap: var(--s-4);
+  align-items: flex-start;
   padding: var(--s-4);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  text-align: center;
 }
 
-.nom-submitted p {
-  margin-bottom: var(--s-3);
+.nom-confirmed__details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nom-confirmed__title {
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.nom-confirmed__author {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: var(--t-sm);
+  color: var(--text2);
+}
+
+.nom-confirmed__reason {
+  margin-top: var(--s-2);
+  font-family: var(--font-reading);
+  font-size: var(--t-sm);
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.nom-confirmed__actions {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
 }
 
 /* ---- Inline Messages ---- */

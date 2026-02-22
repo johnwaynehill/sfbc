@@ -168,17 +168,39 @@
       })
       .then(function (result) {
         if (result.ok && result.data.success) {
-          // Show success message and hide the form
+          // Show confirmation card and hide the form
           form.hidden = true;
           messageEl.hidden = false;
-          messageEl.className = 'nom-message nom-message--success';
+          messageEl.className = '';
+
+          var book = result.data.book;
+          var coverHtml = book.coverUrl
+            ? '<div class="book-cover book-cover--sm"><img src="' + escapeHtml(book.coverUrl) + '" alt="Cover of ' + escapeHtml(book.title) + '"></div>'
+            : '';
+          var reasonHtml = reason
+            ? '<p class="nom-confirmed__reason">&ldquo;' + escapeHtml(reason) + '&rdquo;</p>'
+            : '';
+
           messageEl.innerHTML =
-            'Nomination submitted! You nominated <strong>' +
-            escapeHtml(result.data.book.title) + '</strong> by ' +
-            escapeHtml(result.data.book.author) + '.' +
-            '<div style="display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-3);">' +
-            '<a href="/" class="btn btn--primary">Back to Home</a>' +
-            '<a href="/nominate/' + meetingId + '?edit=1" class="btn btn--secondary">Edit Nomination</a>' +
+            '<div class="nom-confirmed">' +
+              '<p class="nom-confirmed__badge">' +
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                  '<polyline points="20 6 9 17 4 12"></polyline>' +
+                '</svg>' +
+                'Nomination Submitted' +
+              '</p>' +
+              '<div class="nom-confirmed__card">' +
+                coverHtml +
+                '<div class="nom-confirmed__details">' +
+                  '<span class="nom-confirmed__title">' + escapeHtml(book.title) + '</span>' +
+                  '<span class="nom-confirmed__author">by ' + escapeHtml(book.author) + '</span>' +
+                  reasonHtml +
+                '</div>' +
+              '</div>' +
+              '<div class="nom-confirmed__actions">' +
+                '<a href="/" class="btn btn--primary">Back to Home</a>' +
+                '<a href="/nominate/' + meetingId + '?edit=1" class="btn btn--secondary">Edit Nomination</a>' +
+              '</div>' +
             '</div>';
         } else {
           showError(result.data.error || 'Something went wrong.');
