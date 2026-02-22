@@ -699,14 +699,35 @@
    ============================================ */
 
 /* ---- Form Elements (reusable) ---- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .form-label {
   display: flex;
   flex-direction: column;
-  gap: var(--s-1);
+  gap: 6px;
   font-family: var(--font-ui);
   font-size: var(--t-sm);
   font-weight: 500;
   color: var(--text);
+}
+
+/* When inside .form-group, the label is just text — the group handles layout */
+.form-group > .form-label {
+  display: inline;
+}
+
+.form-required {
+  color: var(--danger, #dc2626);
+  margin-left: 2px;
+}
+
+.form-hint {
+  color: var(--text3);
+  font-weight: 400;
 }
 
 .form-input {
@@ -798,6 +819,7 @@ textarea.form-input {
   margin-bottom: var(--s-5);
 }
 
+.nom-form[hidden] { display: none; }
 .nom-form {
   display: flex;
   flex-direction: column;
@@ -810,16 +832,28 @@ textarea.form-input {
   gap: var(--s-3);
 }
 
-/* ---- Cover Preview ---- */
+/* ---- Cover Preview (tappable) ---- */
+.nom-preview[hidden] { display: none; }
 .nom-preview {
   display: flex;
   gap: var(--s-3);
   align-items: flex-start;
+  width: 100%;
   padding: var(--s-3);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
   animation: fadeIn 200ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.nom-preview:hover,
+.nom-preview:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
 }
 
 .nom-preview__info {
@@ -827,6 +861,7 @@ textarea.form-input {
   flex-direction: column;
   gap: 2px;
   padding-top: var(--s-1);
+  min-width: 0;
 }
 
 .nom-preview__title {
@@ -850,11 +885,10 @@ textarea.form-input {
   margin-top: 2px;
 }
 
-.nom-preview__searching {
-  font-family: var(--font-body);
-  font-size: var(--t-xs);
-  color: var(--text3);
+.nom-preview__hint {
+  color: var(--accent);
   font-style: italic;
+  margin-top: var(--s-1);
 }
 
 /* ---- Already Nominated ---- */

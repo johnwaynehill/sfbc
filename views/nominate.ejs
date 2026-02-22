@@ -2,7 +2,7 @@
   <h1 class="t-section nom-page__heading"><%= pageTitle %></h1>
   <p class="t-body text-secondary nom-page__subheading">for <%= meeting.month_year %></p>
   <% if (user) { %>
-    <p class="t-caption text-secondary">Nominating as <strong><%= user.display_name %></strong></p>
+    <p class="t-caption text-secondary" style="margin-bottom: var(--s-3);">Nominating as <strong><%= user.display_name %></strong></p>
   <% } %>
 
   <% if (alreadyNominated) { %>
@@ -24,8 +24,8 @@
           data-meeting-id="<%= meeting.id %>">
 
       <div class="nom-form__fields">
-        <label class="form-label">
-          Book Title <span class="text-secondary">*</span>
+        <div class="form-group">
+          <label class="form-label" for="nom-title">Book Title <span class="form-required">*</span></label>
           <input type="text"
                  name="title"
                  id="nom-title"
@@ -33,10 +33,10 @@
                  autocomplete="off"
                  class="form-input"
                  placeholder="e.g. The Left Hand of Darkness">
-        </label>
+        </div>
 
-        <label class="form-label">
-          Author <span class="text-secondary">*</span>
+        <div class="form-group">
+          <label class="form-label" for="nom-author">Author <span class="form-required">*</span></label>
           <input type="text"
                  name="author"
                  id="nom-author"
@@ -44,10 +44,10 @@
                  autocomplete="off"
                  class="form-input"
                  placeholder="e.g. Ursula K. Le Guin">
-        </label>
+        </div>
 
-        <label class="form-label">
-          Why this book? <span class="text-secondary">(optional, 280 chars)</span>
+        <div class="form-group">
+          <label class="form-label" for="nom-reason">Why this book? <span class="form-hint">(optional, 280 chars)</span></label>
           <textarea name="reason"
                     id="nom-reason"
                     maxlength="280"
@@ -55,11 +55,11 @@
                     class="form-input"
                     placeholder="A quick pitch for why the club should read this&hellip;"></textarea>
           <span class="char-counter" id="reason-counter">0 / 280</span>
-        </label>
+        </div>
       </div>
 
-      <!-- Live cover preview (populated by JS) -->
-      <div id="cover-preview" class="nom-preview" hidden>
+      <!-- Live cover preview (populated by JS, tappable to fill form) -->
+      <button type="button" id="cover-preview" class="nom-preview" hidden aria-label="Use this book's details">
         <div class="book-cover book-cover--sm">
           <img id="preview-img" src="" alt="Cover preview">
         </div>
@@ -67,11 +67,9 @@
           <span id="preview-title" class="nom-preview__title"></span>
           <span id="preview-author" class="nom-preview__author"></span>
           <span id="preview-year" class="nom-preview__year"></span>
+          <span class="nom-preview__hint t-caption">Tap to use these details</span>
         </div>
-      </div>
-      <div id="cover-searching" class="nom-preview" hidden>
-        <span class="nom-preview__searching">Searching for cover&hellip;</span>
-      </div>
+      </button>
 
       <button type="submit" class="btn btn--primary" id="nom-submit">Submit Nomination</button>
     </form>

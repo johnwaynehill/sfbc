@@ -355,6 +355,7 @@ router.get('/books/search', async (req, res) => {
       author: result.author,
       coverUrl: result.coverUrl,
       year: result.publicationYear,
+      googleBooksId: result.googleBooksId || null,
     });
   } catch {
     res.json({ found: false });

@@ -79,8 +79,8 @@ const findBookStmt = db.prepare(
 );
 
 const insertBookStmt = db.prepare(`
-  INSERT INTO books (title, author, author_slug, title_slug, google_books_id, isbn, publication_year, page_count)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO books (title, author, author_slug, title_slug, google_books_id, isbn, publication_year, page_count, cover_url)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 /**
@@ -110,7 +110,8 @@ function findOrCreateBook(title, author, metadata = {}) {
     metadata.googleBooksId || null,
     metadata.isbn || null,
     metadata.publicationYear || null,
-    metadata.pageCount || null
+    metadata.pageCount || null,
+    metadata.coverUrl || null
   );
 
   return findBookStmt.get(trimTitle, trimAuthor);
