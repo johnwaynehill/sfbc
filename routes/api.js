@@ -411,14 +411,6 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
     'SELECT id FROM nominations WHERE meeting_id = ? AND submitted_fingerprint = ?'
   ).get(meetingId, fingerprint);
 
-  if (existing) {
-    const wantsJson = req.get('Accept')?.includes('application/json');
-    if (wantsJson) {
-      return res.status(409).json({ error: 'You have already nominated a book for this meeting.' });
-    }
-    return res.redirect(`/nominate/${meetingId}`);
-  }
-
   // Find or create the book
   const metadata = req.body._metadata || {};
   const book = findOrCreateBook(title, author, metadata);
@@ -426,8 +418,27 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
   // Get user ID if logged in
   const userId = (req.session && req.session.userId) ? req.session.userId : null;
 
-  // Insert nomination + nominee in a transaction
+  // Insert (or replace) nomination + nominee in a transaction
   db.transaction(() => {
+    if (existing) {
+      // Remove old nomination so the user can re-nominate a different book
+      const oldNom = db.prepare(
+        'SELECT book_id FROM nominations WHERE id = ?'
+      ).get(existing.id);
+      db.prepare('DELETE FROM nominations WHERE id = ?').run(existing.id);
+
+      // Only remove the old meeting_nominee if no other nominations reference it
+      if (oldNom) {
+        const otherNoms = db.prepare(
+          'SELECT 1 FROM nominations WHERE meeting_id = ? AND book_id = ?'
+        ).get(meetingId, oldNom.book_id);
+        if (!otherNoms) {
+          db.prepare(
+            'DELETE FROM meeting_nominees WHERE meeting_id = ? AND book_id = ?'
+          ).run(meetingId, oldNom.book_id);
+        }
+      }
+    }
     insertNomination.run(meetingId, book.id, fingerprint, reason, userId);
     insertNominee.run(meetingId, book.id);
   })();
