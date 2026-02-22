@@ -29,12 +29,16 @@ router.get('/nominate/:meetingId', (req, res) => {
 
   res.locals.layout = 'layouts/focus-shell';
 
+  // ?edit=1 lets a user re-submit (change their nomination)
+  const wantsEdit = req.query.edit === '1' && existing;
+
   res.render('nominate', {
-    pageTitle: 'Nominate a Book',
+    pageTitle: wantsEdit ? 'Edit Nomination' : 'Nominate a Book',
     pageScript: '/js/nominate-form.js',
     meeting,
-    alreadyNominated: !!existing,
+    alreadyNominated: !wantsEdit && !!existing,
     existingNomination: existing || null,
+    editMode: !!wantsEdit,
   });
 });
 

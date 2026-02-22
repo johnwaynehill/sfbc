@@ -176,7 +176,10 @@
             'Nomination submitted! You nominated <strong>' +
             escapeHtml(result.data.book.title) + '</strong> by ' +
             escapeHtml(result.data.book.author) + '.' +
-            '<br><a href="/results/' + meetingId + '" class="btn btn--primary" style="margin-top: var(--s-3); display: inline-flex;">View Live Results &rarr;</a>';
+            '<div style="display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-3);">' +
+            '<a href="/" class="btn btn--primary">Back to Home</a>' +
+            '<a href="/nominate/' + meetingId + '?edit=1" class="btn btn--secondary">Edit Nomination</a>' +
+            '</div>';
         } else {
           showError(result.data.error || 'Something went wrong.');
         }

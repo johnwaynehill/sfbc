@@ -1,6 +1,6 @@
 <section class="nom-page">
   <h1 class="t-section nom-page__heading"><%= pageTitle %></h1>
-  <p class="t-body text-secondary nom-page__subheading">for <%= meeting.month_year %></p>
+  <p class="t-body text-secondary nom-page__subheading">for <%= formatMonthYear(meeting.month_year) %></p>
   <% if (user) { %>
     <p class="t-caption text-secondary" style="margin-bottom: var(--s-3);">Nominating as <strong><%= user.display_name %></strong></p>
   <% } %>
@@ -12,7 +12,10 @@
         <strong><%= existingNomination.title %></strong>
         by <%= existingNomination.author %>.
       </p>
-      <a href="/results/<%= meeting.id %>" class="btn btn--primary">View Live Results &rarr;</a>
+      <div style="display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-3);">
+        <a href="/" class="btn btn--primary">Back to Home</a>
+        <a href="/nominate/<%= meeting.id %>?edit=1" class="btn btn--secondary">Edit Nomination</a>
+      </div>
     </div>
   <% } else { %>
     <div id="nom-message" hidden></div>
@@ -32,7 +35,8 @@
                  required
                  autocomplete="off"
                  class="form-input"
-                 placeholder="e.g. The Left Hand of Darkness">
+                 placeholder="e.g. The Left Hand of Darkness"
+                 value="<%= editMode && existingNomination ? existingNomination.title : '' %>">
         </div>
 
         <div class="form-group">
@@ -43,7 +47,8 @@
                  required
                  autocomplete="off"
                  class="form-input"
-                 placeholder="e.g. Ursula K. Le Guin">
+                 placeholder="e.g. Ursula K. Le Guin"
+                 value="<%= editMode && existingNomination ? existingNomination.author : '' %>">
         </div>
 
         <div class="form-group">
@@ -53,7 +58,7 @@
                     maxlength="280"
                     rows="2"
                     class="form-input"
-                    placeholder="A quick pitch for why the club should read this&hellip;"></textarea>
+                    placeholder="A quick pitch for why the club should read this&hellip;"><%= editMode && existingNomination && existingNomination.reason ? existingNomination.reason : '' %></textarea>
           <span class="char-counter" id="reason-counter">0 / 280</span>
         </div>
       </div>
@@ -71,7 +76,7 @@
         </div>
       </button>
 
-      <button type="submit" class="btn btn--primary" id="nom-submit">Submit Nomination</button>
+      <button type="submit" class="btn btn--primary" id="nom-submit"><%= editMode ? 'Update Nomination' : 'Submit Nomination' %></button>
     </form>
   <% } %>
 </section>
