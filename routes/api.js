@@ -11,6 +11,7 @@ const {
 } = require('../services/voting');
 const meetings = require('../services/meetings');
 const { requireAdmin, requireMember } = require('../middleware/auth');
+const { monthYearSlug } = require('../utils/format');
 
 // ---------------------------------------------------------------------------
 // Health check
@@ -218,6 +219,38 @@ router.put('/admin/meetings/:id/status', requireAdmin, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Force-set meeting status (admin override, bypasses transition validation)
+// PUT /api/admin/meetings/:id/force-status
+// ---------------------------------------------------------------------------
+router.put('/admin/meetings/:id/force-status', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid meeting ID.' });
+
+  const newStatus = (req.body.status || '').trim();
+  const validStatuses = ['upcoming', 'reading', 'nominations', 'voting', 'results'];
+  if (!validStatuses.includes(newStatus)) {
+    return res.status(400).json({ error: 'Invalid status.' });
+  }
+
+  const meeting = meetings.getById(id);
+  if (!meeting) return res.status(404).json({ error: 'Meeting not found.' });
+
+  if (meeting.status === newStatus) {
+    return res.status(400).json({ error: 'Meeting is already in that status.' });
+  }
+
+  meetings.forceStatus(id, newStatus);
+
+  // Notify SSE clients when status changes to results
+  if (newStatus === 'results') {
+    broadcastStatusChange(id, 'results');
+  }
+
+  const updated = meetings.getById(id);
+  res.json({ success: true, meeting: updated });
+});
+
+// ---------------------------------------------------------------------------
 // Admin-add nominee
 // POST /api/admin/meetings/:id/nominees
 // ---------------------------------------------------------------------------
@@ -255,6 +288,25 @@ router.delete('/admin/meetings/:id/nominees/:bookId', requireAdmin, (req, res) =
   }
 
   meetings.removeNominee(meetingId, bookId);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// Delete meeting (super-admin only)
+// DELETE /api/admin/meetings/:id
+// ---------------------------------------------------------------------------
+router.delete('/admin/meetings/:id', requireAdmin, (req, res) => {
+  if (!req.user.isSuperAdmin) {
+    return res.status(403).json({ error: 'Only the super-admin can delete meetings.' });
+  }
+
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid meeting ID.' });
+
+  const existing = meetings.getById(id);
+  if (!existing) return res.status(404).json({ error: 'Meeting not found.' });
+
+  meetings.deleteById(id);
   res.json({ success: true });
 });
 
@@ -400,7 +452,7 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
     if (wantsJson) {
       return res.status(400).json({ error: 'Title and author are required.' });
     }
-    return res.redirect(`/nominate/${meetingId}`);
+    return res.redirect(`/nominate/${monthYearSlug(meeting.month_year)}`);
   }
 
   // Derive fingerprint for this browser + meeting
@@ -428,7 +480,7 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
     if (wantsJson) {
       return res.status(409).json({ error: msg });
     }
-    return res.redirect(`/nominate/${meetingId}`);
+    return res.redirect(`/nominate/${monthYearSlug(meeting.month_year)}`);
   }
 
   // Get user ID if logged in
@@ -459,10 +511,12 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
     insertNominee.run(meetingId, book.id);
   })();
 
+  const slug = monthYearSlug(meeting.month_year);
   const wantsJson = req.get('Accept')?.includes('application/json');
   if (wantsJson) {
     return res.status(201).json({
       success: true,
+      meetingSlug: slug,
       book: {
         title: book.title,
         author: book.author,
@@ -472,7 +526,7 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
   }
 
   // Non-JS fallback: redirect back to the nomination page (which will show "already nominated")
-  res.redirect(`/nominate/${meetingId}`);
+  res.redirect(`/nominate/${slug}`);
 });
 
 // ---------------------------------------------------------------------------
@@ -530,13 +584,15 @@ router.post('/meetings/:meetingId/votes', (req, res) => {
   // Derive fingerprint
   const fingerprint = getFingerprint(req, res, meetingId);
 
+  const slug = monthYearSlug(meeting.month_year);
+
   // Already voted?
   if (hasVoted(meetingId, fingerprint)) {
     const wantsJson = req.get('Accept')?.includes('application/json');
     if (wantsJson) {
       return res.status(409).json({ error: 'You have already voted in this meeting.' });
     }
-    return res.redirect('/results/' + meetingId);
+    return res.redirect('/results/' + slug);
   }
 
   // Parse ranking from multiple possible input formats
@@ -575,7 +631,7 @@ router.post('/meetings/:meetingId/votes', (req, res) => {
     if (wantsJson) {
       return res.status(400).json({ error: 'Ranking must include all nominees exactly once.' });
     }
-    return res.redirect('/vote/' + meetingId);
+    return res.redirect('/vote/' + slug);
   }
 
   // Check all IDs are valid and no duplicates
@@ -586,7 +642,7 @@ router.post('/meetings/:meetingId/votes', (req, res) => {
       if (wantsJson) {
         return res.status(400).json({ error: 'Ranking contains invalid or duplicate book IDs.' });
       }
-      return res.redirect('/vote/' + meetingId);
+      return res.redirect('/vote/' + slug);
     }
     seen.add(id);
   }
@@ -599,10 +655,10 @@ router.post('/meetings/:meetingId/votes', (req, res) => {
 
   const wantsJson = req.get('Accept')?.includes('application/json');
   if (wantsJson) {
-    return res.status(201).json({ success: true, redirect: '/results/' + meetingId });
+    return res.status(201).json({ success: true, redirect: '/results/' + slug });
   }
 
-  res.redirect('/results/' + meetingId);
+  res.redirect('/results/' + slug);
 });
 
 // ---------------------------------------------------------------------------

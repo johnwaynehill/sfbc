@@ -1,43 +1,102 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
-    <h1 class="t-section"><%= pageTitle %></h1>
+    <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
     <a href="/admin/meetings/new" class="btn btn--primary btn--sm">New Meeting</a>
   </div>
 
-  <% if (meetings.length > 0) { %>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th class="t-caption">Month / Year</th>
-          <th class="t-caption">Status</th>
-          <th class="t-caption">Winner</th>
-          <th class="t-caption"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% meetings.forEach(function(m) { %>
+  <% if (activeMeetings.length > 0) { %>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <td class="t-body"><%= formatMonthYear(m.month_year) %></td>
-            <td>
-              <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
-            </td>
-            <td class="t-body text-secondary">
-              <% if (m.book_title) { %>
-                <%= m.book_title %>
-              <% } else { %>
-                &mdash;
-              <% } %>
-            </td>
-            <td>
-              <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
-            </td>
+            <th class="t-caption" style="width: 35%;">Month / Year</th>
+            <th class="t-caption" style="width: 20%;">Status</th>
+            <th class="t-caption" style="width: 30%;">Winner</th>
+            <th class="t-caption" style="width: 15%;"></th>
           </tr>
-        <% }); %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% activeMeetings.forEach(function(m) { %>
+            <tr>
+              <td class="t-body"><%= formatMonthYear(m.month_year) %></td>
+              <td>
+                <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
+              </td>
+              <td class="t-body text-secondary">
+                <% if (m.book_title) { %>
+                  <%= m.book_title %>
+                <% } else { %>
+                  &mdash;
+                <% } %>
+              </td>
+              <td>
+                <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
   <% } else { %>
     <div class="admin-empty">
-      <p class="t-body text-secondary">No meetings yet. Create your first one.</p>
+      <p class="t-body text-secondary">No active meetings. Create your first one.</p>
+    </div>
+  <% } %>
+
+  <% if (finishedMeetings.length > 0) { %>
+    <div class="admin-collapsible" id="finished-section">
+      <button type="button" class="admin-collapsible__toggle" id="finished-toggle">
+        <svg class="admin-collapsible__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 4 10 8 6 12"></polyline>
+        </svg>
+        Finished (<%= finishedMeetings.length %>)
+      </button>
+      <div class="admin-collapsible__body">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th class="t-caption" style="width: 35%;">Month / Year</th>
+                <th class="t-caption" style="width: 20%;">Status</th>
+                <th class="t-caption" style="width: 30%;">Winner</th>
+                <th class="t-caption" style="width: 15%;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% finishedMeetings.forEach(function(m) { %>
+                <tr>
+                  <td class="t-body"><%= formatMonthYear(m.month_year) %></td>
+                  <td>
+                    <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
+                  </td>
+                  <td class="t-body text-secondary">
+                    <% if (m.book_title) { %>
+                      <%= m.book_title %>
+                    <% } else { %>
+                      &mdash;
+                    <% } %>
+                  </td>
+                  <td>
+                    <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   <% } %>
 </section>
+
+<script>
+(function () {
+  var toggle = document.getElementById('finished-toggle');
+  var section = document.getElementById('finished-section');
+  if (toggle && section) {
+    toggle.addEventListener('click', function () {
+      section.classList.toggle('is-open');
+    });
+  }
+})();
+</script>

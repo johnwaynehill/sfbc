@@ -31,7 +31,7 @@
 
       <div class="nom-confirmed__actions">
         <a href="/" class="btn btn--primary">Back to Home</a>
-        <a href="/nominate/<%= meeting.id %>?edit=1" class="btn btn--secondary">Edit Nomination</a>
+        <a href="/nominate/<%= meetingSlug %>?edit=1" class="btn btn--secondary">Edit Nomination</a>
       </div>
     </div>
   <% } else { %>
@@ -41,7 +41,8 @@
           class="nom-form"
           method="POST"
           action="/api/meetings/<%= meeting.id %>/nominations"
-          data-meeting-id="<%= meeting.id %>">
+          data-meeting-id="<%= meeting.id %>"
+          data-meeting-slug="<%= meetingSlug %>">
 
       <div class="nom-form__fields">
         <div class="form-group">

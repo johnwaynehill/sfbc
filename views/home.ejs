@@ -72,7 +72,7 @@
     <div class="banner__text">
       <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Submit your pick!</p>
     </div>
-    <a href="/nominate/<%= activeMeeting.id %>" class="btn-primary">Nominate a Book</a>
+    <a href="/nominate" class="btn-primary">Nominate a Book</a>
   </div>
 </section>
 <% } else if (activeMeeting && activeMeeting.status === 'voting') { %>
@@ -81,7 +81,7 @@
     <div class="banner__text">
       <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Cast your vote!</p>
     </div>
-    <a href="/vote/<%= activeMeeting.id %>" class="btn-primary">Vote Now</a>
+    <a href="/vote" class="btn-primary">Vote Now</a>
   </div>
 </section>
 <% } %>
@@ -94,7 +94,7 @@
     <div class="banner__text">
       <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Submit your pick!</p>
     </div>
-    <a href="/nominate/<%= activeMeeting.id %>" class="btn-primary">Nominate a Book</a>
+    <a href="/nominate" class="btn-primary">Nominate a Book</a>
   </div>
 </section>
 <% } else if (activeMeeting && activeMeeting.status === 'voting') { %>
@@ -103,7 +103,7 @@
     <div class="banner__text">
       <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Cast your vote!</p>
     </div>
-    <a href="/vote/<%= activeMeeting.id %>" class="btn-primary">Vote Now</a>
+    <a href="/vote" class="btn-primary">Vote Now</a>
   </div>
 </section>
 <% } else { %>

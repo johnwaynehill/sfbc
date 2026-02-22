@@ -4,6 +4,7 @@ const router = require('express').Router();
 const db = require('../db');
 const { calculateResults } = require('../services/voting');
 const { bookPath } = require('../utils/slug');
+const { monthYearSlug, parseMonthYearSlug } = require('../utils/format');
 
 // Accessible 8-color palette for bar chart fills
 const BAR_COLORS = [
@@ -18,14 +19,52 @@ const BAR_COLORS = [
 ];
 
 // ---------------------------------------------------------------------------
-// GET /results/:meetingId
+// Helper: resolve a meeting from a slug or numeric ID param
 // ---------------------------------------------------------------------------
-router.get('/results/:meetingId', (req, res) => {
-  const meetingId = parseInt(req.params.meetingId, 10);
-  if (isNaN(meetingId)) return res.redirect('/');
+function resolveMeeting(param) {
+  const monthYear = parseMonthYearSlug(param);
+  if (monthYear) {
+    return db.prepare('SELECT * FROM meetings WHERE month_year = ?').get(monthYear) || null;
+  }
+  const id = parseInt(param, 10);
+  if (!isNaN(id)) {
+    return db.prepare('SELECT * FROM meetings WHERE id = ?').get(id) || null;
+  }
+  return null;
+}
 
-  const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId);
+// ---------------------------------------------------------------------------
+// GET /results — auto-find current voting/results meeting
+// ---------------------------------------------------------------------------
+router.get('/results', (req, res) => {
+  // Prefer a meeting in voting status (live results), fall back to most recent finished
+  const meeting = (
+    db.prepare(
+      "SELECT * FROM meetings WHERE status = 'voting' ORDER BY month_year ASC LIMIT 1"
+    ).get()
+    ||
+    db.prepare(
+      "SELECT * FROM meetings WHERE status = 'results' ORDER BY month_year DESC LIMIT 1"
+    ).get()
+  );
+
   if (!meeting) return res.redirect('/');
+
+  res.redirect('/results/' + monthYearSlug(meeting.month_year));
+});
+
+// ---------------------------------------------------------------------------
+// GET /results/:slug
+// ---------------------------------------------------------------------------
+router.get('/results/:slug', (req, res) => {
+  const meeting = resolveMeeting(req.params.slug);
+  if (!meeting) return res.redirect('/');
+
+  // Backward compat: if accessed by numeric ID, redirect to slug
+  const slug = monthYearSlug(meeting.month_year);
+  if (req.params.slug !== slug) {
+    return res.redirect('/results/' + slug);
+  }
 
   // Allow viewing during voting and after
   if (meeting.status !== 'voting' && meeting.status !== 'results') {
@@ -33,7 +72,7 @@ router.get('/results/:meetingId', (req, res) => {
   }
 
   const isVotingOpen = meeting.status === 'voting';
-  const results = calculateResults(meetingId);
+  const results = calculateResults(meeting.id);
 
   // Assign colors to each nominee
   const colors = {};
@@ -52,6 +91,7 @@ router.get('/results/:meetingId', (req, res) => {
     pageTitle: isVotingOpen ? 'Live Results' : 'Final Results',
     pageScript: '/js/results-live.js',
     meeting,
+    meetingSlug: slug,
     results,
     isVotingOpen,
     winner,

@@ -1694,15 +1694,40 @@ textarea.form-input {
 /* ---- Admin: Actions Row ---- */
 .admin-actions {
   display: flex;
+  align-items: center;
   gap: var(--s-2);
   flex-wrap: wrap;
   margin-top: var(--s-3);
 }
 
+/* ---- Admin: Status Override ---- */
+.admin-status-override {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-left: auto;
+}
+
+.admin-status-override label {
+  white-space: nowrap;
+}
+
+.form-input--sm {
+  padding: 5px 8px;
+  font-size: var(--t-sm);
+  line-height: 1.4;
+}
+
 /* ---- Admin: Table ---- */
+.admin-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-family: var(--font-body);
   font-size: var(--t-sm);
 }
@@ -2211,15 +2236,16 @@ textarea.form-input {
   margin-bottom: var(--s-3);
 }
 
-/* ---- Admin: Inline Form ---- */
-.admin-form--inline {
+/* ---- Admin: Inline Form (double selector for specificity over .admin-form) ---- */
+.admin-form.admin-form--inline {
   display: flex;
+  flex-direction: row;
   gap: var(--s-2);
   align-items: flex-end;
   flex-wrap: wrap;
 }
 
-.admin-form--inline .form-input {
+.admin-form.admin-form--inline .form-input {
   flex: 1;
   min-width: 140px;
 }
@@ -2354,13 +2380,28 @@ textarea.form-input {
   border-radius: var(--radius-md);
 }
 
+/* ---- Admin: Back Link ---- */
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text3);
+  text-decoration: none;
+  margin-bottom: var(--s-3);
+  transition: color 150ms ease;
+}
+
+.admin-back-link:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
 /* ---- Admin Nominee Row (refined) ---- */
 .admin-nominee {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--s-3);
-  padding: var(--s-2) var(--s-3);
+  padding: var(--s-3);
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -2371,12 +2412,23 @@ textarea.form-input {
   border-color: var(--text3);
 }
 
+.admin-nominee .book-cover--xs {
+  flex-shrink: 0;
+  width: 36px;
+  align-self: flex-start;
+}
+
 .admin-nominee__info {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--s-1);
+  flex-direction: column;
+  gap: 1px;
   min-width: 0;
+  flex: 1;
+}
+
+.admin-nominee .btn--danger {
+  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 /* ---- Admin Form ---- */
@@ -2485,6 +2537,61 @@ textarea.form-input {
 
 .btn--danger:hover {
   opacity: 0.9;
+}
+
+/* ---- Admin: Danger Zone ---- */
+.admin-danger-zone {
+  margin-top: var(--s-6);
+  padding: var(--s-4);
+  border: 1px solid var(--danger, #dc2626);
+  border-radius: var(--radius-md);
+  background: #FEF2F2;
+}
+
+.admin-danger-zone .admin-page__subheading {
+  margin-top: 0;
+  border-bottom-color: rgba(220, 38, 38, 0.2);
+  color: var(--danger, #dc2626);
+}
+
+/* ---- Admin: Collapsible Section ---- */
+.admin-collapsible__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  width: 100%;
+  padding: var(--s-3) 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  color: var(--text2);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  text-align: left;
+  transition: color 150ms ease;
+}
+
+.admin-collapsible__toggle:hover {
+  color: var(--text);
+}
+
+.admin-collapsible__chevron {
+  transition: transform 200ms ease;
+  flex-shrink: 0;
+}
+
+.admin-collapsible.is-open .admin-collapsible__chevron {
+  transform: rotate(90deg);
+}
+
+.admin-collapsible__body {
+  display: none;
+}
+
+.admin-collapsible.is-open .admin-collapsible__body {
+  display: block;
 }
 
 /* ==================================================================

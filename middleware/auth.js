@@ -1,6 +1,7 @@
 'use strict';
 
 const db = require('../db');
+const config = require('../config');
 
 function requireAdmin(req, res, next) {
   if (!req.session || !req.session.userId) {
@@ -13,6 +14,13 @@ function requireAdmin(req, res, next) {
   if (!user || user.role !== 'admin') {
     return res.redirect('/admin/login');
   }
+
+  // Flag super-admin based on env-configured email
+  user.isSuperAdmin = !!(
+    config.superAdminEmail &&
+    user.email &&
+    user.email.toLowerCase() === config.superAdminEmail
+  );
 
   req.user = user;
   next();

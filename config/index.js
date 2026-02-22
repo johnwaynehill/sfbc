@@ -8,6 +8,7 @@ module.exports = {
   databasePath: process.env.DATABASE_PATH || './data/bookclub.sqlite',
   bootstrapKey: process.env.BOOTSTRAP_KEY || '',
   googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '',
+  superAdminEmail: (process.env.SUPER_ADMIN_EMAIL || '').toLowerCase().trim(),
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: parseInt(process.env.SMTP_PORT, 10) || 465,

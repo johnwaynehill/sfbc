@@ -279,6 +279,29 @@ function getStats() {
   };
 }
 
+/**
+ * Force-set a meeting's status, bypassing normal transition validation.
+ * Intended for admin override when the normal flow gets stuck.
+ */
+function forceStatus(id, newStatus) {
+  updateStatusStmt.run(newStatus, id);
+}
+
+/**
+ * Permanently delete a meeting and all associated data.
+ * Only intended for super-admin use.
+ */
+const deleteMeetingTxn = db.transaction((id) => {
+  db.prepare('DELETE FROM votes WHERE meeting_id = ?').run(id);
+  db.prepare('DELETE FROM nominations WHERE meeting_id = ?').run(id);
+  db.prepare('DELETE FROM meeting_nominees WHERE meeting_id = ?').run(id);
+  db.prepare('DELETE FROM meetings WHERE id = ?').run(id);
+});
+
+function deleteById(id) {
+  deleteMeetingTxn(id);
+}
+
 module.exports = {
   getCurrent,
   getUpcoming,
@@ -292,4 +315,6 @@ module.exports = {
   addNominee,
   removeNominee,
   getStats,
+  forceStatus,
+  deleteById,
 };

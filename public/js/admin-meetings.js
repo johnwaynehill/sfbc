@@ -120,6 +120,66 @@
   });
 
   // -----------------------------------------------------------------------
+  // Status override dropdown + Apply button
+  // -----------------------------------------------------------------------
+
+  var statusSelect = document.getElementById('status-override-select');
+  var statusBtn = document.getElementById('status-override-btn');
+
+  if (statusSelect && statusBtn) {
+    // Enable/disable the Apply button based on selection
+    statusSelect.addEventListener('change', function () {
+      statusBtn.disabled = !statusSelect.value;
+    });
+
+    statusBtn.addEventListener('click', async function () {
+      var meetingId = statusSelect.dataset.meetingId;
+      var currentStatus = statusSelect.dataset.currentStatus;
+      var newStatus = statusSelect.value;
+      var statusLabels = {
+        upcoming: 'Upcoming',
+        reading: 'Reading',
+        nominations: 'Nominations',
+        voting: 'Voting',
+        results: 'Finished',
+      };
+
+      if (!newStatus || newStatus === currentStatus) return;
+
+      if (!confirm('Override status from "' + (statusLabels[currentStatus] || currentStatus) + '" to "' + (statusLabels[newStatus] || newStatus) + '"?')) {
+        return;
+      }
+
+      statusSelect.disabled = true;
+      statusBtn.disabled = true;
+      statusBtn.textContent = 'Applying\u2026';
+
+      try {
+        var res = await fetch('/api/admin/meetings/' + meetingId + '/force-status', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+
+        var data = await res.json();
+
+        if (res.ok && data.success) {
+          window.location.reload();
+          return;
+        }
+
+        alert(data.error || 'Something went wrong.');
+      } catch (err) {
+        alert('Network error.');
+      }
+
+      statusSelect.disabled = false;
+      statusBtn.disabled = false;
+      statusBtn.textContent = 'Apply';
+    });
+  }
+
+  // -----------------------------------------------------------------------
   // Remove nominee buttons
   // -----------------------------------------------------------------------
 
@@ -272,6 +332,52 @@
 
       addBtn.disabled = false;
       addBtn.textContent = 'Add';
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // Delete meeting (super-admin only)
+  // -----------------------------------------------------------------------
+
+  var deleteBtn = document.getElementById('delete-meeting-btn');
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async function () {
+      var meetingId = deleteBtn.dataset.meetingId;
+      var label = deleteBtn.dataset.meetingLabel || 'this meeting';
+
+      if (!confirm('Are you sure you want to permanently delete "' + label + '"?\n\nThis will remove all nominations, votes, and results. This cannot be undone.')) {
+        return;
+      }
+
+      // Double-confirm
+      if (!confirm('This action is irreversible. Delete "' + label + '"?')) {
+        return;
+      }
+
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = 'Deleting\u2026';
+
+      try {
+        var res = await fetch('/api/admin/meetings/' + meetingId, {
+          method: 'DELETE',
+          headers: { 'Accept': 'application/json' },
+        });
+
+        var data = await res.json();
+
+        if (res.ok && data.success) {
+          window.location.href = '/admin/meetings';
+          return;
+        }
+
+        alert(data.error || 'Something went wrong.');
+      } catch (err) {
+        alert('Network error.');
+      }
+
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = 'Delete Meeting';
     });
   }
 })();

@@ -35,6 +35,8 @@
 
   <% } else { %>
     <!-- Existing meeting detail -->
+    <a href="/admin/meetings" class="admin-back-link t-caption">&larr; All Meetings</a>
+
     <div class="admin-page__header-row">
       <h1 class="t-section"><%= formatMonthYear(meeting.month_year) %></h1>
       <span class="status-pill status-pill--<%= meeting.status %>"><%= formatStatus(meeting.status) %></span>
@@ -85,6 +87,22 @@
       <% } %>
 
       <button type="button" class="btn btn--secondary btn--sm" id="toggle-edit-btn">Edit Details</button>
+
+      <!-- Manual status override -->
+      <div class="admin-status-override">
+        <label class="t-caption text-secondary" for="status-override-select">Set status:</label>
+        <select id="status-override-select" class="form-input form-input--sm"
+                data-meeting-id="<%= meeting.id %>"
+                data-current-status="<%= meeting.status %>">
+          <option value="">Change&hellip;</option>
+          <option value="upcoming"<%= meeting.status === 'upcoming' ? ' disabled' : '' %>>Upcoming</option>
+          <option value="reading"<%= meeting.status === 'reading' ? ' disabled' : '' %>>Reading</option>
+          <option value="nominations"<%= meeting.status === 'nominations' ? ' disabled' : '' %>>Nominations</option>
+          <option value="voting"<%= meeting.status === 'voting' ? ' disabled' : '' %>>Voting</option>
+          <option value="results"<%= meeting.status === 'results' ? ' disabled' : '' %>>Finished</option>
+        </select>
+        <button type="button" class="btn btn--secondary btn--sm" id="status-override-btn" disabled>Apply</button>
+      </div>
     </div>
 
     <%- include('../partials/qr-panel') %>
@@ -176,13 +194,21 @@
       <div class="admin-nominees">
         <% nominees.forEach(function(nom) { %>
           <div class="admin-nominee" data-book-id="<%= nom.book_id %>">
+            <% if (nom.cover_url) { %>
+              <div class="book-cover book-cover--xs">
+                <img src="<%= nom.cover_url %>" alt="<%= nom.title %>" loading="lazy">
+              </div>
+            <% } %>
             <div class="admin-nominee__info">
               <span class="t-body"><%= nom.title %></span>
               <span class="t-caption text-secondary"><%= nom.author %></span>
-              <% if (nom.nominator_name) { %>
-                <span class="t-caption text-secondary">by <%= nom.nominator_name %></span>
-              <% } %>
-              <span class="t-caption text-secondary" style="opacity: 0.6;"><%= nom.source %></span>
+              <span class="t-caption text-secondary" style="opacity: 0.5;">
+                <% if (nom.nominator_name) { %>
+                  Nominated by <%= nom.nominator_name %>
+                <% } else { %>
+                  <%= nom.source %>
+                <% } %>
+              </span>
             </div>
             <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading') { %>
               <button class="btn btn--danger btn--sm js-remove-nominee"
@@ -200,10 +226,10 @@
     <!-- Add nominee (only during nominations) -->
     <% if (meeting.status === 'nominations') { %>
       <h2 class="t-body-bold admin-page__subheading">Add Nominee</h2>
-      <form id="add-nominee-form" class="admin-form admin-form--inline"
+      <form id="add-nominee-form" class="admin-nominee-form"
             data-meeting-id="<%= meeting.id %>">
-        <input type="text" name="title" class="form-input" placeholder="Title" required>
-        <input type="text" name="author" class="form-input" placeholder="Author" required>
+        <input type="text" name="title" class="form-input" placeholder="Book title" required>
+        <input type="text" name="author" class="form-input" placeholder="Author name" required>
         <button type="submit" class="btn btn--secondary btn--sm" id="add-nominee-submit">Add</button>
       </form>
       <div id="nominee-message" hidden></div>
@@ -232,6 +258,23 @@
           <% }); %>
         </tbody>
       </table>
+    <% } %>
+
+    <!-- Super-admin: Delete Meeting -->
+    <% if (typeof isSuperAdmin !== 'undefined' && isSuperAdmin) { %>
+      <div class="admin-danger-zone">
+        <h2 class="t-body-bold admin-page__subheading">Danger Zone</h2>
+        <p class="t-caption text-secondary" style="margin-bottom: var(--s-2);">
+          Permanently delete this meeting and all associated nominations, votes, and results.
+        </p>
+        <button type="button"
+                class="btn btn--danger btn--sm"
+                id="delete-meeting-btn"
+                data-meeting-id="<%= meeting.id %>"
+                data-meeting-label="<%= formatMonthYear(meeting.month_year) %>">
+          Delete Meeting
+        </button>
+      </div>
     <% } %>
   <% } %>
 </section>

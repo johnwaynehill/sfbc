@@ -3,21 +3,59 @@
 const router = require('express').Router();
 const db = require('../db');
 const { getFingerprint } = require('../services/fingerprint');
+const { monthYearSlug, parseMonthYearSlug } = require('../utils/format');
 
 // ---------------------------------------------------------------------------
-// GET /nominate/:meetingId
+// Helper: resolve a meeting from a slug or numeric ID param
 // ---------------------------------------------------------------------------
-router.get('/nominate/:meetingId', (req, res) => {
-  const meetingId = parseInt(req.params.meetingId, 10);
-  if (isNaN(meetingId)) return res.redirect('/');
+function resolveMeeting(param) {
+  // Try month-year slug first (e.g. "january-2026")
+  const monthYear = parseMonthYearSlug(param);
+  if (monthYear) {
+    return db.prepare('SELECT * FROM meetings WHERE month_year = ?').get(monthYear) || null;
+  }
+  // Fall back to numeric ID for backward compatibility
+  const id = parseInt(param, 10);
+  if (!isNaN(id)) {
+    return db.prepare('SELECT * FROM meetings WHERE id = ?').get(id) || null;
+  }
+  return null;
+}
 
-  const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId);
-  if (!meeting || meeting.status !== 'nominations') {
+// ---------------------------------------------------------------------------
+// GET /nominate — auto-find current nominations-open meeting
+// ---------------------------------------------------------------------------
+router.get('/nominate', (req, res) => {
+  const meeting = db.prepare(
+    "SELECT * FROM meetings WHERE status = 'nominations' ORDER BY month_year ASC LIMIT 1"
+  ).get();
+
+  if (!meeting) return res.redirect('/');
+
+  // Redirect to the canonical slug URL
+  res.redirect('/nominate/' + monthYearSlug(meeting.month_year));
+});
+
+// ---------------------------------------------------------------------------
+// GET /nominate/:slug
+// ---------------------------------------------------------------------------
+router.get('/nominate/:slug', (req, res) => {
+  const meeting = resolveMeeting(req.params.slug);
+  if (!meeting) return res.redirect('/');
+
+  // Backward compat: if accessed by numeric ID, redirect to slug
+  const expectedSlug = monthYearSlug(meeting.month_year);
+  if (req.params.slug !== expectedSlug) {
+    const qs = req.query.edit === '1' ? '?edit=1' : '';
+    return res.redirect('/nominate/' + expectedSlug + qs);
+  }
+
+  if (meeting.status !== 'nominations') {
     return res.redirect('/');
   }
 
   // Set the _client_id cookie and derive this visitor's fingerprint
-  const fingerprint = getFingerprint(req, res, meetingId);
+  const fingerprint = getFingerprint(req, res, meeting.id);
 
   // Check if this visitor has already nominated
   const existing = db.prepare(`
@@ -25,7 +63,7 @@ router.get('/nominate/:meetingId', (req, res) => {
     FROM nominations n
     JOIN books b ON b.id = n.book_id
     WHERE n.meeting_id = ? AND n.submitted_fingerprint = ?
-  `).get(meetingId, fingerprint);
+  `).get(meeting.id, fingerprint);
 
   res.locals.layout = 'layouts/focus-shell';
 
@@ -36,6 +74,7 @@ router.get('/nominate/:meetingId', (req, res) => {
     pageTitle: wantsEdit ? 'Edit Nomination' : 'Nominate a Book',
     pageScript: '/js/nominate-form.js',
     meeting,
+    meetingSlug: expectedSlug,
     alreadyNominated: !wantsEdit && !!existing,
     existingNomination: existing || null,
     editMode: !!wantsEdit,

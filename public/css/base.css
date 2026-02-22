@@ -473,8 +473,8 @@ button {
 .admin-nav .nav-links a.is-active {
   color: var(--text);
   font-weight: 600;
-  background: rgba(0, 0, 0, 0.05);
-  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 0;
 }
 
 /* Admin nav: View Site link */
@@ -500,13 +500,13 @@ button {
   text-decoration: none;
 }
 
-/* Admin nav: Avatar circle */
+/* Admin nav: Avatar — reuse .nav-avatar styling */
 .admin-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;

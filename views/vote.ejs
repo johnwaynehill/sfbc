@@ -1,7 +1,7 @@
 <section class="vote-page">
   <header class="vote-page__header">
     <h1 class="t-section vote-page__heading"><%= pageTitle %></h1>
-    <p class="t-body text-secondary">for <%= meeting.month_year %></p>
+    <p class="t-body text-secondary">for <%= formatMonthYear(meeting.month_year) %></p>
     <p class="t-caption text-secondary vote-page__count">
       <span id="vote-count"><%= voteCount %></span> vote<%= voteCount === 1 ? '' : 's' %> counted
     </p>
@@ -19,7 +19,8 @@
         class="vote-form"
         method="POST"
         action="/api/meetings/<%= meeting.id %>/votes"
-        data-meeting-id="<%= meeting.id %>">
+        data-meeting-id="<%= meeting.id %>"
+        data-meeting-slug="<%= meetingSlug %>">
 
     <ol id="ballot-list" class="ballot-list">
       <% nominees.forEach(function(nom, i) { %>

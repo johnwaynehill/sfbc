@@ -13,17 +13,18 @@ const { formatMonthYear, parseMonthYearSlug, monthYearSlug } = require('../utils
 /*  QR code helper                                                     */
 /* ------------------------------------------------------------------ */
 
-async function generateQrCodes(meetingId, status) {
+async function generateQrCodes(meeting_month_year, status) {
   const base = config.appUrl;
+  const slug = monthYearSlug(meeting_month_year);
   const codes = [];
 
   if (status === 'nominations' || status === 'voting' || status === 'results') {
-    codes.push({ label: 'Nominate', url: `${base}/nominate/${meetingId}` });
+    codes.push({ label: 'Nominate', url: `${base}/nominate/${slug}` });
   }
   if (status === 'voting' || status === 'results') {
-    codes.push({ label: 'Vote', url: `${base}/vote/${meetingId}` });
+    codes.push({ label: 'Vote', url: `${base}/vote/${slug}` });
   }
-  codes.push({ label: 'Results', url: `${base}/results/${meetingId}` });
+  codes.push({ label: 'Results', url: `${base}/results/${slug}` });
 
   for (const code of codes) {
     code.dataUrl = await QRCode.toDataURL(code.url, {
@@ -58,6 +59,7 @@ router.use(requireAdmin);
 router.use((req, res, next) => {
   res.locals.layout = 'layouts/admin-shell';
   res.locals.adminPath = req.path;
+  res.locals.isSuperAdmin = !!(req.user && req.user.isSuperAdmin);
   next();
 });
 
@@ -80,7 +82,7 @@ router.get('/', async (req, res) => {
     if (current.status === 'voting' || current.status === 'results') {
       results = calculateResults(current.id);
     }
-    qrCodes = await generateQrCodes(current.id, current.status);
+    qrCodes = await generateQrCodes(current.month_year, current.status);
   }
 
   res.render('admin/overview', {
@@ -100,9 +102,13 @@ router.get('/', async (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/meetings', (req, res) => {
   const allMeetings = meetings.getAll();
+  const activeMeetings = allMeetings.filter(m => m.status !== 'results');
+  const finishedMeetings = allMeetings.filter(m => m.status === 'results');
   res.render('admin/meetings', {
     pageTitle: 'Meetings',
     meetings: allMeetings,
+    activeMeetings,
+    finishedMeetings,
   });
 });
 
@@ -153,7 +159,7 @@ router.get('/meetings/:slug', async (req, res) => {
     results = calculateResults(meeting.id);
   }
 
-  const qrCodes = await generateQrCodes(meeting.id, meeting.status);
+  const qrCodes = await generateQrCodes(meeting.month_year, meeting.status);
 
   res.render('admin/meeting-detail', {
     pageTitle: formatMonthYear(meeting.month_year),

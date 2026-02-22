@@ -27,6 +27,7 @@
   var previewYear  = document.getElementById('preview-year');
 
   var meetingId = form.dataset.meetingId;
+  var meetingSlug = form.dataset.meetingSlug;
 
   // Stores the last Google Books result so we can send metadata on submit
   var lastPreviewData = null;
@@ -173,6 +174,7 @@
           messageEl.hidden = false;
           messageEl.className = '';
 
+          var slug = result.data.meetingSlug || meetingSlug;
           var book = result.data.book;
           var coverHtml = book.coverUrl
             ? '<div class="book-cover book-cover--sm"><img src="' + escapeHtml(book.coverUrl) + '" alt="Cover of ' + escapeHtml(book.title) + '"></div>'
@@ -199,7 +201,7 @@
               '</div>' +
               '<div class="nom-confirmed__actions">' +
                 '<a href="/" class="btn btn--primary">Back to Home</a>' +
-                '<a href="/nominate/' + meetingId + '?edit=1" class="btn btn--secondary">Edit Nomination</a>' +
+                '<a href="/nominate/' + slug + '?edit=1" class="btn btn--secondary">Edit Nomination</a>' +
               '</div>' +
             '</div>';
         } else {

@@ -17,8 +17,15 @@
   <nav class="admin-nav" role="navigation" aria-label="Admin navigation">
     <div class="page-container">
       <a href="/admin" class="nav-brand t-brand">
-        <% if (user && user.display_name) { %>
-          <span class="admin-avatar"><%= user.display_name.charAt(0).toUpperCase() %></span>
+        <% if (user) { %>
+          <%
+            var dn = user.display_name || user.email;
+            var words = dn.trim().split(/\s+/);
+            var initials = words.length >= 2
+              ? words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
+              : words[0].charAt(0).toUpperCase();
+          %>
+          <span class="nav-avatar"><%= initials %></span>
         <% } %>
         Admin
       </a>

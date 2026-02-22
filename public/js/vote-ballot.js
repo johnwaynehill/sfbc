@@ -18,6 +18,7 @@
   var submitBtn = document.getElementById('vote-submit');
   var messageEl = document.getElementById('vote-message');
   var meetingId = form.dataset.meetingId;
+  var meetingSlug = form.dataset.meetingSlug;
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -228,7 +229,7 @@
 
       if (res.ok && data.success) {
         // Redirect to results page
-        window.location.href = data.redirect || ('/results/' + meetingId);
+        window.location.href = data.redirect || ('/results/' + meetingSlug);
         return;
       }
 
