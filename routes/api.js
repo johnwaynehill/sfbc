@@ -415,6 +415,22 @@ router.post('/meetings/:meetingId/nominations', (req, res) => {
   const metadata = req.body._metadata || {};
   const book = findOrCreateBook(title, author, metadata);
 
+  // Block nominations for books the club has already read
+  const alreadyRead = db.prepare(`
+    SELECT m.month_year FROM meetings m
+    WHERE m.winning_book_id = ? AND m.status IN ('reading', 'results')
+    LIMIT 1
+  `).get(book.id);
+
+  if (alreadyRead) {
+    const wantsJson = req.get('Accept')?.includes('application/json');
+    const msg = 'The club has already read this book! Try nominating something new.';
+    if (wantsJson) {
+      return res.status(409).json({ error: msg });
+    }
+    return res.redirect(`/nominate/${meetingId}`);
+  }
+
   // Get user ID if logged in
   const userId = (req.session && req.session.userId) ? req.session.userId : null;
 
