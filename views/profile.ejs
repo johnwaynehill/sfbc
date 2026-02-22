@@ -1,103 +1,225 @@
 <section class="profile-page">
   <h1 class="t-section profile-page__heading">Your Profile</h1>
 
-  <div class="profile-card">
-    <div class="profile-card__avatar">
-      <%
-        var dn = user.display_name || user.email;
-        var words = dn.trim().split(/\s+/);
-        var initials = words.length >= 2
-          ? words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
-          : words[0].charAt(0).toUpperCase();
-      %>
-      <span class="profile-avatar"><%= initials %></span>
+  <!-- ---- Avatar Picker ---- -->
+  <div class="profile-section">
+    <h2 class="t-body-bold profile-section__title">Avatar</h2>
+    <div class="profile-card">
+      <div class="profile-card__avatar" id="avatar-preview">
+        <%- include('partials/avatar', { avatarUser: profileUser, avatarSize: 'lg', avatarClass: 'profile-avatar' }) %>
+      </div>
+      <div class="avatar-picker" id="avatar-picker">
+        <%
+          var avatarGroups = [
+            {
+              id: 'classic', label: 'Classic',
+              styles: [
+                { id: 'initials',  label: 'Initials' },
+                { id: 'identicon', label: 'Identicon' },
+                { id: 'rings',     label: 'Rings' },
+                { id: 'shapes',    label: 'Shapes' },
+              ],
+            },
+            {
+              id: 'illustrated', label: 'Illustrated',
+              styles: [
+                { id: 'lorelei',            label: 'Lorelei' },
+                { id: 'micah',              label: 'Micah' },
+                { id: 'miniavs',            label: 'Miniavs' },
+                { id: 'personas',           label: 'Personas' },
+                { id: 'notionists',         label: 'Notionists' },
+                { id: 'notionists-neutral', label: 'Notionists N' },
+                { id: 'open-peeps',         label: 'Open Peeps' },
+                { id: 'big-smile',          label: 'Big Smile' },
+                { id: 'big-ears',           label: 'Big Ears' },
+                { id: 'big-ears-neutral',   label: 'Big Ears N' },
+                { id: 'adventurer-neutral', label: 'Adventurer' },
+                { id: 'dylan',              label: 'Dylan' },
+                { id: 'glass',              label: 'Glass' },
+              ],
+            },
+            {
+              id: 'fun', label: 'Fun',
+              styles: [
+                { id: 'bottts',             label: 'Robots' },
+                { id: 'thumbs',             label: 'Thumbs' },
+                { id: 'fun-emoji',          label: 'Emoji' },
+                { id: 'avataaars',          label: 'Avataaars' },
+                { id: 'avataaars-neutral',  label: 'Avataaars N' },
+                { id: 'croodles',           label: 'Croodles' },
+                { id: 'croodles-neutral',   label: 'Croodles N' },
+                { id: 'pixel-art',          label: 'Pixel Art' },
+                { id: 'pixel-art-neutral',  label: 'Pixel Art N' },
+              ],
+            },
+          ];
+
+          var currentStyle = profileUser.avatar_style || 'initials';
+          var seed = encodeURIComponent(profileUser.display_name || profileUser.email);
+
+          // Compute initials once
+          var _dn = profileUser.display_name || profileUser.email;
+          var _words = _dn.trim().split(/\s+/);
+          var ini = _words.length >= 2
+            ? _words[0].charAt(0).toUpperCase() + _words[1].charAt(0).toUpperCase()
+            : _words[0].charAt(0).toUpperCase();
+
+          // Find which group the current style belongs to
+          var defaultGroupId = 'classic';
+          avatarGroups.forEach(function(g) {
+            if (g.styles.some(function(s) { return s.id === currentStyle; })) {
+              defaultGroupId = g.id;
+            }
+          });
+        %>
+
+        <div class="avatar-picker__tabs" role="tablist">
+          <% avatarGroups.forEach(function(g) { %>
+            <button type="button"
+                    class="avatar-picker__tab<%= g.id === defaultGroupId ? ' is-active' : '' %>"
+                    role="tab"
+                    data-group="<%= g.id %>"
+                    aria-selected="<%= g.id === defaultGroupId ? 'true' : 'false' %>">
+              <%= g.label %>
+            </button>
+          <% }); %>
+        </div>
+
+        <% avatarGroups.forEach(function(g) { %>
+          <div class="avatar-picker__panel<%= g.id === defaultGroupId ? ' is-active' : '' %>"
+               data-group="<%= g.id %>"
+               role="tabpanel">
+            <div class="avatar-picker__grid">
+              <% g.styles.forEach(function(s) { %>
+                <button type="button"
+                        class="avatar-picker__option<%= s.id === currentStyle ? ' is-active' : '' %>"
+                        data-style="<%= s.id %>"
+                        title="<%= s.label %>">
+                  <% if (s.id === 'initials') { %>
+                    <span class="avatar avatar--md"><%= ini %></span>
+                  <% } else { %>
+                    <img class="avatar avatar--md"
+                         src="https://api.dicebear.com/9.x/<%= s.id %>/svg?seed=<%= seed %>"
+                         alt="<%= s.label %>" loading="lazy">
+                  <% } %>
+                  <span class="t-caption"><%= s.label %></span>
+                </button>
+              <% }); %>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+      <div id="avatar-message" hidden></div>
     </div>
-
-    <form class="profile-form" id="profile-form">
-      <label class="form-label">
-        Display Name
-        <input type="text" name="display_name" class="form-input"
-               value="<%= user.display_name || '' %>" maxlength="40"
-               placeholder="How you appear to others" required autofocus>
-      </label>
-
-      <label class="form-label">
-        Email
-        <input type="email" class="form-input" value="<%= user.email %>" disabled>
-        <span class="t-caption text-tertiary">Email cannot be changed.</span>
-      </label>
-
-      <div id="profile-message" hidden></div>
-
-      <button type="submit" class="btn btn--primary" id="profile-submit">Save Changes</button>
-    </form>
   </div>
 
+  <!-- ---- Display Name ---- -->
+  <div class="profile-section">
+    <h2 class="t-body-bold profile-section__title">Display Name</h2>
+    <div class="profile-card">
+      <form class="profile-form" id="profile-form">
+        <label class="form-label">
+          Display Name
+          <input type="text" name="display_name" class="form-input"
+                 value="<%= profileUser.display_name || '' %>" maxlength="40"
+                 placeholder="How you appear to others" required>
+        </label>
+
+        <label class="form-label">
+          Email
+          <input type="email" class="form-input" value="<%= profileUser.email %>" disabled>
+          <span class="t-caption text-tertiary">Email cannot be changed.</span>
+        </label>
+
+        <div id="profile-message" hidden></div>
+
+        <button type="submit" class="btn btn--primary" id="profile-submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---- Social Links ---- -->
+  <div class="profile-section">
+    <h2 class="t-body-bold profile-section__title">Social Links</h2>
+    <div class="profile-card">
+      <form class="profile-form" id="social-form">
+        <label class="form-label">
+          Goodreads Profile URL
+          <input type="url" name="goodreads_url" class="form-input"
+                 value="<%= profileUser.goodreads_url || '' %>"
+                 placeholder="https://goodreads.com/user/show/...">
+        </label>
+
+        <label class="form-label">
+          StoryGraph Profile URL
+          <input type="url" name="storygraph_url" class="form-input"
+                 value="<%= profileUser.storygraph_url || '' %>"
+                 placeholder="https://app.thestorygraph.com/profile/...">
+        </label>
+
+        <label class="form-label">
+          Instagram Handle
+          <input type="text" name="instagram_handle" class="form-input"
+                 value="<%= profileUser.instagram_handle || '' %>"
+                 maxlength="60" placeholder="username">
+        </label>
+
+        <label class="form-label">
+          Threads Handle
+          <input type="text" name="threads_handle" class="form-input"
+                 value="<%= profileUser.threads_handle || '' %>"
+                 maxlength="60" placeholder="username">
+        </label>
+
+        <div id="social-message" hidden></div>
+
+        <button type="submit" class="btn btn--primary" id="social-submit">Save Links</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---- Password ---- -->
+  <div class="profile-section">
+    <h2 class="t-body-bold profile-section__title">
+      <%= profileUser.hasPassword ? 'Change Password' : 'Set Password' %>
+    </h2>
+    <p class="t-caption text-secondary" style="margin-bottom: var(--s-3);">
+      Optional. You can always use the magic link to sign in.
+    </p>
+    <div class="profile-card">
+      <form class="profile-form" id="password-form">
+        <% if (profileUser.hasPassword) { %>
+          <label class="form-label">
+            Current Password
+            <input type="password" name="current_password" class="form-input"
+                   autocomplete="current-password" required>
+          </label>
+        <% } %>
+
+        <label class="form-label">
+          New Password
+          <input type="password" name="new_password" class="form-input"
+                 autocomplete="new-password" minlength="8" required>
+          <span class="t-caption text-tertiary">At least 8 characters.</span>
+        </label>
+
+        <label class="form-label">
+          Confirm Password
+          <input type="password" name="confirm_password" class="form-input"
+                 autocomplete="new-password" minlength="8" required>
+        </label>
+
+        <div id="password-message" hidden></div>
+
+        <button type="submit" class="btn btn--primary" id="password-submit">
+          <%= profileUser.hasPassword ? 'Update Password' : 'Set Password' %>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---- Logout ---- -->
   <div class="profile-logout">
     <a href="/auth/logout" class="btn btn--ghost">Log Out</a>
   </div>
 </section>
-
-<script>
-(function () {
-  'use strict';
-  var form = document.getElementById('profile-form');
-  var btn = document.getElementById('profile-submit');
-  var msg = document.getElementById('profile-message');
-  if (!form) return;
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var name = form.querySelector('[name="display_name"]').value.trim();
-    if (!name) return;
-
-    btn.disabled = true;
-    btn.textContent = 'Saving\u2026';
-
-    try {
-      var res = await fetch('/api/auth/display-name', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ display_name: name }),
-      });
-      var data = await res.json();
-      if (res.ok && data.success) {
-        msg.hidden = false;
-        msg.className = 'nom-message nom-message--success';
-        msg.textContent = 'Display name updated!';
-
-        // Update the nav avatar if visible
-        var navAvatar = document.querySelector('.nav-avatar');
-        if (navAvatar) {
-          var words = name.trim().split(/\s+/);
-          var initials = words.length >= 2
-            ? words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase()
-            : words[0].charAt(0).toUpperCase();
-          navAvatar.textContent = initials;
-        }
-
-        // Update the profile avatar
-        var profileAvatar = document.querySelector('.profile-avatar');
-        if (profileAvatar) {
-          var words2 = name.trim().split(/\s+/);
-          var initials2 = words2.length >= 2
-            ? words2[0].charAt(0).toUpperCase() + words2[1].charAt(0).toUpperCase()
-            : words2[0].charAt(0).toUpperCase();
-          profileAvatar.textContent = initials2;
-        }
-      } else {
-        msg.hidden = false;
-        msg.className = 'nom-message nom-message--error';
-        msg.textContent = data.error || 'Something went wrong.';
-      }
-    } catch (err) {
-      msg.hidden = false;
-      msg.className = 'nom-message nom-message--error';
-      msg.textContent = 'Network error. Please try again.';
-    }
-
-    btn.disabled = false;
-    btn.textContent = 'Save Changes';
-  });
-})();
-</script>

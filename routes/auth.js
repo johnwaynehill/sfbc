@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const router = require('express').Router();
 const db = require('../db');
 const { sendMagicLink } = require('../services/email');
@@ -139,6 +140,32 @@ router.get('/auth/callback', (req, res) => {
     const returnTo = req.session.returnTo || '/';
     delete req.session.returnTo;
     res.redirect(returnTo);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// POST /auth/password-login — email + password login
+// ---------------------------------------------------------------------------
+router.post('/auth/password-login', (req, res) => {
+  const email = (req.body.email || '').toLowerCase().trim();
+  const password = req.body.password || '';
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+
+  const user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+
+  if (!user || !user.password_hash || !bcrypt.compareSync(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Invalid email or password.' });
+  }
+
+  req.session.userId = user.id;
+  req.session.save((err) => {
+    if (err) console.error('Session save error:', err);
+    const returnTo = req.session.returnTo || '/';
+    delete req.session.returnTo;
+    res.json({ success: true, redirect: returnTo });
   });
 });
 

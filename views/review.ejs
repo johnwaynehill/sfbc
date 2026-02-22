@@ -27,37 +27,39 @@
       <input type="hidden" name="_method" value="PUT">
     <% } %>
 
-    <label class="form-label">
-      Grade
-      <select name="grade" class="form-select grade-select" required>
-        <option value="">Choose a grade&hellip;</option>
-        <% for (const g of grades) { %>
-          <option value="<%= g.grade %>" <%= review && review.grade === g.grade ? 'selected' : '' %>>
-            <%= g.grade %>
-          </option>
-        <% } %>
-      </select>
-    </label>
+    <!-- Hidden input that holds the actual grade value -->
+    <input type="hidden" name="grade" id="grade-input" value="<%= review ? review.grade : '' %>">
 
-    <label class="form-label">
-      Review <span class="text-secondary">(optional)</span>
-      <textarea name="body" class="form-textarea" rows="8"
-                placeholder="What did you think of this book?"><%= review ? review.body_markdown : '' %></textarea>
-    </label>
-    <div class="formatting-help">
-      <p class="formatting-help__label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
-        Markdown supported
-      </p>
-      <div class="formatting-help__examples">
-        <span class="formatting-help__item"><code>**bold**</code> &rarr; <strong>bold</strong></span>
-        <span class="formatting-help__item"><code>*italic*</code> &rarr; <em>italic</em></span>
-        <span class="formatting-help__item"><code>- item</code> &rarr; list</span>
-        <span class="formatting-help__item"><code>> quote</code> &rarr; blockquote</span>
-        <span class="formatting-help__item"><code>||spoiler||</code> &rarr; <span class="spoiler-example">hidden</span></span>
+    <!-- Grade Slider -->
+    <div class="form-label">Grade</div>
+    <div class="grade-slider" id="grade-slider">
+      <div class="grade-slider__display">
+        <span class="grade-slider__value" id="grade-display"><%= review ? review.grade : '—' %></span>
+      </div>
+      <input type="range" class="grade-slider__range" id="grade-range"
+             min="0" max="13" step="1"
+             value="<%= review ? '' : '7' %>">
+      <div class="grade-slider__labels">
+        <span>F</span>
+        <span>D</span>
+        <span>C</span>
+        <span>B</span>
+        <span>A</span>
+        <span>S</span>
       </div>
     </div>
+
+    <div class="form-label">
+      <div style="display:flex;align-items:baseline;gap:var(--s-2);">
+        <span>Review</span>
+        <span class="text-secondary" style="font-weight:400;font-size:var(--t-xs);">optional</span>
+      </div>
+      <textarea name="body" id="review-body" class="form-textarea" rows="8"
+                placeholder="What did you think of this book?"><%= review ? review.body_markdown : '' %></textarea>
+    </div>
+    <p class="formatting-hint">
+      Markdown: <code>**bold**</code> <code>*italic*</code> <code>- list</code> <code>> quote</code> <code>||spoiler||</code>
+    </p>
 
     <div id="review-message" hidden></div>
 
@@ -77,6 +79,92 @@
   var form = document.getElementById('review-form');
   if (!form) return;
 
+  // ---- Grade Slider ----
+  var gradeInput = document.getElementById('grade-input');
+  var slider = document.getElementById('grade-range');
+  var display = document.getElementById('grade-display');
+  var sliderWrap = document.getElementById('grade-slider');
+
+  // Grades ordered from lowest (0) to highest (13)
+  var GRADES = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+','S'];
+
+  var TIER_COLORS = {
+    f:  { bg: 'linear-gradient(135deg, #FEF2F2, #FECACA)', text: '#991B1B', track: '#FECACA', darkBg: 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08))', darkText: '#f87171', darkTrack: 'rgba(239,68,68,0.3)' },
+    d:  { bg: 'linear-gradient(135deg, #FFF7ED, #FED7AA)', text: '#9A3412', track: '#FED7AA', darkBg: 'linear-gradient(135deg, rgba(249,115,22,0.18), rgba(249,115,22,0.08))', darkText: '#fb923c', darkTrack: 'rgba(249,115,22,0.3)' },
+    c:  { bg: 'linear-gradient(135deg, #F5F5F4, #E7E5E4)', text: '#57534E', track: '#D6D3D1', darkBg: 'linear-gradient(135deg, rgba(168,162,158,0.15), rgba(168,162,158,0.06))', darkText: '#a8a29e', darkTrack: 'rgba(168,162,158,0.3)' },
+    b:  { bg: 'linear-gradient(135deg, #EFF6FF, #BFDBFE)', text: '#1E3A5F', track: '#93C5FD', darkBg: 'linear-gradient(135deg, rgba(59,130,246,0.18), rgba(59,130,246,0.08))', darkText: '#60a5fa', darkTrack: 'rgba(59,130,246,0.3)' },
+    a:  { bg: 'linear-gradient(135deg, #ECFDF5, #A7F3D0)', text: '#065F46', track: '#6EE7B7', darkBg: 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08))', darkText: '#4ade80', darkTrack: 'rgba(34,197,94,0.3)' },
+    s:  { bg: 'linear-gradient(135deg, #FEF3C7, #FDE68A, #FCD34D)', text: '#78350F', track: '#FCD34D', darkBg: 'linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08))', darkText: '#fbbf24', darkTrack: 'rgba(245,158,11,0.35)' },
+  };
+
+  function getTier(grade) {
+    if (!grade) return null;
+    return grade.charAt(0).toLowerCase();
+  }
+
+  function isDark() {
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') return true;
+    if (theme === 'light') return false;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function updateSlider(index, setInput) {
+    var grade = GRADES[index];
+    var tier = getTier(grade);
+    var colors = TIER_COLORS[tier];
+    var dark = isDark();
+
+    // Update display
+    display.textContent = grade;
+    display.style.background = dark ? colors.darkBg : colors.bg;
+    display.style.color = dark ? colors.darkText : colors.text;
+    if (tier === 's') {
+      display.style.boxShadow = dark
+        ? '0 2px 12px rgba(245, 158, 11, 0.15)'
+        : '0 2px 12px rgba(245, 158, 11, 0.2)';
+    } else {
+      display.style.boxShadow = 'none';
+    }
+
+    // Update track fill color via CSS custom property
+    var pct = (index / 13) * 100;
+    var trackColor = dark ? colors.darkTrack : colors.track;
+    slider.style.setProperty('--fill-pct', pct + '%');
+    slider.style.setProperty('--fill-color', trackColor);
+
+    // Update hidden input
+    if (setInput) {
+      gradeInput.value = grade;
+    }
+  }
+
+  // Set initial position from existing review
+  var existingGrade = gradeInput.value;
+  if (existingGrade) {
+    var idx = GRADES.indexOf(existingGrade);
+    if (idx !== -1) {
+      slider.value = idx;
+      updateSlider(idx, false);
+    }
+  } else {
+    // No grade yet — show middle position but don't set a value
+    display.textContent = '—';
+    display.style.background = 'var(--surface)';
+    display.style.color = 'var(--text3)';
+    var pct = (7 / 13) * 100;
+    slider.style.setProperty('--fill-pct', pct + '%');
+    slider.style.setProperty('--fill-color', 'var(--border)');
+  }
+
+  var hasInteracted = !!existingGrade;
+
+  slider.addEventListener('input', function () {
+    hasInteracted = true;
+    updateSlider(parseInt(this.value, 10), true);
+  });
+
+  // ---- Form Submission ----
   var submitBtn = document.getElementById('review-submit');
   var messageEl = document.getElementById('review-message');
   var methodField = form.querySelector('[name="_method"]');
@@ -85,9 +173,14 @@
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    var grade = form.querySelector('[name="grade"]').value;
-    if (!grade) return;
+    if (!hasInteracted || !gradeInput.value) {
+      messageEl.hidden = false;
+      messageEl.className = 'nom-message nom-message--error';
+      messageEl.textContent = 'Please select a grade using the slider.';
+      return;
+    }
 
+    var grade = gradeInput.value;
     var body = form.querySelector('[name="body"]').value.trim();
 
     submitBtn.disabled = true;

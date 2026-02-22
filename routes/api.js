@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const db = require('../db');
 const config = require('../config');
+const { slugify } = require('../utils/slug');
 const { searchGoogleBooks, findOrCreateBook } = require('../services/books');
 const { getFingerprint } = require('../services/fingerprint');
 const {
@@ -118,8 +119,89 @@ router.put('/auth/display-name', requireMember, (req, res) => {
   const name = (req.body.display_name || '').trim().slice(0, 40);
   if (!name) return res.status(400).json({ error: 'Display name is required.' });
 
-  db.prepare('UPDATE users SET display_name = ? WHERE id = ?').run(name, req.user.id);
-  res.json({ success: true, display_name: name });
+  // Regenerate slug to match the new name
+  const base = slugify(name) || 'member';
+  let slug = base;
+  let n = 2;
+  while (db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(slug, req.user.id)) {
+    slug = base + '-' + n++;
+  }
+
+  db.prepare('UPDATE users SET display_name = ?, user_slug = ? WHERE id = ?').run(name, slug, req.user.id);
+  res.json({ success: true, display_name: name, user_slug: slug });
+});
+
+// ---------------------------------------------------------------------------
+// PUT /api/auth/password — set or change password (member)
+// ---------------------------------------------------------------------------
+router.put('/auth/password', requireMember, (req, res) => {
+  const { current_password, new_password, confirm_password } = req.body;
+
+  if (!new_password || new_password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
+  if (new_password !== confirm_password) {
+    return res.status(400).json({ error: 'Passwords do not match.' });
+  }
+
+  // If user already has a password, require current_password
+  const user = db.prepare('SELECT password_hash FROM users WHERE id = ?').get(req.user.id);
+  if (user.password_hash) {
+    if (!current_password || !bcrypt.compareSync(current_password, user.password_hash)) {
+      return res.status(403).json({ error: 'Current password is incorrect.' });
+    }
+  }
+
+  const hash = bcrypt.hashSync(new_password, 12);
+  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, req.user.id);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// PUT /api/auth/social-links — update social profile links (member)
+// ---------------------------------------------------------------------------
+router.put('/auth/social-links', requireMember, (req, res) => {
+  const goodreads_url = (req.body.goodreads_url || '').trim().slice(0, 500);
+  const storygraph_url = (req.body.storygraph_url || '').trim().slice(0, 500);
+  const instagram_handle = (req.body.instagram_handle || '').trim().replace(/^@/, '').slice(0, 60);
+  const threads_handle = (req.body.threads_handle || '').trim().replace(/^@/, '').slice(0, 60);
+
+  db.prepare(`
+    UPDATE users
+    SET goodreads_url = ?, storygraph_url = ?, instagram_handle = ?, threads_handle = ?
+    WHERE id = ?
+  `).run(goodreads_url, storygraph_url, instagram_handle, threads_handle, req.user.id);
+
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// PUT /api/auth/avatar-style — update avatar style (member)
+// ---------------------------------------------------------------------------
+const VALID_AVATAR_STYLES = [
+  // Classic / geometric
+  'initials', 'identicon', 'rings', 'shapes',
+  // Illustrated characters
+  'lorelei', 'micah', 'miniavs', 'personas',
+  'notionists', 'notionists-neutral',
+  'open-peeps', 'big-smile',
+  'big-ears', 'big-ears-neutral',
+  'adventurer-neutral', 'dylan', 'glass',
+  // Fun / playful
+  'bottts', 'thumbs', 'fun-emoji',
+  'avataaars', 'avataaars-neutral',
+  'croodles', 'croodles-neutral',
+  'pixel-art', 'pixel-art-neutral',
+];
+
+router.put('/auth/avatar-style', requireMember, (req, res) => {
+  const style = (req.body.avatar_style || '').trim();
+  if (!VALID_AVATAR_STYLES.includes(style)) {
+    return res.status(400).json({ error: 'Invalid avatar style.' });
+  }
+
+  db.prepare('UPDATE users SET avatar_style = ? WHERE id = ?').run(style, req.user.id);
+  res.json({ success: true, avatar_style: style });
 });
 
 // ---------------------------------------------------------------------------

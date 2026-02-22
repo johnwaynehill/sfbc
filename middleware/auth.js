@@ -8,7 +8,7 @@ function requireAdmin(req, res, next) {
     return res.redirect('/admin/login');
   }
 
-  const user = db.prepare('SELECT id, email, display_name, role FROM users WHERE id = ?')
+  const user = db.prepare('SELECT id, email, display_name, role, avatar_style FROM users WHERE id = ?')
     .get(req.session.userId);
 
   if (!user || user.role !== 'admin') {
@@ -32,7 +32,7 @@ function requireMember(req, res, next) {
     return res.redirect('/login');
   }
 
-  const user = db.prepare('SELECT id, email, display_name, role FROM users WHERE id = ?')
+  const user = db.prepare('SELECT id, email, display_name, role, avatar_style FROM users WHERE id = ?')
     .get(req.session.userId);
 
   if (!user) {

@@ -1,0 +1,30 @@
+<%
+/**
+ * Avatar partial — DRY avatar rendering
+ *
+ * Locals:
+ *   avatarUser  — user object (needs: display_name, email, avatar_style)
+ *   avatarSize  — 'sm' | 'md' | 'lg' (default 'sm')
+ *   avatarClass — extra CSS class (optional)
+ */
+var _au = typeof avatarUser !== 'undefined' ? avatarUser : (typeof user !== 'undefined' ? user : null);
+var _sz = typeof avatarSize !== 'undefined' ? avatarSize : 'sm';
+var _cls = typeof avatarClass !== 'undefined' ? avatarClass : '';
+var _style = _au && _au.avatar_style ? _au.avatar_style : 'initials';
+
+var _dn = _au ? (_au.display_name || _au.email) : '?';
+var _words = _dn.trim().split(/\s+/);
+var _initials = _words.length >= 2
+  ? _words[0].charAt(0).toUpperCase() + _words[1].charAt(0).toUpperCase()
+  : _words[0].charAt(0).toUpperCase();
+%>
+<% if (_style === 'initials') { %>
+  <span class="avatar avatar--<%= _sz %> <%= _cls %>"><%= _initials %></span>
+<% } else { %>
+  <img
+    class="avatar avatar--<%= _sz %> <%= _cls %>"
+    src="https://api.dicebear.com/9.x/<%= _style %>/svg?seed=<%= encodeURIComponent(_dn) %>"
+    alt="<%= _dn %>"
+    loading="lazy"
+  >
+<% } %>

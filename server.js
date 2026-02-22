@@ -79,7 +79,7 @@ app.use(session({
 app.use((req, res, next) => {
   res.locals.user = null;
   if (req.session && req.session.userId) {
-    const user = db.prepare('SELECT id, email, display_name, role FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, email, display_name, role, avatar_style FROM users WHERE id = ?')
       .get(req.session.userId);
     if (user) {
       res.locals.user = user;
@@ -99,6 +99,17 @@ app.use((req, res, next) => {
   res.locals.formatMonthYear = formatMonthYear;
   res.locals.formatStatus = formatStatus;
   res.locals.monthYearSlug = monthYearSlug;
+  res.locals.gradeTier = function (grade) {
+    if (!grade) return '';
+    var letter = grade.charAt(0).toUpperCase();
+    if (letter === 'S') return 'grade-badge--s';
+    if (letter === 'A') return 'grade-badge--a';
+    if (letter === 'B') return 'grade-badge--b';
+    if (letter === 'C') return 'grade-badge--c';
+    if (letter === 'D') return 'grade-badge--d';
+    if (letter === 'F') return 'grade-badge--f';
+    return '';
+  };
   next();
 });
 

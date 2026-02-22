@@ -1,21 +1,3 @@
-<%
-  /**
-   * Map a grade letter to its CSS tier class for colored badge.
-   * S/A grades → gold, B → green, C → neutral, D/F → red
-   */
-  function gradeTier(grade) {
-    if (!grade) return '';
-    var letter = grade.charAt(0).toUpperCase();
-    if (letter === 'S') return 'grade-badge--s';
-    if (letter === 'A') return 'grade-badge--a';
-    if (letter === 'B') return 'grade-badge--b';
-    if (letter === 'C') return 'grade-badge--c';
-    if (letter === 'D') return 'grade-badge--d';
-    if (letter === 'F') return 'grade-badge--f';
-    return '';
-  }
-%>
-
 <!-- ===== Book Hero ===== -->
 <section class="book-hero">
   <div class="book-cover book-cover--lg">
@@ -144,7 +126,17 @@
         <div class="review-card__body">
           <div class="review-card__meta">
             <% if (user && review.display_name) { %>
-              <span class="review-card__author"><%= review.display_name %></span>
+              <% if (review.user_slug) { %>
+                <a href="/members/<%= review.user_slug %>" class="review-card__reviewer">
+                  <%- include('partials/avatar', { avatarUser: review, avatarSize: 'sm', avatarClass: '' }) %>
+                  <span class="review-card__author"><%= review.display_name %></span>
+                </a>
+              <% } else { %>
+                <span class="review-card__reviewer">
+                  <%- include('partials/avatar', { avatarUser: review, avatarSize: 'sm', avatarClass: '' }) %>
+                  <span class="review-card__author"><%= review.display_name %></span>
+                </span>
+              <% } %>
             <% } else if (!user) { %>
               <span class="review-card__author" style="font-style: italic; opacity: 0.7;">Anonymous</span>
             <% } %>

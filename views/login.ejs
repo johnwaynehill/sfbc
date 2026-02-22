@@ -26,6 +26,31 @@
       </button>
     </form>
 
+    <div class="login-divider">
+      <span class="login-divider__text t-caption text-tertiary">or sign in with password</span>
+    </div>
+
+    <form id="password-form" class="login-form" style="display:none;">
+      <label class="form-label">
+        Email
+        <input type="email" name="pw_email" required autocomplete="email"
+               class="form-input" placeholder="you@example.com">
+      </label>
+      <label class="form-label">
+        Password
+        <input type="password" name="pw_password" required autocomplete="current-password"
+               class="form-input" placeholder="Your password">
+      </label>
+      <div id="pw-message" hidden></div>
+      <button type="submit" class="btn btn--primary" id="pw-submit" style="width: 100%;">
+        Sign In
+      </button>
+    </form>
+
+    <button type="button" class="btn-quiet" id="toggle-pw" style="margin-top: var(--s-2); width: 100%; justify-content: center;">
+      Use password instead
+    </button>
+
   <% } else if (step === 'sent') { %>
     <div class="login-sent">
       <h1 class="t-section login-page__heading">Check Your Email</h1>
@@ -93,6 +118,13 @@
           '<p class="t-caption text-secondary" style="margin-top: var(--s-4);">' +
           'Didn\'t receive it? Check your spam folder or <a href="/login">try again</a>.</p>' +
           '</div>';
+        // Hide password section
+        var divider = document.querySelector('.login-divider');
+        var pwForm = document.getElementById('password-form');
+        var toggleBtn = document.getElementById('toggle-pw');
+        if (divider) divider.style.display = 'none';
+        if (pwForm) pwForm.style.display = 'none';
+        if (toggleBtn) toggleBtn.style.display = 'none';
         return;
       }
 
@@ -108,5 +140,54 @@
     submitBtn.disabled = false;
     submitBtn.textContent = 'Send Login Link';
   });
+
+  // Password form toggle
+  var toggleBtn = document.getElementById('toggle-pw');
+  var pwForm = document.getElementById('password-form');
+  if (toggleBtn && pwForm) {
+    toggleBtn.addEventListener('click', function () {
+      var showing = pwForm.style.display !== 'none';
+      pwForm.style.display = showing ? 'none' : 'block';
+      toggleBtn.textContent = showing ? 'Use password instead' : 'Use magic link instead';
+    });
+
+    pwForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var pwEmail = pwForm.querySelector('[name="pw_email"]').value.trim();
+      var pwPass = pwForm.querySelector('[name="pw_password"]').value;
+      var pwSubmit = document.getElementById('pw-submit');
+      var pwMsg = document.getElementById('pw-message');
+
+      if (!pwEmail || !pwPass) return;
+
+      pwSubmit.disabled = true;
+      pwSubmit.textContent = 'Signing in\u2026';
+
+      try {
+        var res = await fetch('/auth/password-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email: pwEmail, password: pwPass }),
+        });
+        var data = await res.json();
+
+        if (res.ok && data.success) {
+          window.location.href = data.redirect || '/';
+          return;
+        }
+
+        pwMsg.hidden = false;
+        pwMsg.className = 'nom-message nom-message--error';
+        pwMsg.textContent = data.error || 'Something went wrong.';
+      } catch (err) {
+        pwMsg.hidden = false;
+        pwMsg.className = 'nom-message nom-message--error';
+        pwMsg.textContent = 'Network error. Please try again.';
+      }
+
+      pwSubmit.disabled = false;
+      pwSubmit.textContent = 'Sign In';
+    });
+  }
 })();
 </script>

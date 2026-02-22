@@ -95,7 +95,7 @@ router.get('/', (req, res) => {
     LIMIT 6
   `).all(...(currentMeeting ? [currentMeeting.id] : []));
 
-  const totalBooks = db.prepare('SELECT COUNT(*) AS count FROM books').get().count;
+  const totalBooks = db.prepare("SELECT COUNT(*) AS count FROM meetings WHERE status = 'results' AND winning_book_id IS NOT NULL").get().count;
 
   // Active participation meeting (nominations or voting) — may or may not have a book
   const activeMeeting = db.prepare(`
@@ -157,7 +157,7 @@ router.get('/history', (req, res) => {
 // GET /about — About the club
 // ---------------------------------------------------------------------------
 router.get('/about', (req, res) => {
-  const totalBooks = db.prepare('SELECT COUNT(*) AS count FROM books').get().count;
+  const totalBooks = db.prepare("SELECT COUNT(*) AS count FROM meetings WHERE status = 'results' AND winning_book_id IS NOT NULL").get().count;
   const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
   const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
 
@@ -173,8 +173,74 @@ router.get('/about', (req, res) => {
 // GET /profile — User profile page
 // ---------------------------------------------------------------------------
 router.get('/profile', requireMember, (req, res) => {
+  const profileUser = db.prepare(
+    'SELECT id, email, display_name, avatar_style, goodreads_url, storygraph_url, instagram_handle, threads_handle, password_hash FROM users WHERE id = ?'
+  ).get(req.user.id);
+
   res.render('profile', {
     pageTitle: 'Profile',
+    profileUser: {
+      ...profileUser,
+      hasPassword: !!profileUser.password_hash,
+      password_hash: undefined, // never expose hash to template
+    },
+    pageScript: '/js/profile.js',
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /members/:slug — Public member profile
+// ---------------------------------------------------------------------------
+router.get('/members/:slug', requireMember, (req, res) => {
+  const member = db.prepare(`
+    SELECT id, display_name, email, avatar_style, user_slug,
+           goodreads_url, storygraph_url, instagram_handle, threads_handle,
+           created_at
+    FROM users
+    WHERE user_slug = ?
+  `).get(req.params.slug);
+
+  if (!member) {
+    return res.status(404).render('error', {
+      pageTitle: 'Member Not Found',
+      errorCode: 404,
+      errorMessage: 'This member profile does not exist.',
+    });
+  }
+
+  // Reading stats
+  const stats = db.prepare(`
+    SELECT COUNT(r.id) AS review_count,
+           AVG(gw.weight) AS avg_weight
+    FROM reviews r
+    JOIN grade_weights gw ON gw.grade = r.grade
+    WHERE r.user_id = ?
+  `).get(member.id);
+
+  const avgGrade = stats.avg_weight != null ? weightToGrade(stats.avg_weight) : null;
+
+  // Their reviews with book info
+  const reviews = db.prepare(`
+    SELECT r.id, r.grade, r.body_markdown, r.created_at, r.updated_at,
+           b.title, b.author, b.cover_url, b.author_slug, b.title_slug,
+           gw.weight
+    FROM reviews r
+    JOIN books b ON b.id = r.book_id
+    JOIN grade_weights gw ON gw.grade = r.grade
+    WHERE r.user_id = ?
+    ORDER BY r.created_at DESC
+  `).all(member.id);
+
+  res.render('member-profile', {
+    pageTitle: member.display_name || 'Member Profile',
+    member,
+    stats: { ...stats, avgGrade },
+    reviews,
+    getCoverUrl,
+    weightToGrade,
+    formatMonthYear,
+    bookPath,
+    renderMarkdown,
   });
 });
 
@@ -233,7 +299,8 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   // Reviews with display names
   const reviews = db.prepare(`
     SELECT r.id, r.grade, r.body_markdown, r.created_at, r.updated_at,
-           r.user_id, u.display_name, gw.weight
+           r.user_id, u.display_name, u.avatar_style, u.user_slug, u.email,
+           gw.weight
     FROM reviews r
     JOIN grade_weights gw ON gw.grade = r.grade
     JOIN users u ON u.id = r.user_id
