@@ -29,10 +29,10 @@ First Edition — a clean editorial aesthetic directly inspired by record.club.
 
 **Non-Negotiables**
 * One cohesive aesthetic across public, admin, and QR flows.
-* No theme switching or per-page style experiments.
+* Dark mode support: system preference detection (`prefers-color-scheme`) + manual toggle via persistent `data-theme` attribute. Both light and dark themes maintain the First Edition editorial feel.
 * Use only approved typography tokens and color tokens.
 * Follow "Sparse outside, dense inside" density model.
-* Pure white (#FFFFFF) background only. No warm tints, no off-white page backgrounds.
+* Light mode: Pure white (#FFFFFF) background. Dark mode: near-black (#111111) background. Both modes let book cover imagery provide visual energy.
 
 ---
 
@@ -199,7 +199,7 @@ Secondary body text (nomination subtitles, section links):
 * Arial
 * default browser fonts
 
-**Color Tokens (css)**
+**Color Tokens (css) — Light Mode (default)**
 :root {
   /* Backgrounds */
   --bg: #FFFFFF;
@@ -246,6 +246,22 @@ Secondary body text (nomination subtitles, section links):
   --s-6: 48px;
   --s-7: 72px;
 }
+
+**Dark Mode Overrides**
+Applied via `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }` and `[data-theme="dark"]`:
+  --bg: #111111;
+  --surface: #1a1a1a;
+  --surface2: #222222;
+  --text: #e8e8e8;
+  --text2: #a0a0a0;
+  --text3: #6a6a6a;
+  --border: #2a2a2a;
+  --border2: #222222;
+  --cta-bg: #e8e8e8;
+  --cta-text: #111111;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+Dark mode implementation uses a dual-selector pattern for both OS preference detection and manual toggle. A FOUC-prevention script in the `<head>` reads `localStorage('theme')` and sets `data-theme` before first paint. The theme toggle button persists choice to localStorage.
 
 **Background Treatment**
 * Pure white (#FFFFFF) — NO texture, NO grain, NO noise overlay.
@@ -370,16 +386,17 @@ Results:
 
 # 11. Color System Guidance
 
-* Pure white (#FFFFFF) background — no warm tints, no parchment, no off-white page backgrounds.
-* Book cover imagery provides ALL visual color and energy to the interface.
-* Near-zero UI color: black text, gray metadata, white surfaces.
+* Light mode: Pure white (#FFFFFF) background. Dark mode: near-black (#111111) background.
+* Book cover imagery provides ALL visual color and energy to the interface in both modes.
+* Near-zero UI color: high-contrast text, gray metadata, neutral surfaces.
 * Gold (#F5A623) for star ratings only — the one consistent accent.
 * Amber (#b45309) used sparingly for detail links — a subtle nod to club identity.
 * Teal (#0f766e) used sparingly for status indicators (e.g., "Currently Reading" dot).
-* Black (#000000) for primary CTAs (pill-shaped buttons).
-* Subtle gray borders (#E5E5E5) and off-white (#FAFAFA) surfaces define sections without shouting.
+* CTAs: black background in light mode, light background in dark mode (pill-shaped buttons).
+* Subtle borders and surface blocks define sections without shouting.
+* Grade badges use distinct gradient backgrounds per tier: S=gold (3-stop premium gradient), A=emerald, B=blue, C=warm stone, D=orange, F=red. Dark mode uses translucent versions.
 * Avoid overly saturated or "themed" fantasy palettes that reduce readability.
-* All text colors must pass WCAG AA accessibility mandates against white backgrounds.
+* All text colors must pass WCAG AA accessibility mandates against their respective mode backgrounds.
 
 ---
 
@@ -1073,11 +1090,11 @@ Principles:
 * Purpose: Review body input.
 * Features: basic markdown hint + preview toggle (optional).
 
-19. **GradePicker**
+19. **GradeSlider**
 
 * Purpose: Grade selection for reviews.
-* Grades: S, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F+, F, F-.
-* UI: segmented control or compact grid; always accessible on mobile.
+* Grades: S, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F (14 grades).
+* UI: Range slider (0–13) with dynamic color-coded grade badge above. Each tier has a distinct gradient color scheme: S=gold (premium 3-stop gradient with glow), A=emerald, B=blue, C=warm stone, D=orange, F=red. Tier labels (F, D, C, B, A, S) displayed below the track. Mobile-friendly with 32px thumb and 10px track. Dark mode overrides use translucent tier-colored gradients.
 
 ---
 
@@ -1130,6 +1147,46 @@ Principles:
 28. **QRPanel** (Admin)
 
 * Purpose: Displays QR code + short URL for Nominate/Vote/Results for a meeting.
+
+---
+
+### Profile & Identity Components
+
+29. **AvatarPartial**
+
+* Purpose: Reusable avatar rendering across all views (nav, profile, reviews, member profiles).
+* Props: user (email, display_name, avatar_style), size (sm, md, lg).
+* Renders DiceBear API URL for selected style, with initials text fallback.
+* Located at `views/partials/avatar.ejs`.
+
+30. **AvatarPicker**
+
+* Purpose: Tabbed grid for selecting avatar style on profile page.
+* Structure: 3 tabs (Classic / Illustrated / Fun), each containing a grid of preview cards.
+* 24 DiceBear styles total across 3 categories.
+* Click-to-select with immediate visual update; persists via API call.
+* Tab switching via `.avatar-picker__tabs` with `.is-active` state.
+
+31. **MemberProfile**
+
+* Purpose: Public member profile page at `/members/:slug`.
+* Sections: Hero (large avatar + display name + join date), Stats bar (review count + avg grade), Social links (Goodreads, StoryGraph, Instagram, Threads — shown only if populated), Reviews list (grade badge + book link + review text + date).
+* Protected with `requireMember` middleware.
+
+32. **GradeBadge**
+
+* Purpose: Color-coded grade display used in reviews, member profiles, and book detail pages.
+* Variants by tier: `.grade-badge--s` (gold gradient), `--a` (emerald), `--b` (blue), `--c` (stone), `--d` (orange), `--f` (red).
+* Dark mode overrides with translucent gradient backgrounds.
+* No borders; uses `linear-gradient(135deg, ...)` backgrounds.
+* S tier includes subtle `box-shadow` glow effect.
+
+33. **ThemeToggle**
+
+* Purpose: Dark/light mode toggle button in navigation.
+* Shows sun icon (light mode) or moon icon (dark mode).
+* Persists to `localStorage('theme')` and sets `data-theme` attribute.
+* Respects OS preference when no manual choice has been saved.
 
 ---
 
@@ -1198,13 +1255,12 @@ Core Components:
 * GlobalNav
 * BookHero
 * MetadataList
-* Section (Review Summary)
-* ResultsChart (grade distribution visualization)
-* ReviewList
+* Section (Review Summary with avg grade + distribution)
+* ReviewList (each review shows AvatarPartial + reviewer name linked to `/members/:slug` + GradeBadge + markdown body)
 
 Authenticated Enhancements:
 
-* Button (Edit Review)
+* Button (Write a Review / Edit Review)
 
 ---
 
@@ -1264,12 +1320,43 @@ Primary Narrative: "Reflect and submit your review."
 
 Core Components:
 
-* AppShell
-* AuthGate
+* AppShell (focus-shell layout)
 * Section
-* GradePicker
-* TextAreaMarkdown
+* GradeSlider (range input with dynamic badge)
+* TextAreaMarkdown (with inline formatting hint)
 * Button (Submit)
+
+---
+
+### Profile Page
+
+Primary Narrative: "Customize your identity in the club."
+
+Core Components:
+
+* AppShell
+* GlobalNav
+* Section
+* AvatarPicker (tabbed: Classic / Illustrated / Fun)
+* TextField (display name)
+* TextField (social links: Goodreads, StoryGraph, Instagram, Threads)
+* TextField (password management)
+* Button (Save / Logout)
+
+---
+
+### Member Profile Page
+
+Primary Narrative: "See a fellow member's reading journey."
+
+Core Components:
+
+* AppShell
+* GlobalNav
+* AvatarPartial (large)
+* Section (Stats: review count, avg grade)
+* MetadataList (social links)
+* ReviewList (with BookCard links and GradeBadge)
 
 ---
 

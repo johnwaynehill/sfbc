@@ -103,6 +103,15 @@ This can be derived from Nominations in MVP, but adding it explicitly keeps the 
 * email
 * display_name
 * role (member | admin)
+* avatar_style (default: 'initials') — one of 24 DiceBear styles
+* password_hash (nullable — bcrypt, optional secondary auth)
+* user_slug (unique — generated from display_name for public profile URLs)
+* goodreads_url (nullable)
+* storygraph_url (nullable)
+* instagram_handle (nullable)
+* threads_handle (nullable)
+* created_at
+* updated_at
 
 ## MagicLinkToken
 
@@ -110,6 +119,13 @@ This can be derived from Nominations in MVP, but adding it explicitly keeps the 
 * user_id
 * expires_at
 * used_at
+
+## GradeWeight
+
+* grade (TEXT, e.g., "A+")
+* weight (REAL, e.g., 4.0)
+
+Note: 14 grades from F (0.0) to S (4.3). Used for calculating averages and generating grade distribution visualizations. F+ and F- were removed — a failing grade needs no modifiers.
 
 Implementation Guidance:
 
@@ -156,7 +172,9 @@ Define explicit routes so that implementation remains predictable and consistent
 
 * GET /
 * GET /history
+* GET /about
 * GET /books/:authorSlug/:titleSlug
+* GET /members/:slug (requireMember — public member profile)
 
 ## QR Flow Pages
 
@@ -170,13 +188,23 @@ Define explicit routes so that implementation remains predictable and consistent
 ## Authentication
 
 * GET /login
-* POST /api/auth/magic-link
-* GET /auth/callback?token=...
+* POST /auth/send-link (magic link request)
+* GET /auth/verify/:token (magic link verification)
+* POST /auth/password-login (email + password login)
+* GET /auth/logout
+
+## Profile
+
+* GET /profile (requireMember — edit own profile)
+* PUT /api/auth/display-name (also regenerates user_slug)
+* PUT /api/auth/avatar-style
+* PUT /api/auth/social-links
+* PUT /api/auth/password
 
 ## Reviews
 
-* POST /api/reviews
-* PATCH /api/reviews/:reviewId
+* POST /api/books/:bookId/reviews
+* PUT /api/books/:bookId/reviews (update existing)
 
 ## Admin
 
@@ -350,6 +378,78 @@ The `(author_slug, title_slug)` pair has a unique index. If a collision occurs (
 * Slug generation is implemented as a shared utility in `utils/slug.js`.
 * All routes, templates, and exports must use `slugify()` / `bookPath()` to avoid divergence.
 * Slugs are stored in the database at insert time (not computed on every request).
+
+## User Slugs
+
+User profiles use slug-based URLs at `/members/:user_slug`.
+
+* Column: `user_slug TEXT` with unique index on the `users` table (migration 008).
+* Generation: `slugify(display_name)` with collision-safe numeric suffix (`jane-doe`, `jane-doe-2`, etc.).
+* Backfill: `seedUserSlugs()` in `db/migrate.js` runs on every server start (idempotent — no-op once all users have slugs).
+* Update: Slug is regenerated when display name changes via `PUT /api/auth/display-name` (excludes self from collision check).
+* Fallback: Uses email prefix if no display name is set, or `'member'` as last resort.
+
+---
+
+# 7A. Database Migrations
+
+Sequential SQL migrations in `db/migrations/` are applied on server start via `db/migrate.js`. Applied migrations are tracked in the `_migrations` table.
+
+Current migrations:
+* `001-initial-schema.sql` — Core tables (meetings, books, nominations, votes, reviews, users, magic_link_tokens, grade_weights)
+* `002` through `006` — Various schema additions
+* `007-profile-enhancements.sql` — Adds `avatar_style`, `goodreads_url`, `storygraph_url`, `instagram_handle`, `threads_handle`, `password_hash` columns to users
+* `008-user-slug.sql` — Adds `user_slug` column to users with unique index
+
+Post-migration seeds:
+* `seedUserSlugs()` — Backfills `user_slug` for any user missing one
+
+---
+
+# 7B. Authentication System
+
+The app supports two authentication methods:
+
+## Magic Link (Primary)
+* User enters email at `/login`
+* Server generates a 15-minute expiring token, stores in `magic_link_tokens` table
+* Email sent via SMTP with verification link
+* `GET /auth/verify/:token` validates token, creates/finds user, establishes session
+* Auto-registration: first login creates a new user account with email prefix as display name
+
+## Password (Secondary, Optional)
+* Users can set a password in their profile settings
+* `POST /auth/password-login` validates email + bcrypt-hashed password
+* Minimum 8 characters, bcrypt cost factor 12
+* Login page shows toggle: "Use password instead" / "Use magic link instead"
+
+## Admin Authentication
+* Bootstrap: `POST /api/admin/bootstrap` (one-time first admin creation with bootstrap key)
+* Login: `POST /api/auth/admin-login` (email + password)
+* Separate admin shell layout at `/admin/*`
+
+## Session Management
+* SQLite session store via `better-sqlite3-session-store`
+* HttpOnly cookies, SameSite=Lax, Secure in production
+* 30-day session expiration
+* Expired session cleanup every 15 minutes
+
+---
+
+# 7C. Dark Mode Implementation
+
+Dark mode uses a dual-selector CSS pattern:
+
+* `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { ... } }` — respects OS preference unless user chose light
+* `[data-theme="dark"] { ... }` — manual dark mode override
+
+Client-side (`public/js/theme.js`):
+* FOUC prevention: inline `<script>` in `<head>` reads `localStorage('theme')` and sets `data-theme` before first paint
+* Toggle button persists choice to `localStorage`
+* Listens for OS preference changes; auto-adapts if no manual choice saved
+* Updates `<meta name="theme-color">` for browser chrome
+
+CSS variables in `tokens.css` provide complete light/dark palettes for backgrounds, text, borders, accents, and component-specific colors.
 
 ---
 

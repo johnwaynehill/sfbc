@@ -89,15 +89,19 @@ Ship after the core experience is solid.
 * Markdown export to Fly.io persistent volume and/or object storage.
 * Canonical URL slugs (`/books/:authorSlug/:titleSlug`) — implemented in Phase 2.
 * Historical data seeding (32 past meetings from Meetup).
-* About section on Home page.
-* Slug collision handling.
+* ~~About section on Home page.~~ ✅ Implemented as standalone `/about` page.
+* ~~Slug collision handling.~~ ✅ Implemented with numeric suffix fallback.
+* ~~Dark mode / theme toggle.~~ ✅ Implemented with system preference detection + manual toggle.
+* ~~Password authentication (alongside magic links).~~ ✅ Implemented as optional secondary auth method.
+* ~~Public member profiles.~~ ✅ Implemented at `/members/:slug` with reading stats, social links, and review history.
+* ~~Avatar customization.~~ ✅ Implemented with 24 DiceBear styles in 3 tabbed groups.
+* ~~Profile social links.~~ ✅ Goodreads, StoryGraph, Instagram, Threads.
 
 ## Future (Post-MVP)
 Tracked for architectural awareness but explicitly out of scope for v1.
 
 * Emoji reactions on reviews.
 * Personal reading queue / "want to read" state.
-* Lightweight member profiles.
 * Supporter/premium features.
 * Multi-club / platform capabilities.
 
@@ -117,9 +121,12 @@ Tracked for architectural awareness but explicitly out of scope for v1.
 * As an attendee, I can scan a QR code and submit a nomination without logging in.
 * As an attendee, I can rank nominees on a phone and see live results.
 * As an admin, I can close voting and share the winner.
-* As a member, I can log in via magic link and leave a letter-grade review.
+* As a member, I can log in via magic link or password and leave a letter-grade review.
 * As a member, after magic-link sign-in I can set a display name used across participation and reviews.
+* As a member, I can customize my avatar from 24 DiceBear styles organized in 3 categories.
+* As a member, I can add social links (Goodreads, StoryGraph, Instagram, Threads) to my profile.
 * As a member, I can see my own review history.
+* As a member, I can view other members' public profiles with their reading stats and reviews.
 * As a public visitor, I can browse book history without seeing reviewer names.
 
 ---
@@ -136,7 +143,7 @@ Scan QR -> ranked ballot -> submit -> live results screen (auto-updating) -> fin
 
 ## Review (member, post-meeting)
 
-Request magic link -> email link -> set display name (first login only) -> review form (grade + comment) -> confirmation -> "My Reviews".
+Request magic link (or use password) -> email link -> set display name (first login only) -> review form (grade slider + optional comment) -> confirmation -> book detail page.
 
 ## Browse (public)
 
@@ -152,12 +159,16 @@ Open nominations -> monitor count -> close -> open voting -> monitor count + liv
 
 * Home / Landing
 * History (public)
-* Book Detail (public, anonymous reviews)
+* Book Detail (public, reviews show avatars + profile links for authenticated users)
+* About (standalone page with club description, stats, How It Works, CTAs)
 * Nominate (QR entry, no login)
 * Vote (QR entry, no login)
 * Live Results (auto-updating)
-* Review (magic link)
+* Login (magic link + optional password auth)
+* Review (authenticated, grade slider)
 * My Reviews (authenticated)
+* Profile (authenticated — avatar picker, display name, social links, password)
+* Member Profile (authenticated — public view of another member's stats and reviews at `/members/:slug`)
 * Admin Dashboard (open/close controls, counts, exports)
 * Optional: Book lookup / details preview (for nomination validation)
 
@@ -293,7 +304,7 @@ Browse past selections.
 
 To allow calculation of averages and charts, grades should map to numeric weights.
 
-Suggested default mapping (adjustable later):
+Current mapping (stored in `grade_weights` table):
 
 * S = 4.3
 * A+ = 4.0
@@ -308,9 +319,7 @@ Suggested default mapping (adjustable later):
 * D+ = 1.0
 * D = 0.7
 * D- = 0.3
-* F+ = 0.2
-* F = 0.1
-* F- = 0.0
+* F = 0.0
 
 Implementation Note:
 
@@ -472,8 +481,8 @@ Post-meeting reflection.
 
 ### Content Blocks
 
-* Grade selector (S, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F+, F, F-).
-* Markdown comment box.
+* Grade slider — a range input (0–13) mapping to 14 grades (F through S). The slider dynamically updates a color-coded grade badge above it, with distinct gradient colors per tier (S=gold, A=emerald, B=blue, C=stone, D=orange, F=red). Tier labels (F, D, C, B, A, S) appear below the track for orientation.
+* Markdown comment box (optional) with inline formatting hint (bold, italic, list, quote, spoiler).
 * Submit.
 
 ---
@@ -621,8 +630,8 @@ This section represents long-term optional enhancements and should not impact MV
 
 ## Reviews
 
-* Reviews require magic-link login.
-* Reviews use the following letter grades: S, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F+, F, F-.
+* Reviews require authentication (magic-link or password login).
+* Reviews use the following letter grades: S, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F (14 grades total; F+/F- were removed as a failing grade needs no modifiers).
 * Review comments optional.
 * Public views hide reviewer names.
 * Authenticated users can view their review history.
@@ -680,7 +689,7 @@ This section represents long-term optional enhancements and should not impact MV
 * Results screen shows a "Votes counted: X" indicator and updates in real time.
 * Public reviews display without names; authenticated views show display names.
 * Display names are collected after first magic-link login and used instead of email attribution.
-* Review grade selector includes S and A+ at the top.
+* Review grade selector is a range slider mapping 14 grades (F through S) with dynamic tier-colored badge display.
 
 ---
 
