@@ -54,6 +54,9 @@ app.use(cookieParser());
 // ---------------------------------------------------------------------------
 // Session
 // ---------------------------------------------------------------------------
+// Trust the first proxy (Fly.io) so secure cookies work behind HTTPS termination
+app.set('trust proxy', 1);
+
 app.use(session({
   store: new SqliteStore({
     client: db,
@@ -158,6 +161,7 @@ app.use((err, req, res, _next) => {
 // ---------------------------------------------------------------------------
 // Start
 // ---------------------------------------------------------------------------
-app.listen(config.port, () => {
-  console.log(`\n  SF Book Club running at http://localhost:${config.port}\n`);
+const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+app.listen(config.port, host, () => {
+  console.log(`\n  SF Book Club running at http://${host}:${config.port}\n`);
 });
