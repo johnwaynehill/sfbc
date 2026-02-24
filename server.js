@@ -5,7 +5,7 @@ const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const config = require('./config');
-const { formatMonthYear, formatStatus, monthYearSlug } = require('./utils/format');
+const { formatMonthYear, formatStatus, monthYearSlug, formatMeetingTime } = require('./utils/format');
 
 // ---------------------------------------------------------------------------
 // Database & migrations
@@ -101,6 +101,7 @@ app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.formatMonthYear = formatMonthYear;
   res.locals.formatStatus = formatStatus;
+  res.locals.formatMeetingTime = formatMeetingTime;
   res.locals.monthYearSlug = monthYearSlug;
   res.locals.gradeTier = function (grade) {
     if (!grade) return '';

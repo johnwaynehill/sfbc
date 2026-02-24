@@ -173,6 +173,23 @@ router.get('/meetings/:slug', async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Users list
+// ---------------------------------------------------------------------------
+router.get('/users', (req, res) => {
+  const users = db.prepare(`
+    SELECT id, email, display_name, role, avatar_style, created_at
+    FROM users
+    ORDER BY created_at DESC
+  `).all();
+
+  res.render('admin/users', {
+    pageTitle: 'Users',
+    pageScript: '/js/admin-users.js',
+    users,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Settings
 // ---------------------------------------------------------------------------
 router.get('/settings', (req, res) => {

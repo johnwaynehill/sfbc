@@ -41,9 +41,9 @@ router.get('/login', (req, res) => {
     return res.redirect('/');
   }
 
-  res.locals.layout = 'layouts/focus-shell';
+  res.locals.layout = 'layouts/app-shell';
   res.render('login', {
-    pageTitle: 'Sign In',
+    pageTitle: 'Sign In or Create an Account',
     step: 'form',
     email: null,
     error: null,
@@ -61,9 +61,9 @@ router.post('/auth/send-link', async (req, res) => {
     if (wantsJson) {
       return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
-    res.locals.layout = 'layouts/focus-shell';
+    res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
-      pageTitle: 'Sign In',
+      pageTitle: 'Sign In or Create an Account',
       step: 'form',
       email,
       error: 'Please enter a valid email address.',
@@ -94,7 +94,7 @@ router.post('/auth/send-link', async (req, res) => {
     return res.json({ success: true, message: 'Check your email for a login link.' });
   }
 
-  res.locals.layout = 'layouts/focus-shell';
+  res.locals.layout = 'layouts/app-shell';
   res.render('login', {
     pageTitle: 'Check Your Email',
     step: 'sent',
@@ -110,7 +110,7 @@ router.get('/auth/callback', (req, res) => {
   const { token } = req.query;
 
   if (!token) {
-    res.locals.layout = 'layouts/focus-shell';
+    res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Invalid Link',
       step: 'error',
@@ -121,7 +121,7 @@ router.get('/auth/callback', (req, res) => {
 
   const row = findValidToken.get(token);
   if (!row) {
-    res.locals.layout = 'layouts/focus-shell';
+    res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Link Expired',
       step: 'error',

@@ -1,8 +1,8 @@
 <section class="login-page">
   <% if (step === 'form') { %>
-    <h1 class="t-section login-page__heading">Sign In</h1>
-    <p class="t-body text-secondary login-page__subtitle">
-      Enter your email and we'll send you a login link.
+    <h1 class="t-section login-page__heading">Sign In or Create an Account</h1>
+    <p class="t-body text-secondary login-page__subtitle" id="login-subtitle">
+      Enter your email and we&rsquo;ll send you a login link.
     </p>
 
     <% if (error) { %>
@@ -11,43 +11,45 @@
       </div>
     <% } %>
 
-    <form id="login-form" method="POST" action="/auth/send-link" class="login-form">
-      <label class="form-label">
-        Email
-        <input type="email" name="email" required autofocus autocomplete="email"
-               class="form-input" placeholder="you@example.com"
-               value="<%= email || '' %>">
-      </label>
+    <div id="form-container">
+      <form id="login-form" method="POST" action="/auth/send-link" class="login-form">
+        <label class="form-label">
+          Email
+          <input type="email" name="email" required autofocus autocomplete="email"
+                 class="form-input" placeholder="you@example.com"
+                 value="<%= email || '' %>">
+        </label>
 
-      <div id="login-message" hidden></div>
+        <div id="login-message" hidden></div>
 
-      <button type="submit" class="btn btn--primary" id="login-submit" style="width: 100%;">
-        Send Login Link
-      </button>
-    </form>
+        <button type="submit" class="btn btn--primary" id="login-submit" style="width: 100%;">
+          Send Login Link
+        </button>
+      </form>
 
-    <div class="login-divider">
-      <span class="login-divider__text t-caption text-tertiary">or sign in with password</span>
+      <form id="password-form" class="login-form" hidden>
+        <label class="form-label">
+          Email
+          <input type="email" name="pw_email" required autocomplete="email"
+                 class="form-input" placeholder="you@example.com">
+        </label>
+        <label class="form-label">
+          Password
+          <input type="password" name="pw_password" required autocomplete="current-password"
+                 class="form-input" placeholder="Your password">
+        </label>
+        <div id="pw-message" hidden></div>
+        <button type="submit" class="btn btn--primary" id="pw-submit" style="width: 100%;">
+          Sign In with Password
+        </button>
+      </form>
     </div>
 
-    <form id="password-form" class="login-form" style="display:none;">
-      <label class="form-label">
-        Email
-        <input type="email" name="pw_email" required autocomplete="email"
-               class="form-input" placeholder="you@example.com">
-      </label>
-      <label class="form-label">
-        Password
-        <input type="password" name="pw_password" required autocomplete="current-password"
-               class="form-input" placeholder="Your password">
-      </label>
-      <div id="pw-message" hidden></div>
-      <button type="submit" class="btn btn--primary" id="pw-submit" style="width: 100%;">
-        Sign In
-      </button>
-    </form>
+    <div class="login-divider">
+      <span class="login-divider__text t-caption text-tertiary">or</span>
+    </div>
 
-    <button type="button" class="btn-quiet" id="toggle-pw" style="margin-top: var(--s-2); width: 100%; justify-content: center;">
+    <button type="button" class="btn-quiet" id="toggle-pw" style="width: 100%; justify-content: center;">
       Use password instead
     </button>
 
@@ -81,16 +83,47 @@
 (function () {
   'use strict';
 
-  var form = document.getElementById('login-form');
-  if (!form) return;
+  var magicForm = document.getElementById('login-form');
+  if (!magicForm) return;
 
+  var pwForm = document.getElementById('password-form');
+  var toggleBtn = document.getElementById('toggle-pw');
+  var subtitle = document.getElementById('login-subtitle');
   var submitBtn = document.getElementById('login-submit');
   var messageEl = document.getElementById('login-message');
+  var showingPassword = false;
 
-  form.addEventListener('submit', async function (e) {
+  // ---- Form swap toggle ----
+  if (toggleBtn && pwForm) {
+    toggleBtn.addEventListener('click', function () {
+      showingPassword = !showingPassword;
+      if (showingPassword) {
+        magicForm.hidden = true;
+        pwForm.hidden = false;
+        toggleBtn.textContent = 'Use magic link instead';
+        subtitle.textContent = 'Enter your email and password to sign in.';
+        // Copy email across if filled
+        var magicEmail = magicForm.querySelector('[name="email"]').value;
+        if (magicEmail) pwForm.querySelector('[name="pw_email"]').value = magicEmail;
+        pwForm.querySelector('[name="pw_email"]').focus();
+      } else {
+        pwForm.hidden = true;
+        magicForm.hidden = false;
+        toggleBtn.textContent = 'Use password instead';
+        subtitle.textContent = 'Enter your email and we\u2019ll send you a login link.';
+        // Copy email back
+        var pwEmail = pwForm.querySelector('[name="pw_email"]').value;
+        if (pwEmail) magicForm.querySelector('[name="email"]').value = pwEmail;
+        magicForm.querySelector('[name="email"]').focus();
+      }
+    });
+  }
+
+  // ---- Magic link form ----
+  magicForm.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    var email = form.querySelector('[name="email"]').value.trim();
+    var email = magicForm.querySelector('[name="email"]').value.trim();
     if (!email) return;
 
     submitBtn.disabled = true;
@@ -109,8 +142,9 @@
       var data = await res.json();
 
       if (res.ok && data.success) {
-        // Replace form with success message
-        form.innerHTML =
+        // Replace entire form area with success message
+        var container = document.getElementById('form-container');
+        container.innerHTML =
           '<div class="login-sent">' +
           '<h2 class="t-section" style="margin-bottom: var(--s-3);">Check Your Email</h2>' +
           '<p class="t-body">We sent a login link to <strong>' + email + '</strong>.</p>' +
@@ -118,13 +152,11 @@
           '<p class="t-caption text-secondary" style="margin-top: var(--s-4);">' +
           'Didn\'t receive it? Check your spam folder or <a href="/login">try again</a>.</p>' +
           '</div>';
-        // Hide password section
+        // Hide divider and toggle
         var divider = document.querySelector('.login-divider');
-        var pwForm = document.getElementById('password-form');
-        var toggleBtn = document.getElementById('toggle-pw');
         if (divider) divider.style.display = 'none';
-        if (pwForm) pwForm.style.display = 'none';
         if (toggleBtn) toggleBtn.style.display = 'none';
+        if (subtitle) subtitle.style.display = 'none';
         return;
       }
 
@@ -141,16 +173,8 @@
     submitBtn.textContent = 'Send Login Link';
   });
 
-  // Password form toggle
-  var toggleBtn = document.getElementById('toggle-pw');
-  var pwForm = document.getElementById('password-form');
-  if (toggleBtn && pwForm) {
-    toggleBtn.addEventListener('click', function () {
-      var showing = pwForm.style.display !== 'none';
-      pwForm.style.display = showing ? 'none' : 'block';
-      toggleBtn.textContent = showing ? 'Use password instead' : 'Use magic link instead';
-    });
-
+  // ---- Password form ----
+  if (pwForm) {
     pwForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       var pwEmail = pwForm.querySelector('[name="pw_email"]').value.trim();
@@ -186,7 +210,7 @@
       }
 
       pwSubmit.disabled = false;
-      pwSubmit.textContent = 'Sign In';
+      pwSubmit.textContent = 'Sign In with Password';
     });
   }
 })();

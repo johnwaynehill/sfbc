@@ -51,7 +51,7 @@
         <% if (currentMeeting.meeting_time) { %>
           <span class="meeting-info__item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-            <%= new Date(currentMeeting.meeting_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) %> at <%= new Date(currentMeeting.meeting_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) %>
+            <%= formatMeetingTime(currentMeeting.meeting_time) %>
           </span>
         <% } %>
         <% if (currentMeeting.location_text) { %>
@@ -178,7 +178,7 @@
               <% if (mtg.meeting_time || mtg.location_text) { %>
                 <span class="upcoming-docket__details">
                   <% if (mtg.meeting_time) { %>
-                    <%= new Date(mtg.meeting_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                    <%= formatMeetingTime(mtg.meeting_time, 'short') %>
                   <% } %>
                   <% if (mtg.meeting_time && mtg.location_text) { %> · <% } %>
                   <% if (mtg.location_text) { %><%= mtg.location_text %><% } %>
@@ -200,7 +200,7 @@
               <% if (mtg.meeting_time || mtg.location_text) { %>
                 <span class="upcoming-docket__details">
                   <% if (mtg.meeting_time) { %>
-                    <%= new Date(mtg.meeting_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                    <%= formatMeetingTime(mtg.meeting_time, 'short') %>
                   <% } %>
                   <% if (mtg.meeting_time && mtg.location_text) { %> · <% } %>
                   <% if (mtg.location_text) { %><%= mtg.location_text %><% } %>

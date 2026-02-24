@@ -2042,6 +2042,40 @@ textarea.form-input {
   color: var(--text2);
 }
 
+/* ---- Admin: Users table ---- */
+.admin-table--users {
+  table-layout: auto;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  white-space: nowrap;
+}
+
+.user-actions {
+  display: flex;
+  gap: var(--s-1);
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.role-badge--admin {
+  background: var(--amber);
+  color: #000;
+}
+
 /* ---- Admin: Nominees ---- */
 .admin-nominees {
   display: flex;
@@ -2074,7 +2108,7 @@ textarea.form-input {
 .login-page {
   max-width: 380px;
   margin: 0 auto;
-  padding: var(--s-7) var(--s-3);
+  padding: var(--s-7) 0;
 }
 
 .login-page__heading {
@@ -2089,6 +2123,10 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
+}
+
+.login-form[hidden] {
+  display: none;
 }
 
 .login-sent {
@@ -2534,6 +2572,17 @@ textarea.form-input {
 
   .admin-table-wrap {
     overflow-x: visible;
+  }
+
+  /* ---- Users table: stacked on mobile ---- */
+  .admin-table--users td:first-child {
+    font-weight: normal;
+    font-size: inherit;
+    margin-bottom: 0;
+  }
+
+  .user-actions {
+    justify-content: flex-start;
   }
 
   /* ---- Lifecycle stepper: vertical on mobile ---- */
@@ -3685,6 +3734,39 @@ textarea.form-input {
 :is([data-theme="dark"], :root:not([data-theme="light"])) .banner .btn-primary {
   background: var(--text);
   color: var(--bg);
+}
+
+/* ---- Toast notifications ---- */
+.toast {
+  position: fixed;
+  bottom: var(--s-4);
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 250ms ease, transform 250ms ease;
+  pointer-events: none;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast--success {
+  background: #065F46;
+  color: #D1FAE5;
+}
+
+.toast--error {
+  background: #991B1B;
+  color: #FEE2E2;
 }
 
 /* Scope the @media dark mode selector for components too */

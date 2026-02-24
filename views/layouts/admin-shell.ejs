@@ -35,6 +35,7 @@
       <ul class="nav-links">
         <li><a href="/admin" class="t-nav<%= adminPath === '/' ? ' is-active' : '' %>">Overview</a></li>
         <li><a href="/admin/meetings" class="t-nav<%= adminPath && adminPath.startsWith('/meetings') ? ' is-active' : '' %>">Meetings</a></li>
+        <li><a href="/admin/users" class="t-nav<%= adminPath && adminPath.startsWith('/users') ? ' is-active' : '' %>">Users</a></li>
         <li><a href="/admin/settings" class="t-nav<%= adminPath === '/settings' ? ' is-active' : '' %>">Settings</a></li>
         <li class="admin-nav__extras">
           <a href="/" class="admin-nav__site-link" target="_blank" rel="noopener">View Site &rarr;</a>

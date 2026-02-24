@@ -1,0 +1,53 @@
+<section class="admin-page">
+  <div class="admin-page__header-row">
+    <h1 class="t-section admin-page__heading"><%= pageTitle %> (<%= users.length %>)</h1>
+  </div>
+
+  <% if (users.length > 0) { %>
+    <div class="admin-table-wrap">
+      <table class="admin-table admin-table--users">
+        <thead>
+          <tr>
+            <th class="t-caption">User</th>
+            <th class="t-caption">Email</th>
+            <th class="t-caption"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(function(u) { %>
+            <tr data-user-id="<%= u.id %>">
+              <td>
+                <div class="user-row">
+                  <%- include('../partials/avatar', { avatarUser: u, avatarSize: 'sm', avatarClass: '' }) %>
+                  <span class="t-body"><%= u.display_name || '—' %></span>
+                  <% if (u.role === 'admin') { %>
+                    <span class="role-badge role-badge--admin">admin</span>
+                  <% } %>
+                </div>
+              </td>
+              <td class="t-body text-secondary"><%= u.email %></td>
+              <td>
+                <div class="user-actions">
+                  <button type="button" class="btn btn--secondary btn--sm js-send-link"
+                          data-user-id="<%= u.id %>" data-email="<%= u.email %>">
+                    Send Link
+                  </button>
+                  <% if (u.role !== 'admin') { %>
+                    <button type="button" class="btn btn--danger btn--sm js-delete-user"
+                            data-user-id="<%= u.id %>" data-name="<%= u.display_name || u.email %>">
+                      Delete
+                    </button>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="admin-empty">
+      <p class="t-body text-secondary">No users yet.</p>
+    </div>
+  <% } %>
+</section>

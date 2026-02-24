@@ -393,6 +393,60 @@ router.delete('/admin/meetings/:id', requireAdmin, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Delete user (admin only, cannot delete admins)
+// DELETE /api/admin/users/:id
+// ---------------------------------------------------------------------------
+router.delete('/admin/users/:id', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid user ID.' });
+
+  const target = db.prepare('SELECT id, role FROM users WHERE id = ?').get(id);
+  if (!target) return res.status(404).json({ error: 'User not found.' });
+
+  if (target.role === 'admin') {
+    return res.status(403).json({ error: 'Cannot delete an admin user.' });
+  }
+
+  // Delete user's reviews, then the user
+  db.transaction(() => {
+    db.prepare('DELETE FROM reviews WHERE user_id = ?').run(id);
+    db.prepare('DELETE FROM users WHERE id = ?').run(id);
+  })();
+
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// Send magic link to a user (admin action)
+// POST /api/admin/users/:id/send-magic-link
+// ---------------------------------------------------------------------------
+const crypto = require('crypto');
+const { sendMagicLink } = require('../services/email');
+
+const insertMagicToken = db.prepare(
+  "INSERT INTO magic_link_tokens (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+15 minutes'))"
+);
+
+router.post('/admin/users/:id/send-magic-link', requireAdmin, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid user ID.' });
+
+  const target = db.prepare('SELECT id, email FROM users WHERE id = ?').get(id);
+  if (!target) return res.status(404).json({ error: 'User not found.' });
+
+  const token = crypto.randomBytes(32).toString('hex');
+  insertMagicToken.run(token, target.id);
+
+  try {
+    await sendMagicLink(target.email, token);
+    res.json({ success: true, message: `Magic link sent to ${target.email}` });
+  } catch (err) {
+    console.error('Failed to send magic link:', err);
+    res.status(500).json({ error: 'Failed to send email. Check server logs.' });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // Create review
 // POST /api/books/:bookId/reviews
 // ---------------------------------------------------------------------------
