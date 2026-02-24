@@ -146,6 +146,75 @@
 </section>
 <% } %>
 
+<!-- ===== Upcoming Books ===== -->
+<% if (upcomingMeetings && upcomingMeetings.length > 0) { %>
+<section class="section upcoming-section">
+  <div class="section-header">
+    <h2 class="t-section">Coming Up</h2>
+  </div>
+  <ol class="upcoming-docket">
+    <% for (const mtg of upcomingMeetings) { %>
+      <li class="upcoming-docket__item">
+        <div class="upcoming-docket__marker">
+          <span class="upcoming-docket__month"><%= formatMonthYear(mtg.month_year) %></span>
+        </div>
+        <% if (mtg.title) { %>
+          <a href="<%= bookPath(mtg.title, mtg.author) %>" class="upcoming-docket__card">
+            <div class="upcoming-docket__cover">
+              <% const upCoverUrl = getCoverUrl(mtg); %>
+              <% if (upCoverUrl) { %>
+                <img src="<%= upCoverUrl %>" alt="Cover of <%= mtg.title %>" loading="lazy">
+              <% } else { %>
+                <div class="placeholder-cover">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+                  </svg>
+                </div>
+              <% } %>
+            </div>
+            <div class="upcoming-docket__text">
+              <span class="upcoming-docket__title"><%= mtg.title %></span>
+              <span class="upcoming-docket__author"><%= mtg.author %></span>
+              <% if (mtg.meeting_time || mtg.location_text) { %>
+                <span class="upcoming-docket__details">
+                  <% if (mtg.meeting_time) { %>
+                    <%= new Date(mtg.meeting_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                  <% } %>
+                  <% if (mtg.meeting_time && mtg.location_text) { %> · <% } %>
+                  <% if (mtg.location_text) { %><%= mtg.location_text %><% } %>
+                </span>
+              <% } %>
+            </div>
+          </a>
+        <% } else { %>
+          <div class="upcoming-docket__card upcoming-docket__card--tbd">
+            <div class="upcoming-docket__cover upcoming-docket__cover--tbd">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75"/>
+                <circle cx="12" cy="18" r=".75" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div class="upcoming-docket__text">
+              <span class="upcoming-docket__title upcoming-docket__title--tbd">To Be Decided</span>
+              <span class="upcoming-docket__author">Book selection coming soon</span>
+              <% if (mtg.meeting_time || mtg.location_text) { %>
+                <span class="upcoming-docket__details">
+                  <% if (mtg.meeting_time) { %>
+                    <%= new Date(mtg.meeting_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                  <% } %>
+                  <% if (mtg.meeting_time && mtg.location_text) { %> · <% } %>
+                  <% if (mtg.location_text) { %><%= mtg.location_text %><% } %>
+                </span>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+      </li>
+    <% } %>
+  </ol>
+</section>
+<% } %>
+
 <!-- ===== About ===== -->
 <section class="about-section">
   <div class="about-section__content">

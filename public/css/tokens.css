@@ -58,11 +58,11 @@
   --s-8: 80px;    /* hero / feature sections */
 
   /* === Font sizes (type scale) === */
-  --t-xs: 13px;   /* captions, small labels */
-  --t-sm: 14px;   /* nav, secondary, buttons */
-  --t-base: 16px; /* body text, form inputs */
-  --t-lg: 18px;   /* section emphasis */
-  --t-xl: 24px;   /* section headings */
+  --t-xs: 0.85rem;   /* captions, small labels */
+  --t-sm: 0.95rem;   /* nav, secondary, buttons */
+  --t-base: 1.1rem;  /* body text, form inputs */
+  --t-lg: 1.25rem;   /* section emphasis */
+  --t-xl: 1.65rem;   /* section headings */
 
   /* === Font families === */
   --font-brand: 'DM Serif Display', Georgia, serif;

@@ -7,6 +7,7 @@ const { formatMonthYear } = require('../utils/format');
 const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
+const meetingsService = require('../services/meetings');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -106,6 +107,16 @@ router.get('/', (req, res) => {
     LIMIT 1
   `).get() || null;
 
+  // Upcoming meetings (status = 'upcoming', ordered by month_year ASC)
+  const upcomingMeetings = meetingsService.getUpcoming().map(m => {
+    // Enrich with full book data if a winner is set
+    if (m.winning_book_id) {
+      const book = db.prepare('SELECT title, author, cover_url, author_slug, title_slug FROM books WHERE id = ?').get(m.winning_book_id);
+      if (book) Object.assign(m, book);
+    }
+    return m;
+  });
+
   // Parse subjects JSON for hero display
   let heroSubjects = [];
   if (currentMeeting && currentMeeting.subjects) {
@@ -117,6 +128,7 @@ router.get('/', (req, res) => {
     currentMeeting,
     activeMeeting,
     recentBooks,
+    upcomingMeetings,
     totalBooks,
     heroSubjects,
     getCoverUrl,

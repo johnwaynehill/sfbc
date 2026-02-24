@@ -500,6 +500,72 @@ button {
   text-decoration: none;
 }
 
+/* Admin nav: Hamburger toggle — hidden on desktop */
+.admin-nav__toggle {
+  display: none;
+}
+
+/* Admin nav: Extras row (View Site + theme toggle) — inline on desktop */
+.admin-nav__extras {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* Admin nav: Mobile layout */
+@media (max-width: 640px) {
+  .admin-nav__toggle {
+    display: flex;
+    margin-left: auto;           /* push hamburger to far right */
+  }
+
+  .admin-nav .page-container {
+    flex-wrap: wrap;
+  }
+
+  .admin-nav .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--admin-border);
+    margin-top: var(--s-3);
+    margin-left: 0;
+  }
+
+  .admin-nav.is-open .nav-links {
+    display: flex;
+  }
+
+  .admin-nav .nav-links li {
+    width: 100%;
+  }
+
+  .admin-nav .nav-links a {
+    display: block;
+    padding: var(--s-3) 0;
+  }
+
+  .admin-nav .nav-links a.is-active {
+    border-bottom: none;
+    border-radius: 0;
+  }
+
+  /* Extras row: site link + theme toggle side by side */
+  .admin-nav__extras {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    border-top: 1px solid var(--admin-border);
+  }
+
+  .admin-nav__extras .admin-nav__site-link {
+    margin-left: 0;
+  }
+}
+
 /* Admin nav: Avatar — reuse .nav-avatar styling */
 .admin-avatar {
   display: inline-flex;
