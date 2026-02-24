@@ -1,0 +1,71 @@
+<section class="admin-page">
+  <div class="admin-page__header-row">
+    <h1 class="t-section admin-page__heading"><%= pageTitle %> (<%= reviews.length %>)</h1>
+  </div>
+
+  <% if (reviews.length > 0) { %>
+    <div class="admin-table-wrap">
+      <table class="admin-table admin-table--reviews">
+        <thead>
+          <tr>
+            <th class="t-caption">Grade</th>
+            <th class="t-caption">Book</th>
+            <th class="t-caption">Reviewer</th>
+            <th class="t-caption">Date</th>
+            <th class="t-caption"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reviews.forEach(function(r) { %>
+            <tr data-review-id="<%= r.id %>" class="js-review-row">
+              <td>
+                <span class="grade-badge grade-badge--sm <%= gradeTier(r.grade) %>"><%= r.grade %></span>
+              </td>
+              <td>
+                <div class="review-book-info">
+                  <span class="t-body"><%= r.book_title %></span>
+                  <span class="t-caption text-secondary"><%= r.book_author %></span>
+                </div>
+              </td>
+              <td class="t-body"><%= r.display_name || r.email %></td>
+              <td class="t-body text-secondary" style="white-space: nowrap;">
+                <%
+                  var parts = r.created_at.split(/[-T ]/);
+                  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                  var dateStr = months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10) + ', ' + parts[0];
+                %>
+                <%= dateStr %>
+              </td>
+              <td>
+                <div class="user-actions">
+                  <% if (r.body_markdown) { %>
+                    <button type="button" class="btn btn--secondary btn--sm js-toggle-review"
+                            aria-expanded="false">
+                      View
+                    </button>
+                  <% } %>
+                  <button type="button" class="btn btn--danger btn--sm js-delete-review"
+                          data-review-id="<%= r.id %>"
+                          data-name="<%= (r.display_name || r.email) + ' on ' + r.book_title %>">
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% if (r.body_markdown) { %>
+              <tr class="review-expand-row" hidden>
+                <td colspan="5">
+                  <div class="review-expand-body t-body text-secondary"><%= r.body_markdown %></div>
+                </td>
+              </tr>
+            <% } %>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="admin-empty">
+      <p class="t-body text-secondary">No reviews yet.</p>
+    </div>
+  <% } %>
+</section>

@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16x16.png">
-  <link rel="stylesheet" href="/css/tokens.css?v=13">
-  <link rel="stylesheet" href="/css/base.css?v=13">
-  <link rel="stylesheet" href="/css/components.css?v=13">
+  <link rel="stylesheet" href="/css/tokens.css?v=15">
+  <link rel="stylesheet" href="/css/base.css?v=15">
+  <link rel="stylesheet" href="/css/components.css?v=15">
   <script>(function(){var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)})()</script>
 </head>
 <body>
@@ -36,6 +36,7 @@
         <li><a href="/admin" class="t-nav<%= adminPath === '/' ? ' is-active' : '' %>">Overview</a></li>
         <li><a href="/admin/meetings" class="t-nav<%= adminPath && adminPath.startsWith('/meetings') ? ' is-active' : '' %>">Meetings</a></li>
         <li><a href="/admin/users" class="t-nav<%= adminPath && adminPath.startsWith('/users') ? ' is-active' : '' %>">Users</a></li>
+        <li><a href="/admin/reviews" class="t-nav<%= adminPath && adminPath.startsWith('/reviews') ? ' is-active' : '' %>">Reviews</a></li>
         <li><a href="/admin/settings" class="t-nav<%= adminPath === '/settings' ? ' is-active' : '' %>">Settings</a></li>
         <li class="admin-nav__extras">
           <a href="/" class="admin-nav__site-link" target="_blank" rel="noopener">View Site &rarr;</a>

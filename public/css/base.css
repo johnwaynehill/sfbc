@@ -636,6 +636,11 @@ img.avatar {
   justify-content: space-between;
 }
 
+.footer-links {
+  display: flex;
+  gap: var(--s-3);
+}
+
 .footer-link {
   color: var(--text3);
 }

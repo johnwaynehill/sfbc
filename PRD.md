@@ -96,6 +96,12 @@ Ship after the core experience is solid.
 * ~~Public member profiles.~~ ✅ Implemented at `/members/:slug` with reading stats, social links, and review history.
 * ~~Avatar customization.~~ ✅ Implemented with 24 DiceBear styles in 3 tabbed groups.
 * ~~Profile social links.~~ ✅ Goodreads, StoryGraph, Instagram, Threads.
+* ~~Admin mobile responsiveness.~~ ✅ Hamburger nav, stacked table cards, vertical lifecycle stepper, full-width QR.
+* ~~Timezone-safe date formatting.~~ ✅ Custom `formatMeetingTime()` helper avoids UTC parsing issues on production.
+* ~~Login page inline form swap.~~ ✅ "Sign In or Create an Account" with magic link / password toggle.
+* ~~Admin user management.~~ ✅ View all users, delete with confirmation + toast, send magic link directly.
+* ~~Upcoming books section on home page.~~ ✅ Timeline-style "Coming Up" docket below Recent Reads.
+* ~~Public changelog.~~ ✅ "What's New" page at `/changelog` linked from footer.
 
 ## Future (Post-MVP)
 Tracked for architectural awareness but explicitly out of scope for v1.
@@ -127,7 +133,12 @@ Tracked for architectural awareness but explicitly out of scope for v1.
 * As a member, I can add social links (Goodreads, StoryGraph, Instagram, Threads) to my profile.
 * As a member, I can see my own review history.
 * As a member, I can view other members' public profiles with their reading stats and reviews.
+* As an admin, I can view all registered users with their avatar, name, email, and role.
+* As an admin, I can delete a non-admin user (with confirmation).
+* As an admin, I can send a magic link directly to any user.
 * As a public visitor, I can browse book history without seeing reviewer names.
+* As a public visitor, I can see upcoming books and meeting dates on the home page.
+* As a visitor, I can view a "What's New" changelog from the site footer.
 
 ---
 
@@ -170,6 +181,8 @@ Open nominations -> monitor count -> close -> open voting -> monitor count + liv
 * Profile (authenticated — avatar picker, display name, social links, password)
 * Member Profile (authenticated — public view of another member's stats and reviews at `/members/:slug`)
 * Admin Dashboard (open/close controls, counts, exports)
+* Admin Users (/admin/users — user list, delete, send magic link)
+* Changelog (public — "What's New" version history at `/changelog`)
 * Optional: Book lookup / details preview (for nomination validation)
 
 ---
@@ -180,9 +193,9 @@ The Admin experience should be a dedicated mode under /admin/* with its own navi
 
 ## Overview (/admin)
 
-## Nominations (/admin/nominations)
+## Meetings (/admin/meetings)
 
-## Results & Exports (/admin/results)
+## Users (/admin/users)
 
 ## Settings (/admin/settings)
 

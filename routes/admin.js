@@ -190,6 +190,28 @@ router.get('/users', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Reviews list
+// ---------------------------------------------------------------------------
+router.get('/reviews', (req, res) => {
+  const reviews = db.prepare(`
+    SELECT r.id, r.grade, r.body_markdown, r.created_at,
+           u.display_name, u.email,
+           b.title AS book_title, b.author AS book_author,
+           b.title_slug, b.author_slug
+    FROM reviews r
+    JOIN users u ON u.id = r.user_id
+    JOIN books b ON b.id = r.book_id
+    ORDER BY r.created_at DESC
+  `).all();
+
+  res.render('admin/reviews', {
+    pageTitle: 'Reviews',
+    pageScript: '/js/admin-reviews.js',
+    reviews,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Settings
 // ---------------------------------------------------------------------------
 router.get('/settings', (req, res) => {

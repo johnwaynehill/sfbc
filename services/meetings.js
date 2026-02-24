@@ -119,6 +119,7 @@ const voteCountStmt = db.prepare(
 
 const countBooksStmt = db.prepare("SELECT COUNT(*) AS cnt FROM meetings WHERE status = 'results' AND winning_book_id IS NOT NULL");
 const countMembersStmt = db.prepare("SELECT COUNT(*) AS cnt FROM users WHERE role = 'member'");
+const countReviewsStmt = db.prepare('SELECT COUNT(*) AS cnt FROM reviews');
 
 /* ------------------------------------------------------------------ */
 /*  Valid status transitions                                           */
@@ -276,6 +277,7 @@ function getStats() {
   return {
     totalBooks: countBooksStmt.get().cnt,
     totalMembers: countMembersStmt.get().cnt,
+    totalReviews: countReviewsStmt.get().cnt,
   };
 }
 

@@ -1,0 +1,35 @@
+[
+  {
+    "version": "0.4",
+    "date": "2026-02-23",
+    "title": "Welcome to the SF Book Club App!",
+    "intro": "John Wayne built this app to give our book club a permanent home \u2014 a place to nominate, vote, review, and remember every book we read together.",
+    "entries": [
+      {
+        "icon": "qr",
+        "text": "Scan a QR code at meetings to nominate books and vote on what we read next, with live results updating in real time."
+      },
+      {
+        "icon": "book",
+        "text": "Browse our full reading history, see what the club thought of each book, and leave your own reviews with letter grades."
+      },
+      {
+        "icon": "magic",
+        "text": "Create an account with just your email \u2014 no password required. We\u2019ll send you a magic link to sign in."
+      },
+      {
+        "icon": "user",
+        "text": "Customize your profile with 24 avatar styles, add your Goodreads or StoryGraph links, and see your review history."
+      },
+      {
+        "icon": "calendar",
+        "text": "See what\u2019s coming up next on the home page with our new \u201cComing Up\u201d section showing future meetings and books."
+      },
+      {
+        "icon": "moon",
+        "text": "Dark mode is built in \u2014 toggle it from the nav or let it follow your system preference."
+      }
+    ],
+    "outro": "This is just the beginning. I will keep improving the app and posting updates here. Happy reading!"
+  }
+]

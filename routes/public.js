@@ -182,6 +182,31 @@ router.get('/about', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /changelog — What's New
+// ---------------------------------------------------------------------------
+const changelogData = require('../data/changelog.json');
+
+const MONTH_NAMES_LONG = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function formatChangelogDate(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  const mi = parseInt(m, 10) - 1;
+  return `${MONTH_NAMES_LONG[mi]} ${parseInt(d, 10)}, ${y}`;
+}
+
+router.get('/changelog', (req, res) => {
+  res.render('changelog', {
+    pageTitle: "What's New",
+    releases: changelogData,
+    formatChangelogDate,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /profile — User profile page
 // ---------------------------------------------------------------------------
 router.get('/profile', requireMember, (req, res) => {

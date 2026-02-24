@@ -447,6 +447,21 @@ router.post('/admin/users/:id/send-magic-link', requireAdmin, async (req, res) =
 });
 
 // ---------------------------------------------------------------------------
+// Delete review (admin only)
+// DELETE /api/admin/reviews/:id
+// ---------------------------------------------------------------------------
+router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid review ID.' });
+
+  const review = db.prepare('SELECT id FROM reviews WHERE id = ?').get(id);
+  if (!review) return res.status(404).json({ error: 'Review not found.' });
+
+  db.prepare('DELETE FROM reviews WHERE id = ?').run(id);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
 // Create review
 // POST /api/books/:bookId/reviews
 // ---------------------------------------------------------------------------
