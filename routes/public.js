@@ -184,7 +184,7 @@ router.get('/about', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /changelog — What's New
 // ---------------------------------------------------------------------------
-const changelogData = require('../data/changelog.json');
+const changelogData = require('../content/changelog.json');
 
 const MONTH_NAMES_LONG = [
   'January', 'February', 'March', 'April', 'May', 'June',
