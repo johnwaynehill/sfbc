@@ -5,7 +5,8 @@ SF Fantasy & Sci-Fi Book Club App
 This document defines the data model, API contracts, rendering strategy, and infrastructure decisions for the app. It is the authoritative reference for all engineering implementation.
 
 Read this alongside:
-- **PRD.md** — product vision, goals, user stories, page definitions, functional requirements
+- **VISION.md** — product vision, market thesis, and platform strategy
+- **PRD.md** — product specification, goals, user stories, page definitions, functional requirements
 - **Design-Specs.md** — visual system, design tokens, components, layout patterns
 - **Brand-Guidelines.md** — strategic brand foundations
 - **Design-Thinking.md** — implementation guidance for the First Edition aesthetic

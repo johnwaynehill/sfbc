@@ -1,35 +1,34 @@
-SF Fantasy & Sci-Fi Book Club App
+GatherBound — SF Fantasy & Sci-Fi Book Club
 
 ## Product Requirements Document (PRD)
 
-Product: SF Fantasy & Sci-Fi Book Club App
+Product: GatherBound (SF Fantasy & Sci-Fi Book Club)
 Owner: You
-Date: February 8, 2026
+Date: February 8, 2026 (revised February 24, 2026)
 
 ---
 
 # 1. Product Vision
 
-**Meetings are temporary. Memory should not be.**
+→ **See [VISION.md](VISION.md)** for the full product vision, market thesis, and platform strategy.
 
-The SF Fantasy & Sci-Fi Book Club has met monthly in San Francisco for years — nominating books, voting, reading, and discussing together. But every meeting vanishes the moment it ends. The nominations, the debates, the votes, the reactions — none of it is preserved. The club uses Strawpoll (ad-ridden, disposable) and scattered Google Docs. There is no permanent record of what was read, when, or what anyone thought about it.
-
-This app transforms that ephemeral ritual into a lasting cultural artifact.
-
-It is not a dashboard. It is not a social network. It is an editorial archive — a living record of shared imagination, designed to feel permanent and meaningful. Every book the club reads becomes a collectible page. Every review becomes part of the record. The history grows month over month into something worth browsing, sharing, and remembering.
-
-**Product thesis:** When an in-person club gets a beautiful, frictionless tool that preserves its shared life, participation deepens, identity strengthens, and the community becomes more durable over time.
+**Core thesis:** The cultural artifact is the center. For a book club, that's the book. Meetings are instances — ways to experience the artifact together — but the artifact page is the permanent hub where everything lives. The app succeeds when someone who has never attended a meeting still considers themselves a member.
 
 ---
 
 # 2. Background / Context
 
-The club (~35 active members) meets monthly, typically the last Wednesday. Members vote in person three months ahead (e.g., July votes for October's book). The current workflow — Strawpoll for voting, loose coordination for nominations — introduces ads, friction, and zero historical memory.
+The SF Fantasy & Sci-Fi Book Club has 900+ members on Meetup. Meetings cap at 25. A core group of 8–10 always attends, which means the vast majority of members rarely — or never — get a seat. Three audiences, in priority order:
 
-The new app should:
+1. **The 875+ who can't get a seat** — The app IS the club for them. Reading along, reacting to reviews, joining discussions, tracking reading status.
+2. **The ~25 who attend each month** — Smooth nominations, voting, reviews, and meeting tools.
+3. **Admins/organizers** — Streamlined nomination→voting→winner flow, meeting management, announcements.
+
+The app should:
 * Support nominations and ranked voting in person via QR code scan.
 * Keep a public, browseable archive of every book the club has read.
-* Allow authenticated members to leave letter-grade reviews.
+* Allow authenticated members to leave letter-grade reviews, react, and discuss.
+* Enable participation for members who can't attend meetings.
 * Feel like a curated editorial experience, not a utility tool.
 
 ---
@@ -41,16 +40,18 @@ The new app should:
 * Store history and reviews in human-readable Markdown as a durability layer.
 * Keep participation friction low (QR scan → nominate/vote in <10 seconds, no login required).
 * Allow review attribution for members via magic-link authentication.
-* Keep the architecture to be open to future social interactions like Liking other people's reviews with emoji, etc. 
+* Enable community engagement between meetings — reactions, replies, discussion threads, reading status.
+* Support multiple meetings per book so more members can participate in person.
 * Keep Admin section separate from the main navigation. Admins can just bookmark the link directly. Admin section should be in a different structure all together.
 
 ---
 
 # 4. Non-Goals
 
-* Replacing Meetup for events.
-* Building a full social network or forum. But, be open to a light social network in the future.
+* Replacing Meetup for event discovery and RSVPs.
+* Building a general-purpose social network or forum — engagement should be structured around artifacts, not freeform feeds.
 * Complex moderation workflows beyond basic admin controls.
+* Full artifact-type expansion (movies, podcasts, etc.) — only when another club actually exists.
 
 ---
 
@@ -103,11 +104,17 @@ Ship after the core experience is solid.
 * ~~Upcoming books section on home page.~~ ✅ Timeline-style "Coming Up" docket below Recent Reads.
 * ~~Public changelog.~~ ✅ "What's New" page at `/changelog` linked from footer.
 
-## Future (Post-MVP)
-Tracked for architectural awareness but explicitly out of scope for v1.
+## Now Core (Promoted from Post-MVP)
+These were originally post-MVP but are now central to the artifacts-as-center model and community engagement strategy.
 
 * Emoji reactions on reviews.
-* Personal reading queue / "want to read" state.
+* Reading status per member (Reading, Read, DNF, Did Not Read).
+* Reply to reviews / discussion threads.
+* Activity feed on Home page.
+
+## Future (Post-MVP)
+Tracked for architectural awareness but explicitly out of scope for current phases.
+
 * Supporter/premium features.
 * Multi-club / platform capabilities.
 
@@ -115,9 +122,10 @@ Tracked for architectural awareness but explicitly out of scope for v1.
 
 # 5. Personas
 
-* Admin organizer.
-* Attending member (in-person voter).
-* Casual public visitor (reads history only).
+* **Community member** (reads along, writes reviews, reacts, discusses — may never attend a meeting).
+* **Attending member** (in-person voter, nominator, meeting participant).
+* **Admin organizer** (manages nomination→voting→winner cycle, meetings, announcements).
+* **Casual public visitor** (browses history and archive only).
 
 ---
 
@@ -139,6 +147,12 @@ Tracked for architectural awareness but explicitly out of scope for v1.
 * As a public visitor, I can browse book history without seeing reviewer names.
 * As a public visitor, I can see upcoming books and meeting dates on the home page.
 * As a visitor, I can view a "What's New" changelog from the site footer.
+* As a community member, I can mark my reading status for the current book (Reading, Read, DNF, Did Not Read).
+* As a community member, I can react to reviews with emoji without writing a full review.
+* As a community member, I can reply to another member's review to start a discussion.
+* As a community member, I can engage with the club's current book on the same timeline as attendees, even if I can't make the meeting.
+* As an admin, I can create multiple meeting sessions for the same book to serve more members.
+* As an admin, I can publish announcements visible on the Home page.
 
 ---
 
@@ -518,25 +532,26 @@ Create identity + ownership for members.
 
 (Admin IA defined separately.)
 
-# 6E. Meeting State Model (Core Product Logic)
+# 6E. Artifact Cycle & Meeting State Model (Core Product Logic)
 
-The application is primarily driven by Meeting State.
+The application is organized around **artifact cycles** (monthly picks), not individual meetings.
 
-Each meeting has a single active state:
+Each artifact cycle has a lifecycle:
 
-- Reading (default)
+- **Selection** — Nominations open → Voting open → Winner selected
+- **Reading** — The community reads/engages with the artifact on a shared timeline
+- **Discussion** — Reviews, reactions, replies, reading status updates
+- **Archive** — The artifact page becomes a permanent record
+
+Meetings are instances attached to an artifact cycle. Multiple meetings can reference the same book, enabling 75–100+ members to participate in person instead of 25.
+
+Each meeting retains its own state for in-person flows:
 
 - Nominations Open
-
 - Voting Open
-
 - Results Published
 
-Homepage content and QR routes adjust based on the current state. Global navigation remains static and predictable to avoid user confusion.
-
-Only admins can change state.
-
-QR routes automatically redirect based on state.
+Homepage content adjusts based on the current artifact cycle state. QR routes redirect based on meeting state. Only admins can change state.
 
 # 6F. Record.club Patterns to Adopt (Design Philosophy)
 
@@ -564,19 +579,19 @@ Implementation Notes:
 
 ---
 
-## 2. Personal Organization (Future-Friendly, Not Required for v1)
+## 2. Personal Organization (Core)
 
-Record.club succeeds partly because it supports personal tracking alongside social discovery.
+Personal tracking alongside social discovery is essential for the 875+ members who engage through the app rather than in person.
 
-Future Concepts (not required for MVP):
+Current Scope:
 
-* Personal reading queue or "want to read" state.
-* "Currently Reading" or "Up Next" indicators.
+* Reading status per book (Reading, Read, DNF, Did Not Read).
+* Personal review history and grade distribution (already shipped via My Reviews).
 * Ability to track books nominated by the member.
 
 Design Principle:
 
-* The app should remain useful even when not actively voting.
+* The app should remain useful even when not actively voting. For most members, the app IS the club.
 
 ---
 
@@ -596,18 +611,19 @@ Goal:
 
 ---
 
-## 4. Lightweight Social Feedback (Future Capability)
+## 4. Structured Social Engagement (Core)
 
-Inspired by record.club's minimal social interactions, the app may support small, low-friction engagement mechanisms.
+The app supports structured, artifact-centered social interactions — not freeform social networking.
 
-Future Possibilities:
+Current Scope:
 
-* Emoji reactions or "likes" on reviews.
-* Viewing reviews a user has reacted to.
+* Emoji reactions on reviews — the simplest way for non-attendees to participate.
+* Reply to reviews — enables conversation about books, not logistics.
+* Activity feed on Home page — shows reviews, replies, reactions as they happen.
 
 Design Constraint:
 
-* Avoid full comment threads or complex social moderation.
+* Social features are always tied to artifacts (books), never freeform. Editorial over social. Structure over stream.
 
 ---
 
@@ -757,20 +773,27 @@ Summary: Node.js backend, SMTP mail for magic-links, SSE for real-time updates, 
 
 # 13. Success Metrics
 
-**Operational (is the tool working?)**
+**Operational (is the in-person tool working?)**
 * 90%+ of attendees complete nominations and voting on mobile without assistance.
 * 75%+ of attendees can see live results within 2 seconds of vote submission.
 * Admin can run one full meeting end-to-end without fallback tools.
 
-**Engagement (is the archive compelling?)**
+**Community Engagement (are the 875+ engaging?)**
+* Non-attending members mark reading status for the current book.
+* Members who have never attended a meeting submit reviews or reactions.
+* Activity feed shows consistent engagement between meeting days.
+* Reply threads and reactions grow month over month.
+
+**Archive & Discovery (is the archive compelling?)**
 * 50%+ of members submit at least one review per quarter.
-* History and Book Detail pages receive organic traffic between meetings (not just on meeting day).
+* History and Book Detail pages receive organic traffic between meetings.
 * Members share Book Detail URLs externally (social, messaging).
+* New members use the archive to catch up on what the club has read.
 
 **Cultural (is the product thesis working?)**
-* The club's history feels browseable and worth revisiting.
-* New members use the archive to catch up on what the club has read.
+* Members who can't attend meetings still consider themselves part of the club.
 * The archive grows richer over time without additional admin effort.
+* Multiple meeting sessions per book increase total in-person participation.
 
 ---
 
@@ -829,15 +852,19 @@ Design-Specs.md contains all implementation details for the **First Edition** ae
 
 ---
 
-# 22. Platform Future (Architectural Awareness)
+# 22. Artifacts-as-Center Architecture (Current Direction)
 
-→ **See [Tech-Specs.md](Tech-Specs.md) §8** for full platform future details.
+→ **See [VISION.md](VISION.md)** for the full platform thesis.
+→ **See [Tech-Specs.md](Tech-Specs.md) §8** for technical platform details.
+→ **See [ROADMAP.md](ROADMAP.md)** for the phased implementation plan.
 
-This section is NOT in scope for v1. It exists to ensure that foundational decisions do not accidentally prevent future scaling. Key protections:
+The artifact-centered architecture is the foundational design principle, not a future consideration. The book is the center. Meetings are instances attached to a book. This enables multiple meetings per book, engagement without attendance, and a permanent archive that grows over time.
 
-* **Keep the meeting state model clean** — it generalizes to any club type.
-* **Use the canonical component system** — BookHero, BookCard, ReviewCard are reusable across clubs.
-* **Keep data model boundaries sharp** — Book is canonical; Meeting is contextual.
+Key architectural principles:
+
+* **Book is canonical; Meeting is contextual** — Reviews, reactions, discussions, and reading status all link to the book, not a meeting.
+* **Artifact cycles decouple from meetings** — The nomination→voting→winner flow operates at the cycle level, not the meeting level.
+* **Use the canonical component system** — BookHero, BookCard, ReviewCard are reusable across artifact types.
 * **Do not hardcode club identity** — use configuration/env vars for name, tagline, links.
 * **Keep First Edition tokens in their own layer** — future clubs swap tokens, not components.
 

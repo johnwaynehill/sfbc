@@ -5,7 +5,8 @@ SF Fantasy & Sci-Fi Book Club App
 This document defines the complete visual and interaction system for the app. It is the authoritative reference for all design implementation decisions.
 
 Read this alongside:
-- **PRD.md** — product vision, goals, user stories, page definitions, functional requirements
+- **VISION.md** — product vision, market thesis, and platform strategy
+- **PRD.md** — product specification, goals, user stories, page definitions, functional requirements
 - **Brand-Guidelines.md** — strategic brand foundations and emotional design map
 - **Design-Thinking.md** — implementation guidance for engineers and AI tools
 - **Tech-Specs.md** — data model, routes, APIs, rendering, and infrastructure

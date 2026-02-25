@@ -1,13 +1,15 @@
-# SF Fantasy & Sci-Fi Book Club App
-# Apple-Style Brand Guidelines
+# GatherBound — Brand Guidelines
+
+→ **See [VISION.md](VISION.md)** for the product vision and platform thesis.
+→ **See [PRD.md](PRD.md)** for the product specification.
 
 ---
 
 # Brand Pyramid
 
-This document defines the strategic, emotional, and visual foundations for the SF Fantasy & Sci‑Fi Book Club application. It serves as the single source of truth for design decisions, engineering implementation, content creation, and future product evolution.
+This document defines the strategic, emotional, and visual foundations for GatherBound — the digital home for in-person communities built around shared cultural experiences. It serves as the single source of truth for design decisions, engineering implementation, content creation, and future product evolution.
 
-The goal is to create a calm editorial experience that transforms a recurring real‑world ritual into a lasting cultural artifact.
+The goal is to create a calm editorial experience that gives every member of a community a way to participate — whether or not they were in the room — and transforms shared cultural experiences into a lasting, browseable record.
 
 ---
 
@@ -15,11 +17,11 @@ The goal is to create a calm editorial experience that transforms a recurring re
 
 ## Core Purpose
 
-**Preserve shared imagination as a living cultural artifact.**
+**The community is always bigger than the room. Give everyone a way to belong.**
 
-Meetings are temporary. Memory should not be.
+Meetings are temporary. Community should not be.
 
-The application transforms ephemeral social moments into permanent narrative and cultural history.
+In-person clubs thrive, but the room can only hold so many people. GatherBound transforms a club from something you attend into something you're part of — turning shared cultural experiences into a permanent, participatory record that grows more valuable over time.
 
 ---
 
@@ -27,13 +29,15 @@ The application transforms ephemeral social moments into permanent narrative and
 
 ## Core Belief
 
-Stories gain meaning when experienced together — and remembered well.
+Stories gain meaning when experienced together — and remembered well. Participation shouldn't require a seat.
 
 Implications:
 
-- History matters.
-- Identity emerges over time.
-- Design should feel archival rather than disposable.
+- The cultural artifact is the center — not the meeting, not the calendar, not the chat.
+- History matters. The archive is the product.
+- Identity emerges over time — for members and for the community.
+- Participation doesn't require attendance. If someone has to be in the room to engage, the product has failed.
+- Design should feel archival rather than disposable. Editorial, not social.
 
 ---
 
@@ -73,20 +77,26 @@ Position: **Calm with moments of communal energy**
 
 ## 1. Artifact Over Interface
 
-Content dominates. Interface recedes.
+Content dominates. Interface recedes. The cultural artifact — the book, the film, the album — is always the center.
 
 ## 2. Ritual Over Feature
 
-Design reinforces the meeting lifecycle:
+Design reinforces the artifact lifecycle:
 
-Nominate → Vote → Reveal → Reflect.
+Nominate → Vote → Read → Discuss → Reflect → Archive.
 
-## 3. Quiet Confidence
+The meeting is one moment in this cycle, not the whole thing.
+
+## 3. Participation Without Attendance
+
+Every feature asks: can someone who wasn't in the room still engage meaningfully? Reviews, reactions, discussions, reading status — these are ways to be part of the community on your own terms.
+
+## 4. Quiet Confidence
 
 - Minimal visual noise.
 - Intentional spacing and typography.
 
-## 4. Single Story Per Screen
+## 5. Single Story Per Screen
 
 Every screen answers one primary narrative question.
 
@@ -214,17 +224,17 @@ Avoid:
 
 # 8. Emotional Design Map
 
-## Home — Welcoming + Curious
+## Home — Welcoming + Alive
 
-Invite exploration and communicate identity calmly.
+Invite exploration, communicate identity, show that the community is active. The activity feed gives members a reason to return between meetings.
 
 ## History — Archival + Discoverable
 
-Reinforce longevity and collective memory.
+Reinforce longevity and collective memory. The archive is the most valuable thing the community owns.
 
-## Book Detail — Reflective + Artifact-Focused
+## Book Detail — The Hub
 
-Make each book feel permanent and meaningful.
+Make each book feel permanent and meaningful. This is where everything lives: reviews, discussions, quotes, reading status, grade distributions. The book detail page is the center — not the meeting.
 
 ## Nominate — Fast + Frictionless
 
@@ -240,15 +250,19 @@ Shared excitement without visual chaos.
 
 ## Review — Personal + Thoughtful
 
-Encourage reflection in a calm environment.
+Encourage reflection in a calm environment. This is how the 875 members who weren't in the room participate most deeply.
 
-## My Reviews — Ownership + Identity
+## Activity Feed — Community Pulse
 
-Reinforce personal contribution over time.
+A structured stream of reviews, reactions, replies, and nominations. Editorial, not social — curated updates, not an endless scroll.
+
+## Member Profiles — Identity Over Time
+
+Reinforce personal contribution. Reading history, reviews, badges, and community engagement build identity within the group.
 
 ## Admin — Confident + Efficient
 
-Operational clarity with minimal decoration.
+Operational clarity with minimal decoration. Running the club through the app must be easier than a spreadsheet.
 
 ---
 
@@ -256,11 +270,13 @@ Operational clarity with minimal decoration.
 
 When unsure about a design decision, ask:
 
-1. Does this make the book feel more like an artifact?
+1. Does this make the cultural artifact feel more like the center?
 2. Does this increase calm or add noise?
 3. Would this fit on record.club or in an independent bookstore archive?
 4. Does this introduce "app energy" instead of editorial energy?
 5. Is the UI disappearing behind the content, or competing with it?
+6. Can a member who never attends a meeting still engage meaningfully with this?
+7. Does this add to the permanent record, or is it disposable?
 
 If the answer conflicts with these principles, reject the change.
 
@@ -268,7 +284,7 @@ If the answer conflicts with these principles, reject the change.
 
 # 10. Brand Summary Statement
 
-The SF Fantasy & Sci‑Fi Book Club app follows the **First Edition** design system — a clean editorial aesthetic inspired by record.club — that transforms monthly reading rituals into a lasting cultural record. The interface recedes; the books and community are the design.
+GatherBound is the digital home for in-person communities built around shared cultural experiences. It follows the **First Edition** design system — a clean editorial aesthetic inspired by record.club — that transforms the community from something you attend into something you belong to. The cultural artifact is the center. The archive grows more valuable over time. Participation doesn't require a seat. The interface recedes; the artifacts and the community are the design.
 
 ---
 

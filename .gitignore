@@ -6,3 +6,7 @@ mockups/images/
 *.sqlite-journal
 *.sqlite-wal
 *.sqlite-shm
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
