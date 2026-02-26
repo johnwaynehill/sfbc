@@ -3535,7 +3535,7 @@ textarea.form-input {
 .spoiler.is-revealed {
   background: var(--amber-light, #FFF8E1);
   color: var(--text);
-  cursor: default;
+  cursor: pointer;
 }
 
 /* Spoiler example in form hint */
@@ -3856,6 +3856,10 @@ textarea.form-input {
 :is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler:not(.is-revealed) {
   background: var(--surface2);
   color: transparent;
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler.is-revealed {
+  background: var(--surface2);
+  color: var(--text);
 }
 
 /* Admin nav hover state */

@@ -52,7 +52,7 @@ Almost every feature below benefits from this refactor. It should be done first,
 
 ### Engagement (small, high-impact, ships fast)
 
-- [ ] **Spoiler tap-to-reveal** — Tapping `||spoiler||` toggles visibility [S]
+- [✅] **Spoiler tap-to-reveal** — Tapping `||spoiler||` toggles visibility [S]
 - [ ] **Spoiler filter on reviews** — Hide/show reviews that contain spoilers [S]
 - [ ] **Emoji reactions to reviews** — Let the 875 non-attendees participate with a single tap [S]
 - [ ] **Announcements on Home page** — Admin publishes updates, gives members a reason to check in [S]
