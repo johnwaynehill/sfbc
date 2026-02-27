@@ -89,6 +89,12 @@ Almost every feature below benefits from this refactor. It should be done first,
   - Close voting, select winner
   - Tie winner to next month's artifact
 - [ ] **Create meetings / link to Meetup.com** — Multiple meetings per monthly pick [M]
+- [ ] **Sort and filter reviews in Admin** — Search, sort by date/grade/book [M]
+- [ ] **Sort and filter users in Admin** — Search, sort by name/join date [M]
+- [ ] **Promote user to Admin** — Add promote/demote action on /admin/users [S]
+- [ ] **Link to profile from Admin users** — Quick link to member's public profile [S]
+- [ ] **Preserve vote results as archive** — Keep past vote tallies accessible, not just the winner [M]
+- [ ] **Prevent past nominations from interfering with winner URLs** — Ensure canonical slugs for winning books aren't affected by prior nomination data [S]
 
 ---
 
@@ -162,6 +168,12 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Create custom DiceBear avatar** — Builder UI for personalization [L]
 - [ ] **Display name collision detection** — Alert + suggest alternatives [S]
 - [ ] **Usernames + display names** — Profile URLs use usernames, admin views show both [M]
+- [ ] **Better UX on Profile Settings page** — Improve layout and flow [M]
+- [ ] **View own public profile** — Let members see how their profile appears to others [S]
+
+### Members
+
+- [ ] **Public Members page** — Shows member info, stats, join date, links to profiles [L]
 
 ### Badges
 
