@@ -8,6 +8,7 @@ const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
 const meetingsService = require('../services/meetings');
+const reactionsService = require('../services/reactions');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -268,11 +269,20 @@ router.get('/members/:slug', requireMember, (req, res) => {
     ORDER BY r.created_at DESC
   `).all(member.id);
 
+  // Emoji reactions for this member's reviews
+  const memberReviewIds = reviews.map(r => r.id);
+  const reactionCounts = reactionsService.getReactionCountsBatch(memberReviewIds);
+  const userReactions = req.session && req.session.userId
+    ? reactionsService.getUserReactionsBatch(memberReviewIds, req.session.userId)
+    : new Map();
+
   res.render('member-profile', {
     pageTitle: member.display_name || 'Member Profile',
     member,
     stats: { ...stats, avgGrade },
     reviews,
+    reactionCounts,
+    userReactions,
     getCoverUrl,
     weightToGrade,
     formatMonthYear,
@@ -351,6 +361,13 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     ? reviews.find(r => r.user_id === userId)
     : null;
 
+  // Emoji reactions — batch-fetch counts + user's own reactions
+  const reviewIds = reviews.map(r => r.id);
+  const reactionCounts = reactionsService.getReactionCountsBatch(reviewIds);
+  const userReactions = userId
+    ? reactionsService.getUserReactionsBatch(reviewIds, userId)
+    : new Map();
+
   // Grade stats
   let avgWeight = null;
   let avgGrade = null;
@@ -387,6 +404,8 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     userReview,
     avgGrade,
     gradeDistribution,
+    reactionCounts,
+    userReactions,
     getCoverUrl,
     formatMonthYear,
     bookPath,

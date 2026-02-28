@@ -457,6 +457,28 @@ router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
 // POST /api/books/:bookId/reviews
 // ---------------------------------------------------------------------------
 const reviewsService = require('../services/reviews');
+const reactionsService = require('../services/reactions');
+
+// ---------------------------------------------------------------------------
+// Toggle emoji reaction on a review
+// POST /api/reviews/:reviewId/reactions
+// ---------------------------------------------------------------------------
+router.post('/reviews/:reviewId/reactions', requireMember, (req, res) => {
+  const reviewId = parseInt(req.params.reviewId, 10);
+  if (isNaN(reviewId)) return res.status(400).json({ error: 'Invalid review ID.' });
+
+  const emoji = (req.body.emoji || '').trim();
+  if (!emoji || emoji.length > 32) {
+    return res.status(400).json({ error: 'Invalid emoji.' });
+  }
+
+  // Verify review exists
+  const review = db.prepare('SELECT id FROM reviews WHERE id = ?').get(reviewId);
+  if (!review) return res.status(404).json({ error: 'Review not found.' });
+
+  const result = reactionsService.toggleReaction(reviewId, req.user.id, emoji);
+  res.json(result);
+});
 
 router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValidationErrors, (req, res) => {
   const bookId = parseInt(req.params.bookId, 10);
