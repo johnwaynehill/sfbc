@@ -335,7 +335,7 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
 
   // Reviews with display names
   const reviews = db.prepare(`
-    SELECT r.id, r.grade, r.body_markdown, r.created_at, r.updated_at,
+    SELECT r.id, r.grade, r.body_markdown, r.has_spoilers, r.created_at, r.updated_at,
            r.user_id, u.display_name, u.avatar_style, u.user_slug, u.email,
            gw.weight
     FROM reviews r

@@ -452,6 +452,67 @@
   color: var(--danger, #c0392b);
 }
 
+/* ---- Spoiler Filter ---- */
+.spoiler-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  color: var(--text2);
+  user-select: none;
+}
+.spoiler-toggle input { margin: 0; }
+
+.spoiler-badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.review-card--spoiler {
+  position: relative;
+}
+
+/* Hide spoiler reviews by default; show when toggle is checked */
+.review-list .review-card[data-spoiler="true"] {
+  display: none;
+}
+.review-list.show-spoilers .review-card[data-spoiler="true"] {
+  display: flex;
+}
+
+/* ---- Spoiler Checkbox (review form) ---- */
+.spoiler-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: var(--s-2);
+  margin-bottom: var(--s-2);
+}
+.spoiler-checkbox input { margin: 0; }
+.spoiler-checkbox__label {
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  color: var(--text2);
+}
+
 /* ---- Reviews Header ---- */
 .reviews-header {
   display: flex;
@@ -1503,10 +1564,10 @@ textarea.form-input {
   color: var(--text2);
   font-style: italic;
 }
-.results-winner__points {
+.results-winner__nominator {
   font-family: var(--font-ui);
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 400;
   color: #92400E;
   margin-top: 2px;
 }
@@ -1514,6 +1575,27 @@ textarea.form-input {
 .results-winner__link {
   margin-top: var(--s-2);
   align-self: flex-start;
+}
+
+/* ---- Results Winner Dark Mode ---- */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .results-winner {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.2) 0%, rgba(180, 83, 9, 0.1) 50%, rgba(120, 53, 15, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .results-winner::before {
+  background: radial-gradient(circle, rgba(245, 166, 35, 0.08) 0%, transparent 70%);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .results-winner::after {
+  background: radial-gradient(circle, rgba(245, 166, 35, 0.06) 0%, transparent 70%);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .results-winner__ribbon {
+  color: #fbbf24;
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .results-winner__nominator {
+  color: rgba(251, 191, 36, 0.7);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .results-winner__cover-img {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .btn--sm {
@@ -2293,6 +2375,31 @@ textarea.form-input {
   color: var(--text2);
   line-height: 1.6;
   font-style: italic;
+}
+
+/* ---- Changelog Collapse ---- */
+.changelog-release__meta {
+  position: relative;
+}
+.changelog-release__toggle {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text3);
+  transition: color 120ms ease, transform 200ms ease;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+}
+.changelog-release__toggle:hover {
+  color: var(--text);
+}
+.changelog-release__body {
+  transition: opacity 200ms ease;
+}
+.changelog-release__body.is-collapsed {
+  display: none;
 }
 
 @media (max-width: 600px) {

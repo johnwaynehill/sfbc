@@ -97,6 +97,13 @@
   <div class="reviews-header">
     <h2 class="t-section">Reviews</h2>
     <div class="reviews-header__actions">
+      <% const spoilerCount = reviews.filter(r => r.has_spoilers).length; %>
+      <% if (spoilerCount > 0) { %>
+        <label class="spoiler-toggle" id="spoilerToggle">
+          <input type="checkbox" id="spoilerToggleInput">
+          <span class="spoiler-toggle__label">Show spoilers (<%= spoilerCount %>)</span>
+        </label>
+      <% } %>
       <% if (reviews.length > 1) { %>
         <div class="sort-dropdown" id="reviewSortDropdown">
           <button type="button" class="history-btn" id="reviewSortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
@@ -121,8 +128,11 @@
   <% if (reviews.length > 0) { %>
   <div class="review-list" id="reviewList">
     <% for (const review of reviews) { %>
-      <div class="review-card" data-review-id="<%= review.id %>" data-date="<%= review.created_at %>" data-weight="<%= review.weight %>">
+      <div class="review-card<%= review.has_spoilers ? ' review-card--spoiler' : '' %>" data-review-id="<%= review.id %>" data-date="<%= review.created_at %>" data-weight="<%= review.weight %>"<%= review.has_spoilers ? ' data-spoiler="true"' : '' %>>
         <span class="grade-badge grade-badge--sm <%= gradeTier(review.grade) %>"><%= review.grade %></span>
+        <% if (review.has_spoilers) { %>
+          <span class="spoiler-badge">Spoiler</span>
+        <% } %>
         <div class="review-card__body">
           <div class="review-card__meta">
             <% if (user && review.display_name) { %>
@@ -176,3 +186,18 @@
 })();
 </script>
 <% } %>
+
+<script>
+(function () {
+  'use strict';
+  var toggle = document.getElementById('spoilerToggleInput');
+  if (!toggle) return;
+
+  var list = document.getElementById('reviewList');
+  if (!list) return;
+
+  toggle.addEventListener('change', function () {
+    list.classList.toggle('show-spoilers', toggle.checked);
+  });
+})();
+</script>

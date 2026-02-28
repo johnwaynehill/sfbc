@@ -61,6 +61,12 @@
       Markdown: <code>**bold**</code> <code>*italic*</code> <code>- list</code> <code>> quote</code> <code>||spoiler||</code>
     </p>
 
+    <label class="spoiler-checkbox">
+      <input type="checkbox" name="has_spoilers" id="has-spoilers" value="1"
+             <%= (review && review.has_spoilers) ? 'checked' : '' %>>
+      <span class="spoiler-checkbox__label">This review contains spoilers</span>
+    </label>
+
     <div id="review-message" hidden></div>
 
     <div class="review-form__actions">
@@ -182,6 +188,7 @@
 
     var grade = gradeInput.value;
     var body = form.querySelector('[name="body"]').value.trim();
+    var hasSpoilers = document.getElementById('has-spoilers').checked;
 
     submitBtn.disabled = true;
     submitBtn.textContent = isPut ? 'Updating\u2026' : 'Submitting\u2026';
@@ -194,7 +201,7 @@
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ grade: grade, body: body }),
+        body: JSON.stringify({ grade: grade, body: body, has_spoilers: hasSpoilers }),
       });
 
       var data = await res.json();

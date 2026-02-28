@@ -478,7 +478,8 @@ router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValid
     return res.status(409).json({ error: 'You already have a review for this book. Use PUT to update it.' });
   }
 
-  reviewsService.create(bookId, req.user.id, grade, body);
+  const hasSpoilers = !!req.body.has_spoilers;
+  reviewsService.create(bookId, req.user.id, grade, body, hasSpoilers);
   res.status(201).json({ success: true });
 });
 
@@ -501,7 +502,8 @@ router.put('/books/:bookId/reviews', requireMember, ...reviewChain, handleValida
   const validGrade = db.prepare('SELECT grade FROM grade_weights WHERE grade = ?').get(grade);
   if (!validGrade) return res.status(400).json({ error: 'Invalid grade.' });
 
-  reviewsService.update(bookId, req.user.id, grade, body);
+  const hasSpoilers = !!req.body.has_spoilers;
+  reviewsService.update(bookId, req.user.id, grade, body, hasSpoilers);
   res.json({ success: true });
 });
 
