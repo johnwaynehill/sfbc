@@ -30,6 +30,13 @@
   overlay.className = 'winner-overlay';
   overlay.setAttribute('aria-hidden', 'true');
 
+  // Close button
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'winner-overlay__close';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.innerHTML = '&times;';
+  overlay.appendChild(closeBtn);
+
   // Book cover
   var coverWrap = document.createElement('div');
   coverWrap.className = 'winner-overlay__cover';
@@ -76,28 +83,25 @@
     });
   });
 
-  // Auto-dismiss after 2.5 seconds
-  setTimeout(function () {
-    overlay.classList.add('is-dismissing');
-
-    // Reveal the winner card underneath
-    winner.style.opacity = '1';
-    winner.style.transform = 'scale(1)';
-
-    // Remove overlay after dismiss animation completes
-    setTimeout(function () {
-      overlay.remove();
-    }, 800);
-  }, 2500);
-
-  // Click to dismiss early
-  overlay.addEventListener('click', function () {
+  // Dismiss helper
+  function dismiss() {
     if (overlay.classList.contains('is-dismissing')) return;
     overlay.classList.add('is-dismissing');
     winner.style.opacity = '1';
     winner.style.transform = 'scale(1)';
     setTimeout(function () {
       overlay.remove();
-    }, 500);
+    }, 600);
+  }
+
+  // Close button click
+  closeBtn.addEventListener('click', dismiss);
+
+  // Also dismiss on Escape key
+  document.addEventListener('keydown', function onKey(e) {
+    if (e.key === 'Escape') {
+      dismiss();
+      document.removeEventListener('keydown', onKey);
+    }
   });
 })();

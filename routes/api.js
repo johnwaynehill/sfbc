@@ -470,7 +470,9 @@ router.post('/admin/announcements', requireAdmin, (req, res) => {
   }
 
   const body = (req.body.body || '').trim() || null;
-  const expiresAt = (req.body.expires_at || '').trim() || null;
+  // Normalize datetime-local format (2026-02-28T15:00) to SQLite format (2026-02-28 15:00:00)
+  const rawExpiry = (req.body.expires_at || '').trim() || null;
+  const expiresAt = rawExpiry ? rawExpiry.replace('T', ' ').replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2})$/, '$1:00') : null;
 
   const result = announcementsService.create({
     type,

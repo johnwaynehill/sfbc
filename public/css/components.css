@@ -489,12 +489,17 @@
   position: relative;
 }
 
-/* Hide spoiler reviews by default; show when toggle is checked */
-.review-list .review-card[data-spoiler="true"] {
-  display: none;
+/* Blur spoiler reviews by default; reveal when toggle is checked */
+.review-list .review-card[data-spoiler="true"] .review-card__body {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 200ms ease;
 }
-.review-list.show-spoilers .review-card[data-spoiler="true"] {
-  display: flex;
+.review-list.show-spoilers .review-card[data-spoiler="true"] .review-card__body {
+  filter: none;
+  pointer-events: auto;
+  user-select: auto;
 }
 
 /* ---- Spoiler Checkbox (review form) ---- */
@@ -1532,7 +1537,7 @@ textarea.form-input {
 
 .results-winner__cover {
   flex-shrink: 0;
-  width: 90px;
+  width: 120px;
   display: block;
 }
 .results-winner__cover-img {
@@ -1752,7 +1757,7 @@ textarea.form-input {
   }
 
   .results-winner__cover {
-    width: 72px;
+    width: 90px;
   }
 
   .results-winner__title {
@@ -3984,6 +3989,13 @@ textarea.form-input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A0A0A0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
 }
 
+/* Date/time inputs — native icons adapt to dark mode */
+:is([data-theme="dark"], :root:not([data-theme="light"])) input[type="date"],
+:is([data-theme="dark"], :root:not([data-theme="light"])) input[type="datetime-local"],
+:is([data-theme="dark"], :root:not([data-theme="light"])) input[type="time"] {
+  color-scheme: dark;
+}
+
 /* Form focus ring — slightly brighter */
 :is([data-theme="dark"], :root:not([data-theme="light"])) .form-input:focus,
 :is([data-theme="dark"], :root:not([data-theme="light"])) .form-textarea:focus,
@@ -4284,40 +4296,48 @@ textarea.form-input {
 .announcements {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
-  margin-bottom: var(--s-4);
+  gap: var(--s-1);
+  padding-top: var(--s-3);
+  margin-bottom: var(--s-3);
 }
 
 .announcement {
   display: flex;
   align-items: flex-start;
-  gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  border-radius: var(--radius-md);
-  border: 1px solid;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid;
+  font-size: var(--t-sm);
 }
 
 .announcement--info {
-  background: #EFF6FF;
-  border-color: #BFDBFE;
-  color: #1E40AF;
+  background: rgba(59, 130, 246, 0.05);
+  border-left-color: #93C5FD;
+  color: var(--text2);
 }
 
 .announcement--warning {
-  background: #FFFBEB;
-  border-color: #FDE68A;
-  color: #92400E;
+  background: rgba(245, 158, 11, 0.05);
+  border-left-color: #F59E0B;
+  color: var(--text2);
 }
 
 .announcement--success {
-  background: #ECFDF5;
-  border-color: #A7F3D0;
-  color: #065F46;
+  background: rgba(16, 185, 129, 0.05);
+  border-left-color: #34D399;
+  color: var(--text2);
 }
 
 .announcement__icon {
   flex-shrink: 0;
   margin-top: 1px;
+  opacity: 0.6;
+}
+
+.announcement__icon svg {
+  width: 15px;
+  height: 15px;
 }
 
 .announcement__content {
@@ -4327,35 +4347,35 @@ textarea.form-input {
 
 .announcement__title {
   font-family: var(--font-ui);
-  font-size: var(--t-sm);
+  font-size: var(--t-xs);
   font-weight: 600;
   display: block;
 }
 
 .announcement__body {
   font-family: var(--font-body);
-  font-size: var(--t-sm);
+  font-size: var(--t-xs);
   margin-top: 2px;
-  opacity: 0.85;
+  opacity: 0.75;
 }
 
 /* ---- Dark mode ---- */
 :is([data-theme="dark"], :root:not([data-theme="light"])) .announcement--info {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #93C5FD;
+  background: rgba(59, 130, 246, 0.06);
+  border-left-color: rgba(147, 197, 253, 0.5);
+  color: var(--text2);
 }
 
 :is([data-theme="dark"], :root:not([data-theme="light"])) .announcement--warning {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #FCD34D;
+  background: rgba(245, 158, 11, 0.06);
+  border-left-color: rgba(245, 158, 11, 0.5);
+  color: var(--text2);
 }
 
 :is([data-theme="dark"], :root:not([data-theme="light"])) .announcement--success {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #6EE7B7;
+  background: rgba(16, 185, 129, 0.06);
+  border-left-color: rgba(52, 211, 153, 0.5);
+  color: var(--text2);
 }
 
 /* ---- Admin announcement list ---- */
@@ -4451,7 +4471,29 @@ textarea.form-input {
   background: rgba(0, 0, 0, 0.85);
   opacity: 0;
   overflow: hidden;
+}
+
+.winner-overlay__close {
+  position: absolute;
+  top: var(--s-4);
+  right: var(--s-4);
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  line-height: 1;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+.winner-overlay__close:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .winner-overlay.is-entering {
@@ -4466,7 +4508,7 @@ textarea.form-input {
 
 /* Book cover in overlay */
 .winner-overlay__cover {
-  width: 220px;
+  width: 300px;
   aspect-ratio: 2 / 3;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -4559,7 +4601,7 @@ textarea.form-input {
 /* Mobile: slightly smaller cover */
 @media (max-width: 600px) {
   .winner-overlay__cover {
-    width: 160px;
+    width: 200px;
   }
   .winner-overlay__label {
     font-size: 1.2rem;
