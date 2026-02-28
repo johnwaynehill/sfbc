@@ -58,6 +58,8 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Announcements on Home page** — Admin publishes updates, gives members a reason to check in [S]
 - [ ] **Improve letter grade interaction** — Better UX on the grade slider [S]
 - [ ] **Changelog collapsible entries** — Latest expanded, others collapsed [S]
+- [ ] **Winning book animation on Results page** — Attention-grabbing reveal when winner is displayed; consider full-screen book cover takeover [M]
+- [ ] **Winning book Results page — dark mode fix** — Remove "# points" from winner card, add "Nominated by" credit, ensure readability in dark mode [S]
 
 ---
 
@@ -95,6 +97,10 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Link to profile from Admin users** — Quick link to member's public profile [S]
 - [ ] **Preserve vote results as archive** — Keep past vote tallies accessible, not just the winner [M]
 - [ ] **Prevent past nominations from interfering with winner URLs** — Ensure canonical slugs for winning books aren't affected by prior nomination data [S]
+- [ ] **Block nominations for already-read books** — Prevent re-nomination with a gentle, warm message explaining the book was already read [S]
+- [ ] **Live SSE for admin meeting detail** — Nominations appear in real-time on the admin meeting page as they come in [M]
+- [ ] **Voting page UX overhaul** — Reduce card height (nominated-by + rationale make cards too big), rethink rank number placement, top-align cover with title; reference strawpoll.com for inspiration [M]
+- [ ] **Admin form field icons — dark mode contrast** — Invert or brighten icons inside admin form fields so they're visible in dark mode [S]
 
 ---
 
@@ -223,6 +229,7 @@ Good ideas that don't justify the effort right now:
 
 ### Home Page
 - [ ] Announcements section (admin-published) — Phase 1
+- [ ] Live status updates — Nominations open, Voting open, and Announcements update live as meeting status changes (SSE) — Phase 2
 - [ ] Activity feed (reviews, replies, reactions, nominations) — Phase 2
 - [ ] Random quotes from past books — Phase 3
 - [ ] Meetup.com rating in About section (cached 7 days) — Phase 4
