@@ -5,50 +5,72 @@
   </p>
 
   <div class="changelog-timeline">
-    <% releases.forEach(function(release) { %>
+    <% releases.forEach(function(release, releaseIndex) { %>
       <article class="changelog-release">
         <div class="changelog-release__meta">
           <span class="changelog-release__version">v<%= release.version %></span>
           <time class="t-caption text-tertiary"><%= formatChangelogDate(release.date) %></time>
+          <% if (releaseIndex > 0) { %>
+            <button type="button" class="changelog-release__toggle" aria-expanded="false" aria-label="Toggle release details">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          <% } %>
         </div>
 
         <% if (release.title) { %>
           <h2 class="t-section changelog-release__title"><%= release.title %></h2>
         <% } %>
 
-        <% if (release.intro) { %>
-          <p class="t-body changelog-release__intro"><%= release.intro %></p>
-        <% } %>
+        <div class="changelog-release__body<%= releaseIndex > 0 ? ' is-collapsed' : '' %>">
+          <% if (release.intro) { %>
+            <p class="t-body changelog-release__intro"><%= release.intro %></p>
+          <% } %>
 
-        <div class="changelog-features">
-          <% release.entries.forEach(function(entry) { %>
-            <div class="changelog-feature">
-              <div class="changelog-feature__icon">
-                <% if (entry.icon === 'qr') { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M21 14v3h-3"/><path d="M14 21h3"/><path d="M21 18v3"/></svg>
-                <% } else if (entry.icon === 'book') { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
-                <% } else if (entry.icon === 'magic') { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10c0-.63.3-1.22.8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"/><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"/></svg>
-                <% } else if (entry.icon === 'user') { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
-                <% } else if (entry.icon === 'calendar') { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-                <% } else if (entry.icon === 'moon') { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                <% } else { %>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <% } %>
+          <div class="changelog-features">
+            <% release.entries.forEach(function(entry) { %>
+              <div class="changelog-feature">
+                <div class="changelog-feature__icon">
+                  <% if (entry.icon === 'qr') { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M21 14v3h-3"/><path d="M14 21h3"/><path d="M21 18v3"/></svg>
+                  <% } else if (entry.icon === 'book') { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
+                  <% } else if (entry.icon === 'magic') { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10c0-.63.3-1.22.8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"/><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"/></svg>
+                  <% } else if (entry.icon === 'user') { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                  <% } else if (entry.icon === 'calendar') { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                  <% } else if (entry.icon === 'moon') { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                  <% } else { %>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  <% } %>
+                </div>
+                <p class="t-body changelog-feature__text"><%= typeof entry === 'string' ? entry : entry.text %></p>
               </div>
-              <p class="t-body changelog-feature__text"><%= typeof entry === 'string' ? entry : entry.text %></p>
-            </div>
-          <% }); %>
-        </div>
+            <% }); %>
+          </div>
 
-        <% if (release.outro) { %>
-          <p class="t-body changelog-release__outro"><%= release.outro %></p>
-        <% } %>
+          <% if (release.outro) { %>
+            <p class="t-body changelog-release__outro"><%= release.outro %></p>
+          <% } %>
+        </div>
       </article>
     <% }); %>
   </div>
 </section>
+
+<script>
+(function () {
+  'use strict';
+  var toggles = document.querySelectorAll('.changelog-release__toggle');
+  for (var i = 0; i < toggles.length; i++) {
+    toggles[i].addEventListener('click', function () {
+      var body = this.closest('.changelog-release').querySelector('.changelog-release__body');
+      var collapsed = body.classList.toggle('is-collapsed');
+      this.setAttribute('aria-expanded', !collapsed);
+      this.style.transform = collapsed ? '' : 'rotate(180deg)';
+    });
+  }
+})();
+</script>

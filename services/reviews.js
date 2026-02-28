@@ -27,12 +27,12 @@ const stmts = {
   `),
 
   create: db.prepare(`
-    INSERT INTO reviews (book_id, user_id, grade, body_markdown, created_at, updated_at)
-    VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
+    INSERT INTO reviews (book_id, user_id, grade, body_markdown, has_spoilers, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
   `),
 
   update: db.prepare(`
-    UPDATE reviews SET grade = ?, body_markdown = ?, updated_at = datetime('now')
+    UPDATE reviews SET grade = ?, body_markdown = ?, has_spoilers = ?, updated_at = datetime('now')
     WHERE book_id = ? AND user_id = ?
   `),
 
@@ -72,13 +72,13 @@ function getByUser(userId) {
 }
 
 /** Create a new review. Returns the insert info. */
-function create(bookId, userId, grade, body) {
-  return stmts.create.run(bookId, userId, grade, body || null);
+function create(bookId, userId, grade, body, hasSpoilers) {
+  return stmts.create.run(bookId, userId, grade, body || null, hasSpoilers ? 1 : 0);
 }
 
 /** Update an existing review. Returns the update info. */
-function update(bookId, userId, grade, body) {
-  return stmts.update.run(grade, body || null, bookId, userId);
+function update(bookId, userId, grade, body, hasSpoilers) {
+  return stmts.update.run(grade, body || null, hasSpoilers ? 1 : 0, bookId, userId);
 }
 
 /** Delete a user's review for a specific book. Returns the change info. */
