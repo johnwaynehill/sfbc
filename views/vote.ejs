@@ -86,6 +86,8 @@
       <% }); %>
     </ol>
 
+    <p class="t-caption text-tertiary ballot-hint">Drag cards or use the arrows to rank your picks</p>
+
     <!-- Hidden field keeps ranking in sync for no-JS form POST fallback -->
     <input type="hidden" name="ranking" id="ranking-input"
            value="<%= nominees.map(function(n) { return n.book_id; }).join(',') %>">

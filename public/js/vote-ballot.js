@@ -117,10 +117,8 @@
   var touchOffsetY = 0;
 
   list.addEventListener('touchstart', function (e) {
-    var handle = e.target.closest('.ballot-card__handle');
-    if (!handle) return;
-
-    var card = handle.closest('.ballot-card');
+    // Allow drag from anywhere on the card (not just the grip handle)
+    var card = e.target.closest('.ballot-card');
     if (!card) return;
 
     touchCard = card;
