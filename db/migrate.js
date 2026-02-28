@@ -37,9 +37,10 @@ function migrate() {
   }
 
   // ---------------------------------------------------------------------------
-  // Post-migration: ensure all users have a slug (idempotent, no-op if done)
+  // Post-migration hooks (idempotent, no-op if already done)
   // ---------------------------------------------------------------------------
   seedUserSlugs();
+  seedMonthlyPicks();
 }
 
 /**
@@ -68,6 +69,64 @@ function seedUserSlugs() {
   }
 
   console.log(`  [migrate] Backfilled slugs for ${rows.length} user(s).`);
+}
+
+/**
+ * Backfill monthly_picks for every meeting that has a winning_book_id
+ * but no monthly_pick_id yet. Idempotent — safe to run on every startup.
+ */
+function seedMonthlyPicks() {
+  // Guard: table may not exist yet if 012 hasn't been applied
+  const tables = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='monthly_picks'"
+  ).all();
+  if (tables.length === 0) return;
+
+  // Guard: meetings must have the monthly_pick_id column
+  const cols = db.prepare("PRAGMA table_info(meetings)").all().map(c => c.name);
+  if (!cols.includes('monthly_pick_id')) return;
+
+  // Find meetings with a winner but no linked monthly_pick
+  const rows = db.prepare(`
+    SELECT m.id, m.winning_book_id, m.month_year, m.status, m.created_at,
+           n.user_id AS nominator_id
+    FROM meetings m
+    LEFT JOIN nominations n ON n.meeting_id = m.id AND n.book_id = m.winning_book_id
+    WHERE m.winning_book_id IS NOT NULL
+      AND m.monthly_pick_id IS NULL
+  `).all();
+
+  if (rows.length === 0) return;
+
+  const insertPick = db.prepare(`
+    INSERT OR IGNORE INTO monthly_picks (book_id, month_year, status, nominated_by, picked_at, created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+  const getPickId = db.prepare(
+    'SELECT id FROM monthly_picks WHERE book_id = ? AND month_year = ?'
+  );
+  const linkMeeting = db.prepare(
+    'UPDATE meetings SET monthly_pick_id = ? WHERE id = ?'
+  );
+
+  db.transaction(() => {
+    for (const m of rows) {
+      insertPick.run(
+        m.winning_book_id,
+        m.month_year,
+        m.status,        // mirror the meeting's current status
+        m.nominator_id || null,
+        m.created_at,    // use meeting creation as picked_at
+        m.created_at
+      );
+      const pick = getPickId.get(m.winning_book_id, m.month_year);
+      if (pick) {
+        linkMeeting.run(pick.id, m.id);
+      }
+    }
+  })();
+
+  console.log(`  [migrate] Backfilled ${rows.length} monthly pick(s).`);
 }
 
 module.exports = migrate;

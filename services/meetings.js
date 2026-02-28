@@ -4,6 +4,39 @@ const db = require('../db');
 const { calculateResults } = require('./voting');
 
 /* ------------------------------------------------------------------ */
+/*  Dual-write helpers for monthly_picks                               */
+/* ------------------------------------------------------------------ */
+
+// Lazy-loaded to avoid circular deps and to tolerate pre-012 schema
+let _monthlyPicksReady = null;
+
+function monthlyPicksReady() {
+  if (_monthlyPicksReady !== null) return _monthlyPicksReady;
+  try {
+    const cols = db.prepare("PRAGMA table_info(meetings)").all().map(c => c.name);
+    _monthlyPicksReady = cols.includes('monthly_pick_id');
+  } catch {
+    _monthlyPicksReady = false;
+  }
+  return _monthlyPicksReady;
+}
+
+const dualWriteStatusStmt = () =>
+  db.prepare("UPDATE monthly_picks SET status = ?, updated_at = datetime('now') WHERE id = ?");
+
+const linkPickStmt = () =>
+  db.prepare('UPDATE meetings SET monthly_pick_id = ? WHERE id = ?');
+
+const createPickStmt = () =>
+  db.prepare(`
+    INSERT INTO monthly_picks (book_id, month_year, status, nominated_by, picked_at)
+    VALUES (?, ?, ?, ?, datetime('now'))
+  `);
+
+const getPickIdStmt = () =>
+  db.prepare('SELECT id FROM monthly_picks WHERE book_id = ? AND month_year = ?');
+
+/* ------------------------------------------------------------------ */
 /*  Prepared statements                                                */
 /* ------------------------------------------------------------------ */
 
@@ -221,9 +254,20 @@ function advanceStatus(id, newStatus) {
   db.transaction(() => {
     // Only one meeting can be "reading" at a time — close any other
     if (newStatus === 'reading') {
+      const closedRows = db.prepare(
+        "SELECT id, monthly_pick_id FROM meetings WHERE status = 'reading' AND id != ?"
+      ).all(id);
       db.prepare(
         "UPDATE meetings SET status = 'results', updated_at = datetime('now') WHERE status = 'reading' AND id != ?"
       ).run(id);
+      // Dual-write: close the monthly_pick too
+      if (monthlyPicksReady()) {
+        for (const row of closedRows) {
+          if (row.monthly_pick_id) {
+            dualWriteStatusStmt().run('results', row.monthly_pick_id);
+          }
+        }
+      }
     }
 
     // Set timestamps
@@ -249,6 +293,37 @@ function advanceStatus(id, newStatus) {
     }
 
     updateStatusStmt.run(newStatus, id);
+
+    // ---- Dual-write to monthly_picks ----
+    if (monthlyPicksReady()) {
+      const updated = getByIdStmt.get(id);
+      if (updated && updated.monthly_pick_id) {
+        // Meeting already linked — just sync status
+        dualWriteStatusStmt().run(newStatus, updated.monthly_pick_id);
+      } else if (updated && updated.winning_book_id && newStatus === 'results') {
+        // Transitioning to results with a winner — create a monthly_pick if none exists
+        const existing = getPickIdStmt().get(updated.winning_book_id, updated.month_year);
+        if (existing) {
+          dualWriteStatusStmt().run(newStatus, existing.id);
+          linkPickStmt().run(existing.id, id);
+        } else {
+          // Look up nominator for this book
+          const nom = db.prepare(
+            'SELECT user_id FROM nominations WHERE meeting_id = ? AND book_id = ? LIMIT 1'
+          ).get(id, updated.winning_book_id);
+          createPickStmt().run(
+            updated.winning_book_id,
+            updated.month_year,
+            newStatus,
+            nom ? nom.user_id : null
+          );
+          const newPick = getPickIdStmt().get(updated.winning_book_id, updated.month_year);
+          if (newPick) {
+            linkPickStmt().run(newPick.id, id);
+          }
+        }
+      }
+    }
   })();
 
   return { meeting: getByIdStmt.get(id) };
