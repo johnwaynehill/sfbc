@@ -4402,6 +4402,137 @@ textarea.form-input {
   color: #6EE7B7;
 }
 
+/* ==================================================================
+   Winner Reveal Animation
+   ================================================================== */
+
+.winner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4);
+  background: rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.winner-overlay.is-entering {
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+
+.winner-overlay.is-dismissing {
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+
+/* Book cover in overlay */
+.winner-overlay__cover {
+  width: 220px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(255, 215, 0, 0.3);
+  transform: scale(0.7);
+  opacity: 0;
+}
+
+.winner-overlay.is-entering .winner-overlay__cover {
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 400ms ease;
+}
+
+.winner-overlay__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Winner label */
+.winner-overlay__label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: #FFD700;
+  font-family: var(--font-ui);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(255, 215, 0, 0.5);
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.winner-overlay.is-entering .winner-overlay__label {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 500ms ease 300ms, opacity 400ms ease 300ms;
+}
+
+.winner-overlay__label svg {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}
+
+/* Confetti particles */
+.winner-confetti {
+  position: absolute;
+  top: -20px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.winner-overlay.is-entering .winner-confetti {
+  animation: confetti-fall linear forwards;
+  animation-delay: inherit;
+  animation-duration: inherit;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    top: -20px;
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    top: 110vh;
+    transform: rotate(720deg) translateX(calc(var(--drift, 30px)));
+  }
+}
+
+/* Add some lateral drift variety */
+.winner-confetti:nth-child(odd) { --drift: -40px; }
+.winner-confetti:nth-child(3n) { --drift: 60px; }
+.winner-confetti:nth-child(5n) { --drift: -25px; }
+.winner-confetti:nth-child(7n) { --drift: 45px; }
+
+/* Reduced motion: skip animation entirely (JS also checks, this is a CSS fallback) */
+@media (prefers-reduced-motion: reduce) {
+  .winner-overlay {
+    display: none !important;
+  }
+}
+
+/* Mobile: slightly smaller cover */
+@media (max-width: 600px) {
+  .winner-overlay__cover {
+    width: 160px;
+  }
+  .winner-overlay__label {
+    font-size: 1.2rem;
+  }
+}
+
 /* Scope the @media dark mode selector for components too */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .status-pill--reading { background: rgba(14, 116, 108, 0.15); }
