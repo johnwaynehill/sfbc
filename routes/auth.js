@@ -2,9 +2,21 @@
 
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const router = require('express').Router();
 const db = require('../db');
 const { sendMagicLink } = require('../services/email');
+
+// ---------------------------------------------------------------------------
+// Auth rate limiter — 5 attempts per 15 minutes per IP
+// ---------------------------------------------------------------------------
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts. Please try again in a few minutes.' },
+});
 
 // ---------------------------------------------------------------------------
 // Prepared statements
@@ -53,7 +65,7 @@ router.get('/login', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /auth/send-link — generate token, send email
 // ---------------------------------------------------------------------------
-router.post('/auth/send-link', async (req, res) => {
+router.post('/auth/send-link', authLimiter, async (req, res) => {
   const email = (req.body.email || '').toLowerCase().trim();
   const wantsJson = req.get('Accept')?.includes('application/json');
 
@@ -146,7 +158,7 @@ router.get('/auth/callback', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /auth/password-login — email + password login
 // ---------------------------------------------------------------------------
-router.post('/auth/password-login', (req, res) => {
+router.post('/auth/password-login', authLimiter, (req, res) => {
   const email = (req.body.email || '').toLowerCase().trim();
   const password = req.body.password || '';
 
