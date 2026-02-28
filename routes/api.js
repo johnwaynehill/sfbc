@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const config = require('../config');
 const { slugify } = require('../utils/slug');
@@ -13,6 +14,17 @@ const {
 const meetings = require('../services/meetings');
 const { requireAdmin, requireMember } = require('../middleware/auth');
 const { monthYearSlug } = require('../utils/format');
+
+// ---------------------------------------------------------------------------
+// Submission rate limiter — 10 per 15 min per IP (nominations + votes)
+// ---------------------------------------------------------------------------
+const submissionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many submissions. Please try again in a few minutes.' },
+});
 
 // ---------------------------------------------------------------------------
 // Health check
@@ -579,7 +591,7 @@ const insertNominee = db.prepare(`
   VALUES (?, ?, 'nomination')
 `);
 
-router.post('/meetings/:meetingId/nominations', (req, res) => {
+router.post('/meetings/:meetingId/nominations', submissionLimiter, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
   if (isNaN(meetingId)) {
     return res.status(400).json({ error: 'Invalid meeting ID.' });
@@ -717,7 +729,7 @@ const insertVote = db.prepare(`
   VALUES (?, ?, ?)
 `);
 
-router.post('/meetings/:meetingId/votes', (req, res) => {
+router.post('/meetings/:meetingId/votes', submissionLimiter, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
   if (isNaN(meetingId)) {
     return res.status(400).json({ error: 'Invalid meeting ID.' });
