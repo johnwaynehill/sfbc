@@ -32,7 +32,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      imgSrc: ["'self'", 'data:', 'https://api.dicebear.com', 'https://books.google.com'],
+      imgSrc: ["'self'", 'data:', 'https://api.dicebear.com', 'https://books.google.com', 'https://covers.openlibrary.org'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       connectSrc: ["'self'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://api.dicebear.com'],
       frameSrc: ["'none'"],
