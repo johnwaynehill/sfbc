@@ -9,6 +9,7 @@ const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
 const meetingsService = require('../services/meetings');
 const reactionsService = require('../services/reactions');
+const announcementsService = require('../services/announcements');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -124,6 +125,9 @@ router.get('/', (req, res) => {
     try { heroSubjects = JSON.parse(currentMeeting.subjects); } catch { /* ignore */ }
   }
 
+  // Active announcements (max 3, non-expired)
+  const announcements = announcementsService.getActive();
+
   res.render('home', {
     pageTitle: 'Home',
     currentMeeting,
@@ -132,6 +136,7 @@ router.get('/', (req, res) => {
     upcomingMeetings,
     totalBooks,
     heroSubjects,
+    announcements,
     getCoverUrl,
     weightToGrade,
     formatMonthYear,

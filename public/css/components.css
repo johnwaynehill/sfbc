@@ -4243,6 +4243,165 @@ textarea.form-input {
   }
 }
 
+/* ==================================================================
+   Announcements
+   ================================================================== */
+
+/* ---- Home page announcement banners ---- */
+.announcements {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-bottom: var(--s-4);
+}
+
+.announcement {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--radius-md);
+  border: 1px solid;
+}
+
+.announcement--info {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #1E40AF;
+}
+
+.announcement--warning {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+  color: #92400E;
+}
+
+.announcement--success {
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #065F46;
+}
+
+.announcement__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.announcement__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.announcement__title {
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  display: block;
+}
+
+.announcement__body {
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+/* ---- Dark mode ---- */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .announcement--info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .announcement--warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .announcement--success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+
+/* ---- Admin announcement list ---- */
+.announcement-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}
+
+.announcement-admin-item {
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.announcement-admin-item.is-inactive {
+  opacity: 0.5;
+}
+
+.announcement-admin-item__header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+.announcement-admin-item__meta {
+  margin-top: var(--s-1);
+}
+
+.announcement-admin-item__actions {
+  display: flex;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+}
+
+.announcement-type-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.announcement-type-badge--info {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.announcement-type-badge--warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.announcement-type-badge--success {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .announcement-type-badge--info {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93C5FD;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .announcement-type-badge--warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FCD34D;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .announcement-type-badge--success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6EE7B7;
+}
+
 /* Scope the @media dark mode selector for components too */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .status-pill--reading { background: rgba(14, 116, 108, 0.15); }

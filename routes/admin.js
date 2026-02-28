@@ -212,6 +212,20 @@ router.get('/reviews', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Announcements
+// ---------------------------------------------------------------------------
+const announcementsService = require('../services/announcements');
+
+router.get('/announcements', (req, res) => {
+  const announcements = announcementsService.getAll();
+  res.render('admin/announcements', {
+    pageTitle: 'Announcements',
+    pageScript: '/js/admin-announcements.js',
+    announcements,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Settings
 // ---------------------------------------------------------------------------
 router.get('/settings', (req, res) => {

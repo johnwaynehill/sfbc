@@ -453,6 +453,73 @@ router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Announcements (admin)
+// ---------------------------------------------------------------------------
+const announcementsService = require('../services/announcements');
+
+// POST /api/admin/announcements
+router.post('/admin/announcements', requireAdmin, (req, res) => {
+  const title = (req.body.title || '').trim();
+  if (!title || title.length > 200) {
+    return res.status(400).json({ error: 'Title is required (max 200 chars).' });
+  }
+
+  const type = (req.body.type || 'info').trim();
+  if (!['info', 'warning', 'success'].includes(type)) {
+    return res.status(400).json({ error: 'Type must be info, warning, or success.' });
+  }
+
+  const body = (req.body.body || '').trim() || null;
+  const expiresAt = (req.body.expires_at || '').trim() || null;
+
+  const result = announcementsService.create({
+    type,
+    title,
+    body: body && body.length > 1000 ? body.slice(0, 1000) : body,
+    createdBy: req.user.id,
+    expiresAt,
+  });
+
+  res.status(201).json({ success: true, id: result.id });
+});
+
+// PUT /api/admin/announcements/:id/deactivate
+router.put('/admin/announcements/:id/deactivate', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid ID.' });
+
+  const existing = announcementsService.getById(id);
+  if (!existing) return res.status(404).json({ error: 'Announcement not found.' });
+
+  announcementsService.deactivate(id);
+  res.json({ success: true });
+});
+
+// PUT /api/admin/announcements/:id/activate
+router.put('/admin/announcements/:id/activate', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid ID.' });
+
+  const existing = announcementsService.getById(id);
+  if (!existing) return res.status(404).json({ error: 'Announcement not found.' });
+
+  announcementsService.activate(id);
+  res.json({ success: true });
+});
+
+// DELETE /api/admin/announcements/:id
+router.delete('/admin/announcements/:id', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid ID.' });
+
+  const existing = announcementsService.getById(id);
+  if (!existing) return res.status(404).json({ error: 'Announcement not found.' });
+
+  announcementsService.deleteById(id);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
 // Create review
 // POST /api/books/:bookId/reviews
 // ---------------------------------------------------------------------------
