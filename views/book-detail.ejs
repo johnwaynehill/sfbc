@@ -160,6 +160,28 @@
           <% if (user && user.id === review.user_id) { %>
             <button type="button" class="review-card__delete" data-book-id="<%= book.id %>" aria-label="Delete my review">Delete</button>
           <% } %>
+
+          <!-- Emoji reactions -->
+          <div class="reaction-bar" data-review-id="<%= review.id %>">
+            <% const reviewReactions = reactionCounts.get(review.id) || []; %>
+            <% const myReactions = userReactions.get(review.id) || new Set(); %>
+            <% for (const r of reviewReactions) { %>
+              <button type="button"
+                class="reaction-pill<%= myReactions.has(r.emoji) ? ' is-active' : '' %>"
+                data-emoji="<%= r.emoji %>"
+                <%= user ? '' : 'disabled' %>
+                aria-label="<%= r.emoji %> (<%= r.count %>)">
+                <span class="reaction-pill__emoji"><%= r.emoji %></span>
+                <span class="reaction-pill__count"><%= r.count %></span>
+              </button>
+            <% } %>
+            <% if (user) { %>
+              <button type="button" class="reaction-add" aria-label="Add reaction">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            <% } %>
+          </div>
         </div>
       </div>
     <% } %>

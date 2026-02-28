@@ -4034,6 +4034,215 @@ textarea.form-input {
   color: #FEE2E2;
 }
 
+/* ==================================================================
+   Emoji Reactions
+   ================================================================== */
+
+/* ---- Reaction bar (below each review) ---- */
+.reaction-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: var(--s-2);
+  position: relative;
+}
+
+/* ---- Reaction pill (emoji + count) ---- */
+.reaction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  cursor: pointer;
+  font-size: var(--t-sm);
+  line-height: 1.4;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.reaction-pill:hover {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.reaction-pill.is-active {
+  border-color: var(--accent);
+  background: rgba(180, 83, 9, 0.08);
+}
+
+.reaction-pill:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.reaction-pill:disabled:hover {
+  border-color: var(--border);
+  background: var(--bg);
+}
+
+.reaction-pill__emoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.reaction-pill__count {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.reaction-pill.is-active .reaction-pill__count {
+  color: var(--accent);
+}
+
+/* ---- Add reaction button ---- */
+.reaction-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 8px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text3);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.reaction-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- Emoji picker popover ---- */
+.emoji-picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 280px;
+  max-height: 320px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: picker-in 150ms ease;
+}
+
+@keyframes picker-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.emoji-picker__search {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+}
+
+.emoji-picker__search::placeholder {
+  color: var(--text3);
+}
+
+.emoji-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  padding: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.emoji-picker__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: background 100ms ease;
+}
+
+.emoji-picker__btn:hover {
+  background: var(--surface);
+}
+
+.emoji-picker__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--s-3);
+  color: var(--text3);
+  font-size: var(--t-sm);
+}
+
+/* ---- Dark mode overrides ---- */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .reaction-pill {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .reaction-pill:hover {
+  background: var(--surface2);
+  border-color: rgba(217, 119, 6, 0.5);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .reaction-pill.is-active {
+  background: rgba(217, 119, 6, 0.15);
+  border-color: rgba(217, 119, 6, 0.5);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .reaction-add {
+  border-color: var(--border);
+  color: var(--text3);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .reaction-add:hover {
+  border-color: rgba(217, 119, 6, 0.5);
+  color: var(--accent);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .emoji-picker {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .emoji-picker__search {
+  background: var(--surface);
+  border-bottom-color: var(--border);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .emoji-picker__btn:hover {
+  background: var(--surface2);
+}
+
+/* ---- Mobile: smaller picker ---- */
+@media (max-width: 600px) {
+  .emoji-picker {
+    width: 240px;
+  }
+  .emoji-picker__grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 /* Scope the @media dark mode selector for components too */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .status-pill--reading { background: rgba(14, 116, 108, 0.15); }
