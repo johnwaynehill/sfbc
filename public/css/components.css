@@ -1833,6 +1833,23 @@ textarea.form-input {
   color: var(--text3);
 }
 
+/* ---- Alert Boxes ---- */
+.alert {
+  border-radius: var(--radius-md);
+  padding: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.alert--error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.alert--success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
 /* ---- Grade Select (legacy) ---- */
 .grade-select {
   max-width: 200px;
@@ -3971,6 +3988,22 @@ textarea.form-input {
 :is([data-theme="dark"], :root:not([data-theme="light"])) .form-input:focus,
 :is([data-theme="dark"], :root:not([data-theme="light"])) .form-textarea:focus,
 :is([data-theme="dark"], :root:not([data-theme="light"])) .form-select:focus {
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+}
+
+/* Alert boxes — dark mode */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .alert--error {
+  background: rgba(185, 28, 28, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .alert--success {
+  background: rgba(22, 163, 74, 0.10);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+/* Nom preview focus ring — dark mode */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .nom-preview:focus-visible {
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
 }
 
