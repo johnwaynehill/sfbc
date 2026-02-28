@@ -44,10 +44,10 @@
       var expandRow = mainRow.nextElementSibling;
       if (!expandRow || !expandRow.classList.contains('review-expand-row')) return;
 
-      var isOpen = !expandRow.hidden;
-      expandRow.hidden = isOpen;
-      btn.textContent = isOpen ? 'View' : 'Hide';
-      btn.setAttribute('aria-expanded', String(!isOpen));
+      expandRow.classList.toggle('is-open');
+      var isOpen = expandRow.classList.contains('is-open');
+      btn.textContent = isOpen ? 'Hide' : 'View';
+      btn.setAttribute('aria-expanded', String(isOpen));
     });
   });
 

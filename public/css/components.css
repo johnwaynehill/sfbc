@@ -1211,6 +1211,11 @@ textarea.form-input {
   opacity: 0.35;
 }
 
+.ballot-hint {
+  text-align: center;
+  margin-top: var(--s-2);
+}
+
 .ballot-card--ghost {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   border-color: var(--text);
@@ -2085,6 +2090,13 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.review-expand-row {
+  display: none;
+}
+.review-expand-row.is-open {
+  display: table-row;
 }
 
 .review-expand-row td {
@@ -3033,9 +3045,9 @@ textarea.form-input {
 
 .admin-winner__info {
   display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-1);
   flex: 1;
   min-width: 0;
 }
@@ -3795,16 +3807,19 @@ textarea.form-input {
 
 /* Helper: use :is() to avoid repeating every rule twice */
 :is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--reading {
-  background: rgba(14, 116, 108, 0.15);
+  background: rgba(14, 116, 108, 0.25);
+  color: #5eead4;
 }
 
 :is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--nominations,
 :is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--voting {
-  background: rgba(217, 119, 6, 0.15);
+  background: rgba(217, 119, 6, 0.25);
+  color: #fbbf24;
 }
 
 :is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--upcoming {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text2);
 }
 
 /* Grade badges — dark translucent backgrounds */
@@ -3860,6 +3875,12 @@ textarea.form-input {
 :is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler.is-revealed {
   background: var(--surface2);
   color: var(--text);
+}
+
+/* Admin winner — dark mode */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .admin-winner {
+  background: var(--surface2);
+  border-color: var(--border);
 }
 
 /* Admin nav hover state */

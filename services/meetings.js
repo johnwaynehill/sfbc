@@ -219,6 +219,13 @@ function advanceStatus(id, newStatus) {
 
   // Perform transition in a transaction
   db.transaction(() => {
+    // Only one meeting can be "reading" at a time — close any other
+    if (newStatus === 'reading') {
+      db.prepare(
+        "UPDATE meetings SET status = 'results', updated_at = datetime('now') WHERE status = 'reading' AND id != ?"
+      ).run(id);
+    }
+
     // Set timestamps
     if (newStatus === 'nominations') {
       setNominationsOpenStmt.run(id);
@@ -242,15 +249,6 @@ function advanceStatus(id, newStatus) {
     }
 
     updateStatusStmt.run(newStatus, id);
-
-    // When a meeting is finalized, auto-advance the next upcoming meeting
-    // to "reading" if it already has a book selected.
-    if (newStatus === 'results') {
-      const next = getNextUpcomingWithBookStmt.get();
-      if (next) {
-        updateStatusStmt.run('reading', next.id);
-      }
-    }
   })();
 
   return { meeting: getByIdStmt.get(id) };

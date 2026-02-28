@@ -9,9 +9,8 @@ I tested the book club app with about 22 people tonight and one of the biggest b
 5. Opening Nominations and/or Voting for the next meeting/month might have changed the Status of other books.
   6. Only ever change the status of the current book / meeting
   7. Page Count should not be displayed in Hero section (currently reading) on Home
-  8. This might be due to this exact book being nominated in the past
-9. Selected book in Dark Mode on /admin/meetings is not readable
-  10. Vertically stack the information
+8. Selected book in Dark Mode on /admin/meetings is not readable
+  9. Vertically stack the information
 
 ## Updates
 1. If a Nomation does not have an associated user, hide the "nomation" text in the Admin view
