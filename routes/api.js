@@ -14,6 +14,19 @@ const {
 const meetings = require('../services/meetings');
 const { requireAdmin, requireMember } = require('../middleware/auth');
 const { monthYearSlug } = require('../utils/format');
+const { validationResult } = require('express-validator');
+const {
+  handleValidationErrors,
+  emailChain,
+  passwordChain,
+  displayNameChain,
+  newPasswordChain,
+  socialLinksChain,
+  reviewChain,
+  nominationChain,
+  meetingChain,
+  meetingStatusChain,
+} = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
 // Submission rate limiter — 10 per 15 min per IP (nominations + votes)
@@ -37,8 +50,8 @@ router.get('/health', (req, res) => {
 // Admin bootstrap (one-time first admin creation)
 // POST /api/admin/bootstrap
 // ---------------------------------------------------------------------------
-router.post('/admin/bootstrap', (req, res) => {
-  const { bootstrapKey, email, password } = req.body;
+router.post('/admin/bootstrap', ...emailChain, ...passwordChain, handleValidationErrors, (req, res) => {
+  const { bootstrapKey } = req.body;
 
   if (!config.bootstrapKey || config.bootstrapKey.trim() === '') {
     return res.status(403).json({
@@ -60,18 +73,10 @@ router.post('/admin/bootstrap', (req, res) => {
     });
   }
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
-  }
-
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-  }
-
-  const hash = bcrypt.hashSync(password, 12);
+  const hash = bcrypt.hashSync(req.body.password, 12);
   const result = db.prepare(
     "INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'admin')"
-  ).run(email.toLowerCase().trim(), hash);
+  ).run(req.body.email, hash);
 
   res.status(201).json({
     message: 'Admin account created successfully.',
@@ -83,16 +88,16 @@ router.post('/admin/bootstrap', (req, res) => {
 // Admin login
 // POST /api/auth/admin-login
 // ---------------------------------------------------------------------------
-router.post('/auth/admin-login', (req, res) => {
-  const { email, password } = req.body;
+router.post('/auth/admin-login', ...emailChain, handleValidationErrors, (req, res) => {
+  const password = req.body.password || '';
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required.' });
   }
 
   const user = db.prepare(
     "SELECT id, email, password_hash, role FROM users WHERE email = ? AND role = 'admin'"
-  ).get(email.toLowerCase().trim());
+  ).get(req.body.email);
 
   if (!user || !user.password_hash) {
     return res.status(401).json({ error: 'Invalid email or password.' });
@@ -127,9 +132,8 @@ router.post('/auth/admin-logout', (req, res) => {
 // Update display name
 // PUT /api/auth/display-name
 // ---------------------------------------------------------------------------
-router.put('/auth/display-name', requireMember, (req, res) => {
-  const name = (req.body.display_name || '').trim().slice(0, 40);
-  if (!name) return res.status(400).json({ error: 'Display name is required.' });
+router.put('/auth/display-name', requireMember, ...displayNameChain, handleValidationErrors, (req, res) => {
+  const name = req.body.display_name; // already trimmed + length-checked by chain
 
   // Regenerate slug to match the new name
   const base = slugify(name) || 'member';
@@ -146,15 +150,8 @@ router.put('/auth/display-name', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 // PUT /api/auth/password — set or change password (member)
 // ---------------------------------------------------------------------------
-router.put('/auth/password', requireMember, (req, res) => {
-  const { current_password, new_password, confirm_password } = req.body;
-
-  if (!new_password || new_password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-  }
-  if (new_password !== confirm_password) {
-    return res.status(400).json({ error: 'Passwords do not match.' });
-  }
+router.put('/auth/password', requireMember, ...newPasswordChain, handleValidationErrors, (req, res) => {
+  const { current_password, new_password } = req.body;
 
   // If user already has a password, require current_password
   const user = db.prepare('SELECT password_hash FROM users WHERE id = ?').get(req.user.id);
@@ -172,11 +169,12 @@ router.put('/auth/password', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 // PUT /api/auth/social-links — update social profile links (member)
 // ---------------------------------------------------------------------------
-router.put('/auth/social-links', requireMember, (req, res) => {
-  const goodreads_url = (req.body.goodreads_url || '').trim().slice(0, 500);
-  const storygraph_url = (req.body.storygraph_url || '').trim().slice(0, 500);
-  const instagram_handle = (req.body.instagram_handle || '').trim().replace(/^@/, '').slice(0, 60);
-  const threads_handle = (req.body.threads_handle || '').trim().replace(/^@/, '').slice(0, 60);
+router.put('/auth/social-links', requireMember, ...socialLinksChain, handleValidationErrors, (req, res) => {
+  // Values already trimmed, stripped of @, and length-checked by chain
+  const goodreads_url = req.body.goodreads_url || '';
+  const storygraph_url = req.body.storygraph_url || '';
+  const instagram_handle = req.body.instagram_handle || '';
+  const threads_handle = req.body.threads_handle || '';
 
   db.prepare(`
     UPDATE users
@@ -220,23 +218,15 @@ router.put('/auth/avatar-style', requireMember, (req, res) => {
 // Create admin user
 // POST /api/admin/users
 // ---------------------------------------------------------------------------
-router.post('/admin/users', requireAdmin, (req, res) => {
-  const email = (req.body.email || '').toLowerCase().trim();
-  const password = (req.body.password || '');
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
-  }
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-  }
+router.post('/admin/users', requireAdmin, ...emailChain, ...passwordChain, handleValidationErrors, (req, res) => {
+  const email = req.body.email; // already trimmed + lowercased + validated by chain
 
   const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
   if (existing) {
     return res.status(409).json({ error: 'A user with that email already exists.' });
   }
 
-  const hash = bcrypt.hashSync(password, 12);
+  const hash = bcrypt.hashSync(req.body.password, 12);
   const result = db.prepare(
     "INSERT INTO users (email, password_hash, role, display_name) VALUES (?, ?, 'admin', ?)"
   ).run(email, hash, email.split('@')[0]);
@@ -251,17 +241,13 @@ router.post('/admin/users', requireAdmin, (req, res) => {
 // Create meeting
 // POST /api/admin/meetings
 // ---------------------------------------------------------------------------
-router.post('/admin/meetings', requireAdmin, (req, res) => {
-  const month_year = (req.body.month_year || '').trim();
-  if (!month_year) {
-    return res.status(400).json({ error: 'Month/year is required.' });
-  }
-
+router.post('/admin/meetings', requireAdmin, ...meetingChain, handleValidationErrors, (req, res) => {
+  // Values already trimmed + length-checked by chain
   const meeting = meetings.create({
-    month_year,
-    meetup_event_url: (req.body.meetup_event_url || '').trim() || null,
-    meeting_time: (req.body.meeting_time || '').trim() || null,
-    location_text: (req.body.location_text || '').trim() || null,
+    month_year: req.body.month_year,
+    meetup_event_url: req.body.meetup_event_url || null,
+    meeting_time: req.body.meeting_time || null,
+    location_text: req.body.location_text || null,
   });
 
   res.status(201).json({ success: true, meeting });
@@ -271,18 +257,19 @@ router.post('/admin/meetings', requireAdmin, (req, res) => {
 // Update meeting details
 // PUT /api/admin/meetings/:id
 // ---------------------------------------------------------------------------
-router.put('/admin/meetings/:id', requireAdmin, (req, res) => {
+router.put('/admin/meetings/:id', requireAdmin, ...meetingChain, handleValidationErrors, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) return res.status(400).json({ error: 'Invalid meeting ID.' });
 
   const existing = meetings.getById(id);
   if (!existing) return res.status(404).json({ error: 'Meeting not found.' });
 
+  // Values already trimmed + length-checked by chain
   const meeting = meetings.update(id, {
-    month_year: (req.body.month_year || '').trim() || existing.month_year,
-    meetup_event_url: (req.body.meetup_event_url || '').trim() || null,
-    meeting_time: (req.body.meeting_time || '').trim() || null,
-    location_text: (req.body.location_text || '').trim() || null,
+    month_year: req.body.month_year || existing.month_year,
+    meetup_event_url: req.body.meetup_event_url || null,
+    meeting_time: req.body.meeting_time || null,
+    location_text: req.body.location_text || null,
   });
 
   res.json({ success: true, meeting });
@@ -292,12 +279,11 @@ router.put('/admin/meetings/:id', requireAdmin, (req, res) => {
 // Advance meeting status
 // PUT /api/admin/meetings/:id/status
 // ---------------------------------------------------------------------------
-router.put('/admin/meetings/:id/status', requireAdmin, (req, res) => {
+router.put('/admin/meetings/:id/status', requireAdmin, ...meetingStatusChain, handleValidationErrors, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) return res.status(400).json({ error: 'Invalid meeting ID.' });
 
-  const newStatus = (req.body.status || '').trim();
-  if (!newStatus) return res.status(400).json({ error: 'New status is required.' });
+  const newStatus = req.body.status; // already trimmed + validated by chain
 
   const result = meetings.advanceStatus(id, newStatus);
   if (result.error) {
@@ -316,15 +302,11 @@ router.put('/admin/meetings/:id/status', requireAdmin, (req, res) => {
 // Force-set meeting status (admin override, bypasses transition validation)
 // PUT /api/admin/meetings/:id/force-status
 // ---------------------------------------------------------------------------
-router.put('/admin/meetings/:id/force-status', requireAdmin, (req, res) => {
+router.put('/admin/meetings/:id/force-status', requireAdmin, ...meetingStatusChain, handleValidationErrors, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) return res.status(400).json({ error: 'Invalid meeting ID.' });
 
-  const newStatus = (req.body.status || '').trim();
-  const validStatuses = ['upcoming', 'reading', 'nominations', 'voting', 'results'];
-  if (!validStatuses.includes(newStatus)) {
-    return res.status(400).json({ error: 'Invalid status.' });
-  }
+  const newStatus = req.body.status; // already trimmed + validated by chain
 
   const meeting = meetings.getById(id);
   if (!meeting) return res.status(404).json({ error: 'Meeting not found.' });
@@ -348,18 +330,15 @@ router.put('/admin/meetings/:id/force-status', requireAdmin, (req, res) => {
 // Admin-add nominee
 // POST /api/admin/meetings/:id/nominees
 // ---------------------------------------------------------------------------
-router.post('/admin/meetings/:id/nominees', requireAdmin, (req, res) => {
+router.post('/admin/meetings/:id/nominees', requireAdmin, ...nominationChain, handleValidationErrors, (req, res) => {
   const meetingId = parseInt(req.params.id, 10);
   if (isNaN(meetingId)) return res.status(400).json({ error: 'Invalid meeting ID.' });
 
   const meeting = meetings.getById(meetingId);
   if (!meeting) return res.status(404).json({ error: 'Meeting not found.' });
 
-  const title = (req.body.title || '').trim();
-  const author = (req.body.author || '').trim();
-  if (!title || !author) {
-    return res.status(400).json({ error: 'Title and author are required.' });
-  }
+  const title = req.body.title; // already trimmed + length-checked by chain
+  const author = req.body.author;
 
   // Find or create the book (reuses Google Books service)
   const metadata = req.body._metadata || {};
@@ -479,17 +458,15 @@ router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
 // ---------------------------------------------------------------------------
 const reviewsService = require('../services/reviews');
 
-router.post('/books/:bookId/reviews', requireMember, (req, res) => {
+router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValidationErrors, (req, res) => {
   const bookId = parseInt(req.params.bookId, 10);
   if (isNaN(bookId)) return res.status(400).json({ error: 'Invalid book ID.' });
 
   const book = db.prepare('SELECT id FROM books WHERE id = ?').get(bookId);
   if (!book) return res.status(404).json({ error: 'Book not found.' });
 
-  const grade = (req.body.grade || '').trim();
-  const body = (req.body.body || '').trim() || null;
-
-  if (!grade) return res.status(400).json({ error: 'Grade is required.' });
+  const grade = req.body.grade; // already trimmed + required by chain
+  const body = req.body.body || null; // already trimmed + length-checked by chain
 
   // Validate grade exists in grade_weights
   const validGrade = db.prepare('SELECT grade FROM grade_weights WHERE grade = ?').get(grade);
@@ -509,7 +486,7 @@ router.post('/books/:bookId/reviews', requireMember, (req, res) => {
 // Update review
 // PUT /api/books/:bookId/reviews
 // ---------------------------------------------------------------------------
-router.put('/books/:bookId/reviews', requireMember, (req, res) => {
+router.put('/books/:bookId/reviews', requireMember, ...reviewChain, handleValidationErrors, (req, res) => {
   const bookId = parseInt(req.params.bookId, 10);
   if (isNaN(bookId)) return res.status(400).json({ error: 'Invalid book ID.' });
 
@@ -518,10 +495,8 @@ router.put('/books/:bookId/reviews', requireMember, (req, res) => {
     return res.status(404).json({ error: 'No review found to update.' });
   }
 
-  const grade = (req.body.grade || '').trim();
-  const body = (req.body.body || '').trim() || null;
-
-  if (!grade) return res.status(400).json({ error: 'Grade is required.' });
+  const grade = req.body.grade; // already trimmed + required by chain
+  const body = req.body.body || null; // already trimmed + length-checked by chain
 
   const validGrade = db.prepare('SELECT grade FROM grade_weights WHERE grade = ?').get(grade);
   if (!validGrade) return res.status(400).json({ error: 'Invalid grade.' });
@@ -591,7 +566,27 @@ const insertNominee = db.prepare(`
   VALUES (?, ?, 'nomination')
 `);
 
-router.post('/meetings/:meetingId/nominations', submissionLimiter, (req, res) => {
+router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nominationChain, (req, res, next) => {
+  // Custom validation handler — redirects for form submissions, JSON for API
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const firstError = errors.array()[0].msg;
+    const wantsJson = req.get('Accept')?.includes('application/json');
+    if (wantsJson) {
+      return res.status(400).json({ error: firstError });
+    }
+    // Form fallback: need meeting to build redirect URL
+    const meetingId = parseInt(req.params.meetingId, 10);
+    const meeting = !isNaN(meetingId)
+      ? db.prepare('SELECT month_year FROM meetings WHERE id = ?').get(meetingId)
+      : null;
+    if (meeting) {
+      return res.redirect(`/nominate/${monthYearSlug(meeting.month_year)}`);
+    }
+    return res.status(400).json({ error: firstError });
+  }
+  next();
+}, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
   if (isNaN(meetingId)) {
     return res.status(400).json({ error: 'Invalid meeting ID.' });
@@ -606,17 +601,9 @@ router.post('/meetings/:meetingId/nominations', submissionLimiter, (req, res) =>
     return res.status(403).json({ error: 'Nominations are not open for this meeting.' });
   }
 
-  const title = (req.body.title || '').trim();
-  const author = (req.body.author || '').trim();
-  const reason = (req.body.reason || '').trim().slice(0, 280) || null;
-
-  if (!title || !author) {
-    const wantsJson = req.get('Accept')?.includes('application/json');
-    if (wantsJson) {
-      return res.status(400).json({ error: 'Title and author are required.' });
-    }
-    return res.redirect(`/nominate/${monthYearSlug(meeting.month_year)}`);
-  }
+  const title = req.body.title; // already trimmed + length-checked by chain
+  const author = req.body.author;
+  const reason = req.body.reason || null;
 
   // Derive fingerprint for this browser + meeting
   const fingerprint = getFingerprint(req, res, meetingId);

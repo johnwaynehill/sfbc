@@ -3,9 +3,11 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
+const { validationResult } = require('express-validator');
 const router = require('express').Router();
 const db = require('../db');
 const { sendMagicLink } = require('../services/email');
+const { emailChain, handleValidationErrors } = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
 // Auth rate limiter — 5 attempts per 15 minutes per IP
@@ -65,22 +67,26 @@ router.get('/login', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /auth/send-link — generate token, send email
 // ---------------------------------------------------------------------------
-router.post('/auth/send-link', authLimiter, async (req, res) => {
-  const email = (req.body.email || '').toLowerCase().trim();
+router.post('/auth/send-link', authLimiter, ...emailChain, async (req, res) => {
   const wantsJson = req.get('Accept')?.includes('application/json');
 
-  if (!email || !email.includes('@')) {
+  // Check validation result — render form for HTML requests, JSON for API
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const firstError = errors.array()[0].msg;
     if (wantsJson) {
-      return res.status(400).json({ error: 'Please enter a valid email address.' });
+      return res.status(400).json({ error: firstError });
     }
     res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Sign In or Create an Account',
       step: 'form',
-      email,
-      error: 'Please enter a valid email address.',
+      email: req.body.email || '',
+      error: firstError,
     });
   }
+
+  const email = req.body.email; // already trimmed + lowercased by chain
 
   // Find or create the user (auto-register on first login)
   let user = findUserByEmail.get(email);
@@ -158,12 +164,12 @@ router.get('/auth/callback', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /auth/password-login — email + password login
 // ---------------------------------------------------------------------------
-router.post('/auth/password-login', authLimiter, (req, res) => {
-  const email = (req.body.email || '').toLowerCase().trim();
+router.post('/auth/password-login', authLimiter, ...emailChain, handleValidationErrors, (req, res) => {
+  const email = req.body.email; // already trimmed + lowercased by chain
   const password = req.body.password || '';
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required.' });
   }
 
   const user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
