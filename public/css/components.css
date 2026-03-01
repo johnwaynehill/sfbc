@@ -474,6 +474,50 @@
   color: #fbbf24;
 }
 
+/* ---- Spoiler Filter Toggle ---- */
+.spoiler-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 4px 12px 4px 8px;
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  color: var(--text3);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  white-space: nowrap;
+}
+.spoiler-toggle:hover {
+  background: var(--surface);
+  color: var(--text2);
+}
+.spoiler-toggle[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--text3);
+}
+.spoiler-toggle__icon { flex-shrink: 0; }
+.spoiler-toggle__label { font-weight: 500; }
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-toggle {
+  border-color: var(--border);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-toggle:hover {
+  background: var(--surface);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-toggle[aria-pressed="true"] {
+  background: var(--surface2);
+  border-color: var(--text3);
+}
+
+/* Hide spoiler reviews by default */
+.review-list:not(.show-spoilers) .review-card[data-spoiler="true"] {
+  display: none;
+}
+
 /* ---- Spoiler Checkbox (review form) ---- */
 .spoiler-checkbox {
   display: flex;
@@ -495,6 +539,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
   margin-bottom: var(--s-3);
 }
 .reviews-header .t-section {
@@ -503,7 +549,7 @@
 .reviews-header__actions {
   display: flex;
   align-items: center;
-  gap: var(--s-3);
+  gap: var(--s-2);
 }
 
 /* ---- Review List ---- */
@@ -1832,19 +1878,19 @@ textarea.form-input {
   max-width: 200px;
 }
 
-/* ---- Grade Slider ---- */
-.grade-slider {
+/* ---- Grade Picker (pill strip) ---- */
+.grade-picker {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--s-4);
+  gap: var(--s-3);
 }
 
-.grade-slider__display {
+.grade-picker__display {
   align-self: center;
 }
 
-.grade-slider__value {
+.grade-picker__value {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1859,105 +1905,65 @@ textarea.form-input {
   transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
 
-/* Range input — custom track + thumb */
-.grade-slider__range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 10px;
-  border-radius: 5px;
-  outline: none;
-  cursor: pointer;
-  --fill-pct: 50%;
-  --fill-color: var(--border);
-  background: linear-gradient(
-    to right,
-    var(--fill-color) 0%,
-    var(--fill-color) var(--fill-pct),
-    var(--border) var(--fill-pct),
-    var(--border) 100%
-  );
-  transition: background 80ms ease;
-}
-
-/* Webkit thumb */
-.grade-slider__range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--text3);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  cursor: grab;
-  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
-}
-
-.grade-slider__range::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
-}
-
-.grade-slider__range::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  transform: scale(1.05);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
-}
-
-/* Firefox thumb */
-.grade-slider__range::-moz-range-thumb {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid var(--text3);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  cursor: grab;
-  transition: border-color 120ms ease, transform 120ms ease;
-}
-
-.grade-slider__range::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
-}
-
-/* Firefox track */
-.grade-slider__range::-moz-range-track {
-  height: 10px;
-  border-radius: 5px;
-  background: var(--border);
-}
-
-.grade-slider__range::-moz-range-progress {
-  height: 10px;
-  border-radius: 5px;
-  background: var(--fill-color);
-}
-
-/* Tier labels below track */
-.grade-slider__labels {
+/* Scrollable pill strip */
+.grade-picker__strip {
   display: flex;
-  justify-content: space-between;
+  gap: 6px;
   width: 100%;
-  padding: 0 2px;
-  margin-top: calc(-1 * var(--s-1));
-  font-family: var(--font-ui);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 8px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;          /* Firefox */
+}
+.grade-picker__strip::-webkit-scrollbar {
+  display: none;                   /* Chrome/Safari */
+}
+
+/* Individual grade pill */
+.grade-pill {
+  flex: 0 0 auto;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 4px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: var(--t-sm);
-  font-weight: 600;
   color: var(--text3);
-  user-select: none;
+  cursor: pointer;
+  scroll-snap-align: center;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, transform 100ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark mode slider */
-:is([data-theme="dark"], :root:not([data-theme="light"])) .grade-slider__range::-webkit-slider-thumb {
+.grade-pill:hover {
   background: var(--surface);
   border-color: var(--text3);
+  color: var(--text2);
 }
 
-:is([data-theme="dark"], :root:not([data-theme="light"])) .grade-slider__range::-moz-range-thumb {
+.grade-pill:active {
+  transform: scale(0.93);
+}
+
+.grade-pill.is-selected {
+  transform: scale(1.08);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .grade-pill {
   background: var(--surface);
-  border-color: var(--text3);
+  border-color: var(--border);
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .grade-pill.is-selected {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ---- Formatting Hint (subtle inline) ---- */

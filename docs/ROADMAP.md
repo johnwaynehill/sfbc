@@ -53,10 +53,10 @@ Almost every feature below benefits from this refactor. It should be done first,
 ### Engagement (small, high-impact, ships fast)
 
 - [✅] **Spoiler tap-to-reveal** — Tapping `||spoiler||` toggles visibility [S]
-- [ ] **Spoiler filter on reviews** — Hide/show reviews that contain spoilers [S]
-- [ ] **Emoji reactions to reviews** — Let the 875 non-attendees participate with a single tap [S]
+- [✅] **Spoiler filter on reviews** — Hide/show reviews that contain spoilers; toggle with localStorage persistence [S]
+- [✅] **Emoji reactions to reviews** — Let the 875 non-attendees participate with a single tap [S]
 - [ ] **Announcements on Home page** — Admin publishes updates, gives members a reason to check in [S]
-- [ ] **Improve letter grade interaction** — Better UX on the grade slider [S]
+- [✅] **Improve letter grade interaction** — Replaced slider with horizontal pill strip of all 14 grades [S]
 - [ ] **Changelog collapsible entries** — Latest expanded, others collapsed [S]
 - [ ] **Winning book animation on Results page** — Attention-grabbing reveal when winner is displayed; consider full-screen book cover takeover [M]
 - [ ] **Winning book Results page — dark mode fix** — Remove "# points" from winner card, add "Nominated by" credit, ensure readability in dark mode [S]
@@ -129,6 +129,8 @@ Almost every feature below benefits from this refactor. It should be done first,
 
 ### Reviews
 
+- [ ] **Enhance spoiler filter UX** — Improve toggle placement, animation, and count badge styling after user testing [S]
+- [ ] **Enhance grade pill strip** — Polish pill strip interaction based on user testing; explore haptic feedback, animation, and mobile scroll UX [S]
 - [ ] **Extended markdown support** — More formatting options [M]
 - [ ] **Emoji flurry for A+ books** — Celebratory animation on high-scoring book pages [S]
 

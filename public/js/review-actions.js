@@ -127,4 +127,38 @@
       reviewList.appendChild(card);
     });
   }
+
+  // ── Spoiler filter ──────────────────────────────────────
+  var spoilerToggle = document.getElementById('spoilerToggle');
+  var spoilerLabel = document.getElementById('spoilerToggleLabel');
+  var spoilerIcon = spoilerToggle ? spoilerToggle.querySelector('.spoiler-toggle__icon') : null;
+
+  // Eye-off SVG (spoilers hidden — default)
+  var EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  // Eye SVG (spoilers showing)
+  var EYE_ON = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+
+  if (spoilerToggle) {
+    var spoilerCount = parseInt(reviewList.getAttribute('data-spoiler-count'), 10) || 0;
+    var suffix = spoilerCount !== 1 ? 's' : '';
+
+    function updateSpoilerUI(isShowing) {
+      spoilerToggle.setAttribute('aria-pressed', String(isShowing));
+      spoilerLabel.textContent = (isShowing ? 'Hide ' : 'Show ') + spoilerCount + ' spoiler' + suffix;
+      if (spoilerIcon) spoilerIcon.innerHTML = isShowing ? EYE_ON : EYE_OFF;
+    }
+
+    // Restore from localStorage
+    var showSpoilers = localStorage.getItem('showSpoilers') === 'true';
+    if (showSpoilers) {
+      reviewList.classList.add('show-spoilers');
+      updateSpoilerUI(true);
+    }
+
+    spoilerToggle.addEventListener('click', function () {
+      var isShowing = reviewList.classList.toggle('show-spoilers');
+      updateSpoilerUI(isShowing);
+      localStorage.setItem('showSpoilers', String(isShowing));
+    });
+  }
 })();

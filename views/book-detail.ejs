@@ -93,11 +93,23 @@
 <% } %>
 
 <!-- ===== Reviews ===== -->
+<% const spoilerCount = reviews.filter(r => r.has_spoilers).length; %>
 <section class="section">
   <div class="reviews-header">
     <h2 class="t-section">Reviews</h2>
     <div class="reviews-header__actions">
-      <%/* Spoiler toggle removed — revisit later */%>
+      <% if (spoilerCount > 0) { %>
+        <button type="button" class="spoiler-toggle" id="spoilerToggle"
+                aria-pressed="false"
+                aria-label="Show spoiler reviews">
+          <svg class="spoiler-toggle__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+          <span class="spoiler-toggle__label" id="spoilerToggleLabel">Show <%= spoilerCount %> spoiler<%= spoilerCount !== 1 ? 's' : '' %></span>
+        </button>
+      <% } %>
       <% if (reviews.length > 1) { %>
         <div class="sort-dropdown" id="reviewSortDropdown">
           <button type="button" class="history-btn" id="reviewSortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
@@ -120,9 +132,9 @@
   </div>
 
   <% if (reviews.length > 0) { %>
-  <div class="review-list" id="reviewList">
+  <div class="review-list" id="reviewList" data-spoiler-count="<%= spoilerCount %>">
     <% for (const review of reviews) { %>
-      <div class="review-card<%= review.has_spoilers ? ' review-card--spoiler' : '' %>" data-review-id="<%= review.id %>" data-date="<%= review.created_at %>" data-weight="<%= review.weight %>"<%= review.has_spoilers ? ' data-spoiler="true"' : '' %>>
+      <div class="review-card<%= review.has_spoilers ? ' review-card--spoiler' : '' %>" data-review-id="<%= review.id %>" data-date="<%= review.created_at %>" data-weight="<%= review.weight %>"<%- review.has_spoilers ? ' data-spoiler="true"' : '' %>>
         <div class="review-card__grade-col">
           <span class="grade-badge grade-badge--sm <%= gradeTier(review.grade) %>"><%= review.grade %></span>
           <% if (review.has_spoilers) { %>

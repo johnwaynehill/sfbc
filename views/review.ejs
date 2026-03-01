@@ -30,22 +30,27 @@
     <!-- Hidden input that holds the actual grade value -->
     <input type="hidden" name="grade" id="grade-input" value="<%= review ? review.grade : '' %>">
 
-    <!-- Grade Slider -->
+    <!-- Grade Picker (pill strip) -->
     <div class="form-label">Grade</div>
-    <div class="grade-slider" id="grade-slider">
-      <div class="grade-slider__display">
-        <span class="grade-slider__value" id="grade-display"><%= review ? review.grade : '—' %></span>
+    <div class="grade-picker" id="grade-picker">
+      <div class="grade-picker__display">
+        <span class="grade-picker__value" id="grade-display"><%= review ? review.grade : '—' %></span>
       </div>
-      <input type="range" class="grade-slider__range" id="grade-range"
-             min="0" max="13" step="1"
-             value="<%= review ? '' : '7' %>">
-      <div class="grade-slider__labels">
-        <span>F</span>
-        <span>D</span>
-        <span>C</span>
-        <span>B</span>
-        <span>A</span>
-        <span>S</span>
+      <div class="grade-picker__strip" id="grade-strip" role="radiogroup" aria-label="Grade">
+        <button type="button" class="grade-pill" data-grade="F">F</button>
+        <button type="button" class="grade-pill" data-grade="D-">D&minus;</button>
+        <button type="button" class="grade-pill" data-grade="D">D</button>
+        <button type="button" class="grade-pill" data-grade="D+">D+</button>
+        <button type="button" class="grade-pill" data-grade="C-">C&minus;</button>
+        <button type="button" class="grade-pill" data-grade="C">C</button>
+        <button type="button" class="grade-pill" data-grade="C+">C+</button>
+        <button type="button" class="grade-pill" data-grade="B-">B&minus;</button>
+        <button type="button" class="grade-pill" data-grade="B">B</button>
+        <button type="button" class="grade-pill" data-grade="B+">B+</button>
+        <button type="button" class="grade-pill" data-grade="A-">A&minus;</button>
+        <button type="button" class="grade-pill" data-grade="A">A</button>
+        <button type="button" class="grade-pill" data-grade="A+">A+</button>
+        <button type="button" class="grade-pill" data-grade="S">S</button>
       </div>
     </div>
 
@@ -85,22 +90,18 @@
   var form = document.getElementById('review-form');
   if (!form) return;
 
-  // ---- Grade Slider ----
+  // ---- Grade Picker (pill strip) ----
   var gradeInput = document.getElementById('grade-input');
-  var slider = document.getElementById('grade-range');
   var display = document.getElementById('grade-display');
-  var sliderWrap = document.getElementById('grade-slider');
-
-  // Grades ordered from lowest (0) to highest (13)
-  var GRADES = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+','S'];
+  var strip = document.getElementById('grade-strip');
 
   var TIER_COLORS = {
-    f:  { bg: 'linear-gradient(135deg, #FEF2F2, #FECACA)', text: '#991B1B', track: '#FECACA', darkBg: 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08))', darkText: '#f87171', darkTrack: 'rgba(239,68,68,0.3)' },
-    d:  { bg: 'linear-gradient(135deg, #FFF7ED, #FED7AA)', text: '#9A3412', track: '#FED7AA', darkBg: 'linear-gradient(135deg, rgba(249,115,22,0.18), rgba(249,115,22,0.08))', darkText: '#fb923c', darkTrack: 'rgba(249,115,22,0.3)' },
-    c:  { bg: 'linear-gradient(135deg, #F5F5F4, #E7E5E4)', text: '#57534E', track: '#D6D3D1', darkBg: 'linear-gradient(135deg, rgba(168,162,158,0.15), rgba(168,162,158,0.06))', darkText: '#a8a29e', darkTrack: 'rgba(168,162,158,0.3)' },
-    b:  { bg: 'linear-gradient(135deg, #EFF6FF, #BFDBFE)', text: '#1E3A5F', track: '#93C5FD', darkBg: 'linear-gradient(135deg, rgba(59,130,246,0.18), rgba(59,130,246,0.08))', darkText: '#60a5fa', darkTrack: 'rgba(59,130,246,0.3)' },
-    a:  { bg: 'linear-gradient(135deg, #ECFDF5, #A7F3D0)', text: '#065F46', track: '#6EE7B7', darkBg: 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08))', darkText: '#4ade80', darkTrack: 'rgba(34,197,94,0.3)' },
-    s:  { bg: 'linear-gradient(135deg, #FEF3C7, #FDE68A, #FCD34D)', text: '#78350F', track: '#FCD34D', darkBg: 'linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08))', darkText: '#fbbf24', darkTrack: 'rgba(245,158,11,0.35)' },
+    f:  { bg: 'linear-gradient(135deg, #FEF2F2, #FECACA)', text: '#991B1B', border: '#FECACA', darkBg: 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08))', darkText: '#f87171', darkBorder: 'rgba(239,68,68,0.3)' },
+    d:  { bg: 'linear-gradient(135deg, #FFF7ED, #FED7AA)', text: '#9A3412', border: '#FED7AA', darkBg: 'linear-gradient(135deg, rgba(249,115,22,0.18), rgba(249,115,22,0.08))', darkText: '#fb923c', darkBorder: 'rgba(249,115,22,0.3)' },
+    c:  { bg: 'linear-gradient(135deg, #F5F5F4, #E7E5E4)', text: '#57534E', border: '#D6D3D1', darkBg: 'linear-gradient(135deg, rgba(168,162,158,0.15), rgba(168,162,158,0.06))', darkText: '#a8a29e', darkBorder: 'rgba(168,162,158,0.3)' },
+    b:  { bg: 'linear-gradient(135deg, #EFF6FF, #BFDBFE)', text: '#1E3A5F', border: '#93C5FD', darkBg: 'linear-gradient(135deg, rgba(59,130,246,0.18), rgba(59,130,246,0.08))', darkText: '#60a5fa', darkBorder: 'rgba(59,130,246,0.3)' },
+    a:  { bg: 'linear-gradient(135deg, #ECFDF5, #A7F3D0)', text: '#065F46', border: '#6EE7B7', darkBg: 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08))', darkText: '#4ade80', darkBorder: 'rgba(34,197,94,0.3)' },
+    s:  { bg: 'linear-gradient(135deg, #FEF3C7, #FDE68A, #FCD34D)', text: '#78350F', border: '#FCD34D', darkBg: 'linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08))', darkText: '#fbbf24', darkBorder: 'rgba(245,158,11,0.35)' },
   };
 
   function getTier(grade) {
@@ -115,60 +116,73 @@
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
-  function updateSlider(index, setInput) {
-    var grade = GRADES[index];
+  function updateDisplay(grade) {
     var tier = getTier(grade);
-    var colors = TIER_COLORS[tier];
+    var colors = tier ? TIER_COLORS[tier] : null;
     var dark = isDark();
 
-    // Update display
-    display.textContent = grade;
-    display.style.background = dark ? colors.darkBg : colors.bg;
-    display.style.color = dark ? colors.darkText : colors.text;
-    if (tier === 's') {
-      display.style.boxShadow = dark
-        ? '0 2px 12px rgba(245, 158, 11, 0.15)'
-        : '0 2px 12px rgba(245, 158, 11, 0.2)';
+    display.textContent = grade || '—';
+
+    if (colors) {
+      display.style.background = dark ? colors.darkBg : colors.bg;
+      display.style.color = dark ? colors.darkText : colors.text;
+      display.style.boxShadow = tier === 's'
+        ? (dark ? '0 2px 12px rgba(245,158,11,0.15)' : '0 2px 12px rgba(245,158,11,0.2)')
+        : 'none';
     } else {
+      display.style.background = 'var(--surface)';
+      display.style.color = 'var(--text3)';
       display.style.boxShadow = 'none';
     }
+  }
 
-    // Update track fill color via CSS custom property
-    var pct = (index / 13) * 100;
-    var trackColor = dark ? colors.darkTrack : colors.track;
-    slider.style.setProperty('--fill-pct', pct + '%');
-    slider.style.setProperty('--fill-color', trackColor);
+  function selectGrade(grade) {
+    hasInteracted = true;
+    gradeInput.value = grade;
+    updateDisplay(grade);
 
-    // Update hidden input
-    if (setInput) {
-      gradeInput.value = grade;
+    var dark = isDark();
+    var pills = strip.querySelectorAll('.grade-pill');
+    for (var i = 0; i < pills.length; i++) {
+      var pill = pills[i];
+      var g = pill.getAttribute('data-grade');
+      var isSelected = g === grade;
+      pill.classList.toggle('is-selected', isSelected);
+
+      if (isSelected) {
+        var colors = TIER_COLORS[getTier(g)];
+        pill.style.background = dark ? colors.darkBg : colors.bg;
+        pill.style.color = dark ? colors.darkText : colors.text;
+        pill.style.borderColor = dark ? colors.darkBorder : colors.border;
+      } else {
+        pill.style.background = '';
+        pill.style.color = '';
+        pill.style.borderColor = '';
+      }
     }
   }
 
-  // Set initial position from existing review
+  // Event listener — single delegated click on the strip
+  strip.addEventListener('click', function (e) {
+    var pill = e.target.closest('.grade-pill');
+    if (!pill) return;
+    selectGrade(pill.getAttribute('data-grade'));
+    // Scroll selected pill into center view
+    pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  });
+
+  // Edit mode: pre-select existing grade
   var existingGrade = gradeInput.value;
-  if (existingGrade) {
-    var idx = GRADES.indexOf(existingGrade);
-    if (idx !== -1) {
-      slider.value = idx;
-      updateSlider(idx, false);
-    }
-  } else {
-    // No grade yet — show middle position but don't set a value
-    display.textContent = '—';
-    display.style.background = 'var(--surface)';
-    display.style.color = 'var(--text3)';
-    var pct = (7 / 13) * 100;
-    slider.style.setProperty('--fill-pct', pct + '%');
-    slider.style.setProperty('--fill-color', 'var(--border)');
-  }
-
   var hasInteracted = !!existingGrade;
 
-  slider.addEventListener('input', function () {
-    hasInteracted = true;
-    updateSlider(parseInt(this.value, 10), true);
-  });
+  if (existingGrade) {
+    selectGrade(existingGrade);
+    // Scroll to selected pill after render
+    var sel = strip.querySelector('.grade-pill.is-selected');
+    if (sel) setTimeout(function () { sel.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 50);
+  } else {
+    updateDisplay(null);
+  }
 
   // ---- Form Submission ----
   var submitBtn = document.getElementById('review-submit');
@@ -182,7 +196,7 @@
     if (!hasInteracted || !gradeInput.value) {
       messageEl.hidden = false;
       messageEl.className = 'nom-message nom-message--error';
-      messageEl.textContent = 'Please select a grade using the slider.';
+      messageEl.textContent = 'Please select a grade.';
       return;
     }
 
