@@ -1,5 +1,34 @@
 [
   {
+    "version": "0.5",
+    "date": "2026-02-28",
+    "title": "Reactions, Announcements & More",
+    "intro": "A big update focused on letting more people participate \u2014 even if you can\u2019t make it to the meeting.",
+    "entries": [
+      {
+        "icon": "magic",
+        "text": "React to reviews with emoji \u2014 tap the + button on any review to leave a \ud83d\udc4d, \u2764\ufe0f, \ud83d\udd25, or any emoji you like. No account needed to see them; log in to react."
+      },
+      {
+        "icon": "book",
+        "text": "Announcements on the home page \u2014 club news, event changes, and reminders now appear right at the top. Admins can create, schedule, and expire them."
+      },
+      {
+        "icon": "calendar",
+        "text": "Winner reveal animation \u2014 when voting closes, the results page now shows a full-screen book cover reveal with confetti. Tap the \u00d7 to dismiss."
+      },
+      {
+        "icon": "moon",
+        "text": "Dark mode improvements \u2014 fixed date picker icons, admin forms, and the results winner card so everything is readable in dark mode."
+      },
+      {
+        "icon": "user",
+        "text": "Security hardening \u2014 added rate limiting, content security headers, and input validation across all forms to keep things safe."
+      }
+    ],
+    "outro": "More coming soon \u2014 we\u2019re working on richer book pages, discussion features, and ways to make the club experience even better between meetings."
+  },
+  {
     "version": "0.4",
     "date": "2026-02-23",
     "title": "Welcome to the SF Book Club App!",
