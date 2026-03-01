@@ -26,11 +26,25 @@
       btn.disabled = true;
       btn.textContent = 'Creating\u2026';
 
+      // Convert local datetime-local value to UTC for SQLite comparison
+      var rawExpiry = form.querySelector('[name="expires_at"]').value || null;
+      var expiresUtc = null;
+      if (rawExpiry) {
+        var d = new Date(rawExpiry);
+        if (!isNaN(d.getTime())) {
+          expiresUtc = d.getUTCFullYear() + '-' +
+            String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getUTCDate()).padStart(2, '0') + ' ' +
+            String(d.getUTCHours()).padStart(2, '0') + ':' +
+            String(d.getUTCMinutes()).padStart(2, '0') + ':00';
+        }
+      }
+
       var formData = {
         type: form.querySelector('[name="type"]').value,
         title: form.querySelector('[name="title"]').value.trim(),
         body: form.querySelector('[name="body"]').value.trim() || null,
-        expires_at: form.querySelector('[name="expires_at"]').value || null,
+        expires_at: expiresUtc,
       };
 
       try {

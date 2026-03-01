@@ -452,54 +452,26 @@
   color: var(--danger, #c0392b);
 }
 
-/* ---- Spoiler Filter ---- */
-.spoiler-toggle {
-  display: inline-flex;
+/* ---- Review Card: Grade + Spoiler Column ---- */
+.review-card__grade-col {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-family: var(--font-ui);
-  font-size: var(--t-xs);
-  color: var(--text2);
-  user-select: none;
+  gap: 4px;
+  flex-shrink: 0;
 }
-.spoiler-toggle input { margin: 0; }
 
 .spoiler-badge {
-  display: inline-block;
   font-family: var(--font-ui);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  background: rgba(245, 158, 11, 0.12);
+  letter-spacing: 0.03em;
   color: #b45309;
-  position: absolute;
-  top: var(--s-2);
-  right: var(--s-2);
+  white-space: nowrap;
 }
 :is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-badge {
-  background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
-}
-
-.review-card--spoiler {
-  position: relative;
-}
-
-/* Blur spoiler reviews by default; reveal when toggle is checked */
-.review-list .review-card[data-spoiler="true"] .review-card__body {
-  filter: blur(5px);
-  pointer-events: none;
-  user-select: none;
-  transition: filter 200ms ease;
-}
-.review-list.show-spoilers .review-card[data-spoiler="true"] .review-card__body {
-  filter: none;
-  pointer-events: auto;
-  user-select: auto;
 }
 
 /* ---- Spoiler Checkbox (review form) ---- */
