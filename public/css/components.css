@@ -2302,6 +2302,11 @@ textarea.form-input {
   gap: var(--s-1);
   margin-bottom: var(--s-3);
 }
+.changelog-release__meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
 
 .changelog-release__version {
   display: inline-flex;

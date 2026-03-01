@@ -8,13 +8,15 @@
     <% releases.forEach(function(release, releaseIndex) { %>
       <article class="changelog-release">
         <div class="changelog-release__meta">
-          <span class="changelog-release__version">v<%= release.version %></span>
+          <div class="changelog-release__meta-row">
+            <span class="changelog-release__version">v<%= release.version %></span>
+            <% if (releaseIndex > 0) { %>
+              <button type="button" class="changelog-release__toggle" aria-expanded="false" aria-label="Toggle release details">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            <% } %>
+          </div>
           <time class="t-caption text-tertiary"><%= formatChangelogDate(release.date) %></time>
-          <% if (releaseIndex > 0) { %>
-            <button type="button" class="changelog-release__toggle" aria-expanded="false" aria-label="Toggle release details">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          <% } %>
         </div>
 
         <% if (release.title) { %>
