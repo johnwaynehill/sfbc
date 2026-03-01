@@ -118,6 +118,9 @@ Almost every feature below benefits from this refactor. It should be done first,
   - Link to StoryGraph search for that tag
 - [ ] **Related books / Books by same author** — Cross-references on book detail pages [L]
   - *Requires external data source (OpenLibrary API)*
+- [ ] **Easy library check out**
+  - Add a way to checkout the book from a local library
+  - Admin enters local libray URL
 
 ### Quotes
 

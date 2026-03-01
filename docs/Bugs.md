@@ -37,6 +37,9 @@
   - This could just be a version of the Voting page without an ability to vote
 - [ ] Create placeholder image for books that don't have covers
 - [ ] Results pages should be persistant; they are part of the culture of the clubs
+- [ ] Users should be able to see Who has left What Reaction to their review
+  - Tap/click on a Reaction to see a list of Reactions and who all left that reaction. 
+  - Similar to Discord
 
 ### Book Detail
 - [ ] Grade distribution should be some kind of chart, not just stacked bar lines
