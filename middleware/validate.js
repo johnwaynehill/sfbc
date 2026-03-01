@@ -137,6 +137,81 @@ const meetingStatusChain = [
     .withMessage('Invalid meeting status.'),
 ];
 
+const announcementChain = [
+  body('title')
+    .trim()
+    .notEmpty().withMessage('Title is required.')
+    .isLength({ max: 200 }).withMessage('Title is too long (max 200 characters).'),
+  body('type')
+    .optional()
+    .trim()
+    .isIn(['info', 'warning', 'success']).withMessage('Type must be info, warning, or success.'),
+  body('body')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ max: 1000 }).withMessage('Body is too long (max 1,000 characters).'),
+  body('expires_at')
+    .optional({ values: 'falsy' })
+    .trim(),
+];
+
+// ---------------------------------------------------------------------------
+// Emoji validation — allow actual emoji characters, reject HTML/scripts
+// Matches Unicode emoji: emoticons, dingbats, symbols, pictographs, etc.
+// ---------------------------------------------------------------------------
+const EMOJI_RE = /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u200d\ufe0f]+$/u;
+
+const emojiChain = [
+  body('emoji')
+    .trim()
+    .notEmpty().withMessage('Emoji is required.')
+    .isLength({ max: 32 }).withMessage('Emoji is too long.')
+    .custom((value) => {
+      if (!EMOJI_RE.test(value)) {
+        throw new Error('Invalid emoji character.');
+      }
+      return true;
+    }),
+];
+
+// ---------------------------------------------------------------------------
+// Reusable sanitized text chain — for replies, discussion questions, etc.
+// Trims, strips zero-width characters, enforces length limits.
+// Usage: sanitizeTextChain('body', { max: 2000, required: true })
+// ---------------------------------------------------------------------------
+function sanitizeTextChain(field, { max = 2000, required = true, label = 'Text' } = {}) {
+  const chain = [
+    body(field)
+      .trim()
+      .customSanitizer((value) => {
+        if (!value) return value;
+        // Strip zero-width characters (invisible control chars used for XSS tricks)
+        return value.replace(/[\u200B-\u200D\u2060\uFEFF]/g, '');
+      }),
+  ];
+
+  if (required) {
+    chain[0] = chain[0]
+      .notEmpty().withMessage(`${label} is required.`);
+  } else {
+    chain[0] = body(field)
+      .optional({ values: 'falsy' })
+      .trim()
+      .customSanitizer((value) => {
+        if (!value) return value;
+        return value.replace(/[\u200B-\u200D\u2060\uFEFF]/g, '');
+      });
+  }
+
+  chain.push(
+    body(field)
+      .optional({ values: 'falsy' })
+      .isLength({ max }).withMessage(`${label} is too long (max ${max.toLocaleString()} characters).`)
+  );
+
+  return chain;
+}
+
 module.exports = {
   handleValidationErrors,
   emailChain,
@@ -148,4 +223,7 @@ module.exports = {
   nominationChain,
   meetingChain,
   meetingStatusChain,
+  announcementChain,
+  emojiChain,
+  sanitizeTextChain,
 };

@@ -26,6 +26,8 @@ const {
   nominationChain,
   meetingChain,
   meetingStatusChain,
+  announcementChain,
+  emojiChain,
 } = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
@@ -458,18 +460,11 @@ router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
 const announcementsService = require('../services/announcements');
 
 // POST /api/admin/announcements
-router.post('/admin/announcements', requireAdmin, (req, res) => {
-  const title = (req.body.title || '').trim();
-  if (!title || title.length > 200) {
-    return res.status(400).json({ error: 'Title is required (max 200 chars).' });
-  }
-
+router.post('/admin/announcements', requireAdmin, ...announcementChain, handleValidationErrors, (req, res) => {
+  const title = req.body.title; // already trimmed + length-checked by chain
   const type = (req.body.type || 'info').trim();
-  if (!['info', 'warning', 'success'].includes(type)) {
-    return res.status(400).json({ error: 'Type must be info, warning, or success.' });
-  }
+  const body = req.body.body || null; // already trimmed + length-checked by chain
 
-  const body = (req.body.body || '').trim() || null;
   // Normalize datetime-local format (2026-02-28T15:00) to SQLite format (2026-02-28 15:00:00)
   const rawExpiry = (req.body.expires_at || '').trim() || null;
   const expiresAt = rawExpiry ? rawExpiry.replace('T', ' ').replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2})$/, '$1:00') : null;
@@ -477,7 +472,7 @@ router.post('/admin/announcements', requireAdmin, (req, res) => {
   const result = announcementsService.create({
     type,
     title,
-    body: body && body.length > 1000 ? body.slice(0, 1000) : body,
+    body,
     createdBy: req.user.id,
     expiresAt,
   });
@@ -532,14 +527,11 @@ const reactionsService = require('../services/reactions');
 // Toggle emoji reaction on a review
 // POST /api/reviews/:reviewId/reactions
 // ---------------------------------------------------------------------------
-router.post('/reviews/:reviewId/reactions', requireMember, (req, res) => {
+router.post('/reviews/:reviewId/reactions', requireMember, ...emojiChain, handleValidationErrors, (req, res) => {
   const reviewId = parseInt(req.params.reviewId, 10);
   if (isNaN(reviewId)) return res.status(400).json({ error: 'Invalid review ID.' });
 
-  const emoji = (req.body.emoji || '').trim();
-  if (!emoji || emoji.length > 32) {
-    return res.status(400).json({ error: 'Invalid emoji.' });
-  }
+  const emoji = req.body.emoji; // already trimmed + validated by chain
 
   // Verify review exists
   const review = db.prepare('SELECT id FROM reviews WHERE id = ?').get(reviewId);

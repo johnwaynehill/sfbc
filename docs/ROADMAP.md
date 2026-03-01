@@ -55,11 +55,11 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [✅] **Spoiler tap-to-reveal** — Tapping `||spoiler||` toggles visibility [S]
 - [✅] **Spoiler filter on reviews** — Hide/show reviews that contain spoilers; toggle with localStorage persistence [S]
 - [✅] **Emoji reactions to reviews** — Let the 875 non-attendees participate with a single tap [S]
-- [ ] **Announcements on Home page** — Admin publishes updates, gives members a reason to check in [S]
+- [✅] **Announcements on Home page** — Admin publishes updates, gives members a reason to check in [S]
 - [✅] **Improve letter grade interaction** — Replaced slider with horizontal pill strip of all 14 grades [S]
-- [ ] **Changelog collapsible entries** — Latest expanded, others collapsed [S]
-- [ ] **Winning book animation on Results page** — Attention-grabbing reveal when winner is displayed; consider full-screen book cover takeover [M]
-- [ ] **Winning book Results page — dark mode fix** — Remove "# points" from winner card, add "Nominated by" credit, ensure readability in dark mode [S]
+- [✅] **Changelog collapsible entries** — Latest expanded, others collapsed [S]
+- [✅] **Winning book animation on Results page** — Attention-grabbing reveal when winner is displayed; consider full-screen book cover takeover [M]
+- [✅] **Winning book Results page — dark mode fix** — Remove "# points" from winner card, add "Nominated by" credit, ensure readability in dark mode [S]
 
 ---
 
@@ -97,7 +97,7 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Link to profile from Admin users** — Quick link to member's public profile [S]
 - [ ] **Preserve vote results as archive** — Keep past vote tallies accessible, not just the winner [M]
 - [ ] **Prevent past nominations from interfering with winner URLs** — Ensure canonical slugs for winning books aren't affected by prior nomination data [S]
-- [ ] **Block nominations for already-read books** — Prevent re-nomination with a gentle, warm message explaining the book was already read [S]
+- [✅] **Block nominations for already-read books** — Prevent re-nomination with a gentle, warm message explaining the book was already read [S]
 - [ ] **Live SSE for admin meeting detail** — Nominations appear in real-time on the admin meeting page as they come in [M]
 - [ ] **Voting page UX overhaul** — Reduce card height (nominated-by + rationale make cards too big), rethink rank number placement, top-align cover with title; reference strawpoll.com for inspiration [M]
 - [ ] **Admin form field icons — dark mode contrast** — Invert or brighten icons inside admin form fields so they're visible in dark mode [S]
