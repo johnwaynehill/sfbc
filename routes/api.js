@@ -411,6 +411,35 @@ router.delete('/admin/users/:id', requireAdmin, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Promote / demote user role (admin only, cannot demote self)
+// PUT /api/admin/users/:id/role
+// ---------------------------------------------------------------------------
+router.put('/admin/users/:id/role', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid user ID.' });
+
+  const newRole = (req.body.role || '').trim();
+  if (newRole !== 'admin' && newRole !== 'member') {
+    return res.status(400).json({ error: 'Role must be "admin" or "member".' });
+  }
+
+  const target = db.prepare('SELECT id, role FROM users WHERE id = ?').get(id);
+  if (!target) return res.status(404).json({ error: 'User not found.' });
+
+  // Cannot demote yourself
+  if (id === req.user.id && newRole !== 'admin') {
+    return res.status(403).json({ error: 'You cannot demote yourself.' });
+  }
+
+  if (target.role === newRole) {
+    return res.json({ success: true, message: 'Role unchanged.' });
+  }
+
+  db.prepare('UPDATE users SET role = ? WHERE id = ?').run(newRole, id);
+  res.json({ success: true, role: newRole });
+});
+
+// ---------------------------------------------------------------------------
 // Send magic link to a user (admin action)
 // POST /api/admin/users/:id/send-magic-link
 // ---------------------------------------------------------------------------

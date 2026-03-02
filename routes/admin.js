@@ -177,7 +177,7 @@ router.get('/meetings/:slug', async (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/users', (req, res) => {
   const users = db.prepare(`
-    SELECT id, email, display_name, role, avatar_style, created_at
+    SELECT id, email, display_name, role, avatar_style, user_slug, created_at
     FROM users
     ORDER BY created_at DESC
   `).all();

@@ -1,6 +1,35 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
-    <h1 class="t-section admin-page__heading"><%= pageTitle %> (<%= reviews.length %>)</h1>
+    <h1 class="t-section admin-page__heading"><%= pageTitle %> (<span id="reviewCount"><%= reviews.length %></span>)</h1>
+
+    <% if (reviews.length > 1) { %>
+      <div class="admin-toolbar">
+        <div class="admin-search" id="adminSearch">
+          <svg class="admin-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" class="admin-search__input" placeholder="Search book, author, or reviewer…" autocomplete="off">
+          <button type="button" class="admin-search__clear" id="searchClear" hidden aria-label="Clear search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="sort-dropdown" id="sortDropdown">
+          <button type="button" class="admin-toolbar__btn" id="sortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
+          </button>
+          <ul class="sort-dropdown__menu" id="sortMenu" role="listbox" aria-label="Sort order">
+            <li class="sort-dropdown__item is-selected" role="option" data-sort="newest" aria-selected="true">Newest first</li>
+            <li class="sort-dropdown__item" role="option" data-sort="oldest" aria-selected="false">Oldest first</li>
+            <li class="sort-dropdown__item" role="option" data-sort="grade-high" aria-selected="false">Grade high &rarr; low</li>
+            <li class="sort-dropdown__item" role="option" data-sort="grade-low" aria-selected="false">Grade low &rarr; high</li>
+            <li class="sort-dropdown__item" role="option" data-sort="book-az" aria-selected="false">Book A &rarr; Z</li>
+          </ul>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <div id="noResults" class="admin-empty" hidden>
+    <p class="t-body text-secondary">No reviews match your search.</p>
   </div>
 
   <% if (reviews.length > 0) { %>
@@ -15,9 +44,21 @@
             <th class="t-caption"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="reviewsBody">
           <% reviews.forEach(function(r) { %>
-            <tr data-review-id="<%= r.id %>" class="js-review-row">
+            <%
+              var reviewer = r.display_name || r.email;
+              var parts = r.created_at.split(/[-T ]/);
+              var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+              var dateStr = months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10) + ', ' + parts[0];
+            %>
+            <tr data-review-id="<%= r.id %>"
+                data-book="<%= r.book_title.toLowerCase() %>"
+                data-author="<%= r.book_author.toLowerCase() %>"
+                data-reviewer="<%= reviewer.toLowerCase() %>"
+                data-grade="<%= r.grade %>"
+                data-date="<%= r.created_at %>"
+                class="js-review-row">
               <td>
                 <span class="grade-badge grade-badge--sm <%= gradeTier(r.grade) %>"><%= r.grade %></span>
               </td>
@@ -27,13 +68,8 @@
                   <span class="t-caption text-secondary"><%= r.book_author %></span>
                 </div>
               </td>
-              <td class="t-body"><%= r.display_name || r.email %></td>
+              <td class="t-body"><%= reviewer %></td>
               <td class="t-body text-secondary" style="white-space: nowrap;">
-                <%
-                  var parts = r.created_at.split(/[-T ]/);
-                  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                  var dateStr = months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10) + ', ' + parts[0];
-                %>
                 <%= dateStr %>
               </td>
               <td>
@@ -46,7 +82,7 @@
                   <% } %>
                   <button type="button" class="btn btn--danger btn--sm js-delete-review"
                           data-review-id="<%= r.id %>"
-                          data-name="<%= (r.display_name || r.email) + ' on ' + r.book_title %>">
+                          data-name="<%= reviewer + ' on ' + r.book_title %>">
                     Delete
                   </button>
                 </div>

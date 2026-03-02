@@ -1,6 +1,35 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
-    <h1 class="t-section admin-page__heading"><%= pageTitle %> (<%= users.length %>)</h1>
+    <h1 class="t-section admin-page__heading"><%= pageTitle %> (<span id="userCount"><%= users.length %></span>)</h1>
+
+    <% if (users.length > 1) { %>
+      <div class="admin-toolbar">
+        <div class="admin-search" id="adminSearch">
+          <svg class="admin-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" class="admin-search__input" placeholder="Search name or email…" autocomplete="off">
+          <button type="button" class="admin-search__clear" id="searchClear" hidden aria-label="Clear search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="sort-dropdown" id="sortDropdown">
+          <button type="button" class="admin-toolbar__btn" id="sortBtn" aria-label="Sort users" aria-haspopup="listbox" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
+          </button>
+          <ul class="sort-dropdown__menu" id="sortMenu" role="listbox" aria-label="Sort order">
+            <li class="sort-dropdown__item is-selected" role="option" data-sort="newest" aria-selected="true">Newest first</li>
+            <li class="sort-dropdown__item" role="option" data-sort="oldest" aria-selected="false">Oldest first</li>
+            <li class="sort-dropdown__item" role="option" data-sort="name-az" aria-selected="false">Name A &rarr; Z</li>
+            <li class="sort-dropdown__item" role="option" data-sort="name-za" aria-selected="false">Name Z &rarr; A</li>
+            <li class="sort-dropdown__item" role="option" data-sort="role" aria-selected="false">Admins first</li>
+          </ul>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <div id="noResults" class="admin-empty" hidden>
+    <p class="t-body text-secondary">No users match your search.</p>
   </div>
 
   <% if (users.length > 0) { %>
@@ -12,27 +41,59 @@
             <th class="t-caption"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="usersBody">
           <% users.forEach(function(u) { %>
-            <tr data-user-id="<%= u.id %>">
+            <%
+              var displayName = u.display_name || '—';
+              var parts = u.created_at.split(/[-T ]/);
+              var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+              var dateStr = months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10) + ', ' + parts[0];
+            %>
+            <tr data-user-id="<%= u.id %>"
+                data-name="<%= displayName.toLowerCase() %>"
+                data-email="<%= u.email.toLowerCase() %>"
+                data-role="<%= u.role %>"
+                data-date="<%= u.created_at %>"
+                data-slug="<%= u.user_slug || '' %>">
               <td>
                 <div class="user-row">
                   <%- include('../partials/avatar', { avatarUser: u, avatarSize: 'sm', avatarClass: '' }) %>
-                  <span class="t-body"><%= u.display_name || '—' %></span>
-                  <% if (u.role === 'admin') { %>
-                    <span class="role-badge role-badge--admin">admin</span>
-                  <% } %>
+                  <div class="user-row__info">
+                    <div class="user-row__name-line">
+                      <span class="t-body"><%= displayName %></span>
+                      <% if (u.role === 'admin') { %>
+                        <span class="role-badge role-badge--admin">admin</span>
+                      <% } %>
+                    </div>
+                    <span class="t-caption text-secondary"><%= u.email %></span>
+                  </div>
                 </div>
               </td>
               <td>
                 <div class="user-actions">
+                  <% if (u.user_slug) { %>
+                    <a href="/members/<%= u.user_slug %>" class="btn btn--ghost btn--sm" target="_blank" title="View profile">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+                  <% } %>
+                  <% if (u.role !== 'admin') { %>
+                    <button type="button" class="btn btn--secondary btn--sm js-promote-user"
+                            data-user-id="<%= u.id %>" data-name="<%= displayName %>">
+                      Promote
+                    </button>
+                  <% } else { %>
+                    <button type="button" class="btn btn--secondary btn--sm js-demote-user"
+                            data-user-id="<%= u.id %>" data-name="<%= displayName %>">
+                      Demote
+                    </button>
+                  <% } %>
                   <button type="button" class="btn btn--secondary btn--sm js-send-link"
                           data-user-id="<%= u.id %>" data-email="<%= u.email %>">
                     Send Link
                   </button>
                   <% if (u.role !== 'admin') { %>
                     <button type="button" class="btn btn--danger btn--sm js-delete-user"
-                            data-user-id="<%= u.id %>" data-name="<%= u.display_name || u.email %>">
+                            data-user-id="<%= u.id %>" data-name="<%= displayName %>">
                       Delete
                     </button>
                   <% } %>
