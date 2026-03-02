@@ -71,6 +71,10 @@
       <dt>Meetup</dt>
       <dd><a href="<%= book.meetup_event_url %>" target="_blank" rel="noopener">View Event</a></dd>
     <% } %>
+    <% if (book.meeting_status === 'results' && book.month_year) { %>
+      <dt>Results</dt>
+      <dd><a href="/results/<%= monthYearSlug(book.month_year) %>">View Voting Results</a></dd>
+    <% } %>
   </dl>
 </section>
 
