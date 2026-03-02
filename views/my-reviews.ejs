@@ -39,10 +39,14 @@
       <% for (const r of reviews) { %>
         <div class="review-card review-card--linked">
           <a href="<%= bookPath(r.title, r.author) %>" class="review-card__cover">
-            <img src="<%= r.cover_url || '/img/placeholder-cover.svg' %>"
-                 alt="<%= r.title %>"
-                 class="review-card__cover-img"
-                 loading="lazy">
+            <% if (r.cover_url) { %>
+              <img src="<%= r.cover_url %>"
+                   alt="<%= r.title %>"
+                   class="review-card__cover-img"
+                   loading="lazy">
+            <% } else { %>
+              <%- include('partials/placeholder-cover', { phTitle: r.title, phSize: 'sm' }) %>
+            <% } %>
           </a>
           <div class="review-card__body">
             <div class="review-card__heading">

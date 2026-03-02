@@ -75,6 +75,110 @@
   ];
 
   var activePicker = null;
+  var activeTooltip = null;
+  var tooltipCache = {};    // key: "reviewId:emoji" → { users, ts }
+  var hoverTimer = null;
+  var hoveredPill = null;
+  var TOOLTIP_DELAY = 400;  // ms before showing
+  var CACHE_TTL = 30000;    // 30s cache
+
+  // ---- Reactor tooltip ----
+
+  function reactorCacheKey(reviewId, emoji) {
+    return reviewId + ':' + emoji;
+  }
+
+  function invalidateReactorCache(reviewId, emoji) {
+    delete tooltipCache[reactorCacheKey(reviewId, emoji)];
+  }
+
+  function hideTooltip() {
+    clearTimeout(hoverTimer);
+    if (activeTooltip) {
+      activeTooltip.remove();
+      activeTooltip = null;
+    }
+  }
+
+  function showReactorTooltip(pill, reviewId, emoji) {
+    hideTooltip();
+
+    var key = reactorCacheKey(reviewId, emoji);
+    var cached = tooltipCache[key];
+
+    if (cached && (Date.now() - cached.ts < CACHE_TTL)) {
+      renderTooltip(pill, cached.users, emoji);
+      return;
+    }
+
+    // Fetch from API
+    fetch('/api/reviews/' + reviewId + '/reactions/' + encodeURIComponent(emoji))
+      .then(function (res) { return res.json(); })
+      .then(function (users) {
+        tooltipCache[key] = { users: users, ts: Date.now() };
+        // Only render if we're still hovering the same pill
+        if (hoveredPill === pill) {
+          renderTooltip(pill, users, emoji);
+        }
+      })
+      .catch(function () { /* silent */ });
+  }
+
+  function renderTooltip(pill, users, emoji) {
+    if (!users || users.length === 0) return;
+    hideTooltip();
+
+    var tip = document.createElement('div');
+    tip.className = 'reactor-tooltip';
+    tip.setAttribute('role', 'tooltip');
+
+    // Build name list (max 8 shown, "+N more" for overflow)
+    var MAX_SHOW = 8;
+    var names = [];
+    for (var i = 0; i < Math.min(users.length, MAX_SHOW); i++) {
+      names.push(escapeHtml(users[i].display_name));
+    }
+    var nameStr = names.join(', ');
+    if (users.length > MAX_SHOW) {
+      nameStr += ' +' + (users.length - MAX_SHOW) + ' more';
+    }
+
+    tip.innerHTML =
+      '<span class="reactor-tooltip__emoji">' + emoji + '</span>' +
+      '<span class="reactor-tooltip__names">' + nameStr + '</span>';
+
+    // Position above the pill
+    var bar = pill.closest('.reaction-bar');
+    bar.appendChild(tip);
+
+    // Adjust position if off-screen
+    requestAnimationFrame(function () {
+      var tipRect = tip.getBoundingClientRect();
+      var pillRect = pill.getBoundingClientRect();
+      var barRect = bar.getBoundingClientRect();
+
+      // Center the tooltip on the pill
+      var pillCenter = pillRect.left + pillRect.width / 2 - barRect.left;
+      var tipHalfWidth = tip.offsetWidth / 2;
+      var left = pillCenter - tipHalfWidth;
+
+      // Clamp to not overflow viewport
+      var maxLeft = window.innerWidth - barRect.left - tip.offsetWidth - 8;
+      left = Math.max(0, Math.min(left, maxLeft));
+      tip.style.left = left + 'px';
+
+      // Position above the pill
+      var bottom = barRect.bottom - pillRect.top + 6;
+      tip.style.bottom = bottom + 'px';
+    });
+
+    activeTooltip = tip;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
   // ---- Helpers ----
 
@@ -180,6 +284,9 @@
   // ---- Toggle reaction (optimistic) ----
 
   function toggleReaction(reviewId, emoji) {
+    hideTooltip();
+    invalidateReactorCache(reviewId, emoji);
+
     var bar = document.querySelector('.reaction-bar[data-review-id="' + reviewId + '"]');
     if (!bar) return;
 
@@ -273,4 +380,36 @@
       }
     }
   });
+
+  // ---- Reactor tooltip on hover ----
+
+  document.addEventListener('mouseover', function (e) {
+    var pill = e.target.closest('.reaction-pill');
+    if (!pill || pill === hoveredPill) return;
+    hoveredPill = pill;
+
+    var bar = pill.closest('.reaction-bar');
+    if (!bar) return;
+    var reviewId = bar.dataset.reviewId;
+    var emoji = pill.dataset.emoji;
+    if (!reviewId || !emoji) return;
+
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(function () {
+      showReactorTooltip(pill, parseInt(reviewId, 10), emoji);
+    }, TOOLTIP_DELAY);
+  });
+
+  document.addEventListener('mouseout', function (e) {
+    var pill = e.target.closest('.reaction-pill');
+    if (!pill) return;
+    // Only hide if we're actually leaving the pill (not moving to a child)
+    var related = e.relatedTarget;
+    if (related && pill.contains(related)) return;
+    hoveredPill = null;
+    hideTooltip();
+  });
+
+  // Hide tooltip on scroll (prevents stale position)
+  document.addEventListener('scroll', hideTooltip, true);
 })();

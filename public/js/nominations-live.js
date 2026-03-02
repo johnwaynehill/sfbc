@@ -33,6 +33,16 @@
     knownIds.add(initialCards[i].dataset.bookId);
   }
 
+  // ── Color hash for placeholder covers ──────────────────────
+  function colorHash(str) {
+    if (!str) return 0;
+    var hash = 5381;
+    for (var i = 0; i < str.length; i++) {
+      hash = ((hash << 5) + hash + str.charCodeAt(i)) & 0xFFFFFFFF;
+    }
+    return Math.abs(hash) % 360;
+  }
+
   // ── Build a single nominee card ─────────────────────────────
   function buildCard(nom) {
     var card = document.createElement('div');
@@ -43,7 +53,9 @@
     if (nom.cover_url) {
       coverHtml = '<img src="' + escapeHtml(nom.cover_url) + '" alt="' + escapeHtml(nom.title) + ' cover" loading="lazy">';
     } else {
-      coverHtml = '<div class="placeholder-cover placeholder-cover--sm"><span class="placeholder-cover__title">' + escapeHtml(nom.title) + '</span></div>';
+      var hue = colorHash(nom.title);
+      var initial = nom.title ? nom.title.charAt(0).toUpperCase() : '?';
+      coverHtml = '<div class="placeholder-cover placeholder-cover--sm" style="--ph-hue: ' + hue + '"><span class="placeholder-cover__initial">' + escapeHtml(initial) + '</span><span class="placeholder-cover__title">' + escapeHtml(nom.title) + '</span></div>';
     }
 
     var nominatorHtml = nom.nominator_name

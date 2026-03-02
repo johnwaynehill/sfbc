@@ -25,9 +25,7 @@
           <% if (winner.cover_url) { %>
             <img src="<%= winner.cover_url %>" alt="<%= winner.title %> cover" class="results-winner__cover-img">
           <% } else { %>
-            <div class="placeholder-cover">
-              <span class="placeholder-cover__title"><%= winner.title %></span>
-            </div>
+            <%- include('partials/placeholder-cover', { phTitle: winner.title }) %>
           <% } %>
         </a>
         <div class="results-winner__info">
@@ -52,9 +50,7 @@
           <% if (r.cover_url) { %>
             <img src="<%= r.cover_url %>" alt="<%= r.title %> cover" loading="lazy">
           <% } else { %>
-            <div class="placeholder-cover placeholder-cover--xs">
-              <span class="placeholder-cover__title"><%= r.title %></span>
-            </div>
+            <%- include('partials/placeholder-cover', { phTitle: r.title, phSize: 'xs' }) %>
           <% } %>
         </div>
         <div class="results-bar__info">

@@ -44,6 +44,15 @@ const stmts = {
   countSingle: db.prepare(`
     SELECT COUNT(*) AS count FROM review_reactions WHERE review_id = ? AND emoji = ?
   `),
+
+  /** Who reacted with a specific emoji on a review. */
+  getUsersForEmoji: db.prepare(`
+    SELECT u.id, u.display_name, u.avatar_style
+    FROM review_reactions rr
+    JOIN users u ON u.id = rr.user_id
+    WHERE rr.review_id = ? AND rr.emoji = ?
+    ORDER BY rr.created_at ASC
+  `),
 };
 
 /* ------------------------------------------------------------------ */
@@ -108,4 +117,12 @@ function toggleReaction(reviewId, userId, emoji) {
   return { added: !existing, count };
 }
 
-module.exports = { getReactionCountsBatch, getUserReactionsBatch, toggleReaction };
+/**
+ * Get the list of users who reacted with a specific emoji on a review.
+ * Returns: Array<{id, display_name, avatar_style}>
+ */
+function getReactorsForEmoji(reviewId, emoji) {
+  return stmts.getUsersForEmoji.all(reviewId, emoji);
+}
+
+module.exports = { getReactionCountsBatch, getUserReactionsBatch, toggleReaction, getReactorsForEmoji };

@@ -1,0 +1,17 @@
+<%
+/**
+ * Placeholder cover partial — deterministic colored book cover
+ *
+ * Locals:
+ *   phTitle  — Book title (required)
+ *   phSize   — '' | 'sm' | 'xs' (default '')
+ */
+var _phTitle = typeof phTitle !== 'undefined' ? phTitle : 'Untitled';
+var _phSize = typeof phSize !== 'undefined' && phSize ? ' placeholder-cover--' + phSize : '';
+var _phInitial = _phTitle.charAt(0).toUpperCase();
+var _phHue = typeof colorHash === 'function' ? colorHash(_phTitle) : 200;
+-%>
+<div class="placeholder-cover<%= _phSize %>" style="--ph-hue: <%= _phHue %>">
+  <span class="placeholder-cover__initial"><%= _phInitial %></span>
+  <span class="placeholder-cover__title"><%= _phTitle %></span>
+</div>

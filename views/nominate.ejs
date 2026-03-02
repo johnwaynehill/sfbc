@@ -15,11 +15,13 @@
       </p>
 
       <div class="nom-confirmed__card">
-        <% if (existingNomination.cover_url) { %>
-          <div class="book-cover book-cover--sm">
+        <div class="book-cover book-cover--sm">
+          <% if (existingNomination.cover_url) { %>
             <img src="<%= existingNomination.cover_url %>" alt="Cover of <%= existingNomination.title %>">
-          </div>
-        <% } %>
+          <% } else { %>
+            <%- include('partials/placeholder-cover', { phTitle: existingNomination.title, phSize: 'sm' }) %>
+          <% } %>
+        </div>
         <div class="nom-confirmed__details">
           <span class="nom-confirmed__title"><%= existingNomination.title %></span>
           <span class="nom-confirmed__author">by <%= existingNomination.author %></span>

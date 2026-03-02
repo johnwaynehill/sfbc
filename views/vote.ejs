@@ -31,9 +31,7 @@
             <% if (nom.cover_url) { %>
               <img src="<%= nom.cover_url %>" alt="<%= nom.title %> cover" loading="lazy">
             <% } else { %>
-              <div class="placeholder-cover placeholder-cover--sm">
-                <span class="placeholder-cover__title"><%= nom.title %></span>
-              </div>
+              <%- include('partials/placeholder-cover', { phTitle: nom.title, phSize: 'sm' }) %>
             <% } %>
           </div>
 

@@ -134,6 +134,7 @@ app.use((req, res, next) => {
   res.locals.formatStatus = formatStatus;
   res.locals.formatMeetingTime = formatMeetingTime;
   res.locals.monthYearSlug = monthYearSlug;
+  res.locals.colorHash = require('./utils/colorHash').colorHash;
   res.locals.gradeTier = function (grade) {
     if (!grade) return '';
     var letter = grade.charAt(0).toUpperCase();

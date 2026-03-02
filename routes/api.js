@@ -567,6 +567,23 @@ const repliesService = require('../services/replies');
 // Toggle emoji reaction on a review
 // POST /api/reviews/:reviewId/reactions
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Who reacted with a specific emoji on a review
+// GET /api/reviews/:reviewId/reactions/:emoji
+// ---------------------------------------------------------------------------
+router.get('/reviews/:reviewId/reactions/:emoji', (req, res) => {
+  const reviewId = parseInt(req.params.reviewId, 10);
+  if (isNaN(reviewId)) return res.status(400).json({ error: 'Invalid review ID.' });
+
+  const emoji = decodeURIComponent(req.params.emoji);
+
+  const review = db.prepare('SELECT id FROM reviews WHERE id = ?').get(reviewId);
+  if (!review) return res.status(404).json({ error: 'Review not found.' });
+
+  const reactors = reactionsService.getReactorsForEmoji(reviewId, emoji);
+  res.json(reactors);
+});
+
 router.post('/reviews/:reviewId/reactions', requireMember, ...emojiChain, handleValidationErrors, (req, res) => {
   const reviewId = parseInt(req.params.reviewId, 10);
   if (isNaN(reviewId)) return res.status(400).json({ error: 'Invalid review ID.' });
