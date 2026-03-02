@@ -1,6 +1,14 @@
 'use strict';
 
 const db = require('../db');
+const { calculateResults } = require('./voting');
+
+// Lazy-loaded to avoid circular deps (meetings.js also requires this file indirectly)
+let _meetings = null;
+function meetingsService() {
+  if (!_meetings) _meetings = require('./meetings');
+  return _meetings;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Prepared statements                                                */
@@ -55,6 +63,63 @@ const updateStatusStmt = db.prepare(`
 const getByBookAndMonthStmt = db.prepare(`
   SELECT id FROM monthly_picks WHERE book_id = ? AND month_year = ?
 `);
+
+/* ------------------------------------------------------------------ */
+/*  Lifecycle prepared statements (Phase 3: picks own the state machine) */
+/* ------------------------------------------------------------------ */
+
+const setPickNominationsOpenStmt = db.prepare(
+  "UPDATE monthly_picks SET nominations_open_at = datetime('now'), updated_at = datetime('now') WHERE id = ?"
+);
+const setPickNominationsCloseStmt = db.prepare(
+  "UPDATE monthly_picks SET nominations_close_at = datetime('now'), updated_at = datetime('now') WHERE id = ?"
+);
+const setPickVotingOpenStmt = db.prepare(
+  "UPDATE monthly_picks SET voting_open_at = datetime('now'), updated_at = datetime('now') WHERE id = ?"
+);
+const setPickVotingCloseStmt = db.prepare(
+  "UPDATE monthly_picks SET voting_close_at = datetime('now'), updated_at = datetime('now') WHERE id = ?"
+);
+const setPickResultsJsonStmt = db.prepare(
+  "UPDATE monthly_picks SET vote_results_json = ?, updated_at = datetime('now') WHERE id = ?"
+);
+const updatePickBookIdStmt = db.prepare(
+  "UPDATE monthly_picks SET book_id = ?, updated_at = datetime('now') WHERE id = ?"
+);
+
+// Meeting-side statements for lifecycle sync
+const meetingSetWinnerStmt = db.prepare(
+  "UPDATE meetings SET winning_book_id = ?, updated_at = datetime('now') WHERE id = ?"
+);
+const meetingSetNominationsOpenStmt = db.prepare(
+  "UPDATE meetings SET nominations_open_at = datetime('now') WHERE id = ?"
+);
+const meetingSetNominationsCloseStmt = db.prepare(
+  "UPDATE meetings SET nominations_close_at = datetime('now') WHERE id = ?"
+);
+const meetingSetVotingOpenStmt = db.prepare(
+  "UPDATE meetings SET voting_open_at = datetime('now') WHERE id = ?"
+);
+const meetingSetVotingCloseStmt = db.prepare(
+  "UPDATE meetings SET voting_close_at = datetime('now') WHERE id = ?"
+);
+const meetingSetResultsJsonStmt = db.prepare(
+  "UPDATE meetings SET vote_results_json = ? WHERE id = ?"
+);
+const meetingUpdateStatusStmt = db.prepare(
+  "UPDATE meetings SET status = ?, updated_at = datetime('now') WHERE id = ?"
+);
+
+const nomineeCountStmt = db.prepare(
+  'SELECT COUNT(*) AS cnt FROM meeting_nominees WHERE meeting_id = ?'
+);
+const voteCountStmt = db.prepare(
+  'SELECT COUNT(*) AS cnt FROM votes WHERE meeting_id = ?'
+);
+
+const linkPickToMeetingStmt = db.prepare(
+  'UPDATE meetings SET monthly_pick_id = ? WHERE id = ?'
+);
 
 /* ------------------------------------------------------------------ */
 /*  Read-side queries (Phase 3: books as primary entity)               */
@@ -200,14 +265,178 @@ function create(bookId, monthYear, status = 'upcoming', nominatedBy = null) {
 }
 
 /**
- * Advance a monthly pick's status. No transition validation here —
- * that's handled by the meetings service which orchestrates both tables.
- * @param {number} id - monthly_picks.id
- * @param {string} newStatus - The new status
+ * Simple status update (no lifecycle validation).
+ * Used by forceStatus and internal helpers.
  */
 function advanceStatus(id, newStatus) {
   updateStatusStmt.run(newStatus, id);
   return getByIdStmt.get(id);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Lifecycle state machine (Phase 3: picks own transitions)           */
+/* ------------------------------------------------------------------ */
+
+const TRANSITIONS = {
+  upcoming: ['reading', 'nominations'],
+  reading: ['nominations'],
+  nominations: ['voting'],
+  voting: ['results'],
+};
+
+/**
+ * Advance a meeting's lifecycle status. The pick service is the lifecycle
+ * owner — it validates transitions, manages timestamps, calculates results,
+ * and creates/links picks as needed.
+ *
+ * Entry point: meeting ID (for backward compat with admin UI).
+ * Internally writes to both the meeting and its linked pick.
+ *
+ * Normal flow:  upcoming → reading → nominations → voting → results
+ * Alt flow:     upcoming → nominations → voting → results (no pre-selected book)
+ * Shortcuts:    reading → voting (skip nominations)
+ *               reading → results (close meeting early)
+ *
+ * When finalized to results, the next upcoming meeting with a pre-selected
+ * book is automatically advanced to "reading".
+ *
+ * @param {number} meetingId - meetings.id
+ * @param {string} newStatus - Target status
+ * @returns {{ meeting: object } | { error: string }}
+ */
+function advanceMeetingStatus(meetingId, newStatus) {
+  const ms = meetingsService();
+  const meeting = ms.getById(meetingId);
+  if (!meeting) return { error: 'Meeting not found.' };
+
+  const allowed = TRANSITIONS[meeting.status] || [];
+
+  // Allow normal transitions plus reading→results (close) and reading→voting (skip noms)
+  const isCloseReading = meeting.status === 'reading' && newStatus === 'results';
+  const isSkipToVoting = meeting.status === 'reading' && newStatus === 'voting';
+  if (!isCloseReading && !isSkipToVoting && !allowed.includes(newStatus)) {
+    return { error: `Cannot transition from "${meeting.status}" to "${newStatus}".` };
+  }
+
+  // Preflight checks
+  if (newStatus === 'voting') {
+    const count = nomineeCountStmt.get(meetingId).cnt;
+    if (count < 2) {
+      return { error: 'Need at least 2 nominees before starting voting.' };
+    }
+  }
+
+  if (newStatus === 'results' && !isCloseReading) {
+    const count = voteCountStmt.get(meetingId).cnt;
+    if (count < 1) {
+      return { error: 'Need at least 1 vote before finalizing results.' };
+    }
+  }
+
+  // Perform transition in a transaction
+  db.transaction(() => {
+    // Only one meeting can be "reading" at a time — close any other
+    if (newStatus === 'reading') {
+      const others = db.prepare(
+        "SELECT id, monthly_pick_id FROM meetings WHERE status = 'reading' AND id != ?"
+      ).all(meetingId);
+      db.prepare(
+        "UPDATE meetings SET status = 'results', updated_at = datetime('now') WHERE status = 'reading' AND id != ?"
+      ).run(meetingId);
+      // Close their linked picks too
+      for (const row of others) {
+        if (row.monthly_pick_id) {
+          updateStatusStmt.run('results', row.monthly_pick_id);
+        }
+      }
+    }
+
+    // --- Set timestamps on the meeting ---
+    if (newStatus === 'nominations') {
+      meetingSetNominationsOpenStmt.run(meetingId);
+    } else if (newStatus === 'voting') {
+      if (!isSkipToVoting) {
+        meetingSetNominationsCloseStmt.run(meetingId);
+      }
+      meetingSetVotingOpenStmt.run(meetingId);
+    } else if (newStatus === 'results') {
+      if (!isCloseReading) {
+        meetingSetVotingCloseStmt.run(meetingId);
+      }
+
+      // Calculate winner from votes (only if voting occurred)
+      if (!isCloseReading) {
+        const results = calculateResults(meetingId);
+        if (results.rankings.length > 0) {
+          meetingSetWinnerStmt.run(results.rankings[0].book_id, meetingId);
+        }
+        meetingSetResultsJsonStmt.run(JSON.stringify(results), meetingId);
+      }
+    }
+
+    // Update meeting status
+    meetingUpdateStatusStmt.run(newStatus, meetingId);
+
+    // --- Mirror to linked pick (canonical lifecycle entity) ---
+    const updated = db.prepare(
+      'SELECT * FROM meetings WHERE id = ?'
+    ).get(meetingId);
+
+    if (updated && updated.monthly_pick_id) {
+      // Pick exists — sync status + timestamps
+      updateStatusStmt.run(newStatus, updated.monthly_pick_id);
+
+      if (newStatus === 'nominations') {
+        setPickNominationsOpenStmt.run(updated.monthly_pick_id);
+      } else if (newStatus === 'voting') {
+        if (!isSkipToVoting) {
+          setPickNominationsCloseStmt.run(updated.monthly_pick_id);
+        }
+        setPickVotingOpenStmt.run(updated.monthly_pick_id);
+      } else if (newStatus === 'results' && !isCloseReading) {
+        setPickVotingCloseStmt.run(updated.monthly_pick_id);
+        // Copy results JSON to pick
+        if (updated.vote_results_json) {
+          setPickResultsJsonStmt.run(updated.vote_results_json, updated.monthly_pick_id);
+        }
+        // Update pick's book_id if winner changed
+        if (updated.winning_book_id) {
+          updatePickBookIdStmt.run(updated.winning_book_id, updated.monthly_pick_id);
+        }
+      }
+    } else if (updated && updated.winning_book_id && newStatus === 'results') {
+      // No pick yet but we have a winner — create the pick
+      const existing = getByBookAndMonthStmt.get(updated.winning_book_id, updated.month_year);
+      if (existing) {
+        // Pick already exists for this book+month — link and sync
+        updateStatusStmt.run(newStatus, existing.id);
+        linkPickToMeetingStmt.run(existing.id, meetingId);
+        if (updated.vote_results_json) {
+          setPickResultsJsonStmt.run(updated.vote_results_json, existing.id);
+        }
+      } else {
+        // Create new pick
+        const nom = db.prepare(
+          'SELECT user_id FROM nominations WHERE meeting_id = ? AND book_id = ? LIMIT 1'
+        ).get(meetingId, updated.winning_book_id);
+        createStmt.run(
+          updated.winning_book_id,
+          updated.month_year,
+          newStatus,
+          nom ? nom.user_id : null
+        );
+        const newPick = getByBookAndMonthStmt.get(updated.winning_book_id, updated.month_year);
+        if (newPick) {
+          linkPickToMeetingStmt.run(newPick.id, meetingId);
+          if (updated.vote_results_json) {
+            setPickResultsJsonStmt.run(updated.vote_results_json, newPick.id);
+          }
+        }
+      }
+    }
+  })();
+
+  return { meeting: ms.getById(meetingId) };
 }
 
 /**
@@ -279,6 +508,7 @@ module.exports = {
   getAll,
   create,
   advanceStatus,
+  advanceMeetingStatus,
   findByBookAndMonth,
   getHero,
   getRecentPicks,

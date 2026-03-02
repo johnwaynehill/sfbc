@@ -12,6 +12,7 @@ const {
   calculateResults,
 } = require('../services/voting');
 const meetings = require('../services/meetings');
+const picksService = require('../services/monthly-picks');
 const { requireAdmin, requireMember } = require('../middleware/auth');
 const { monthYearSlug } = require('../utils/format');
 const { validationResult } = require('express-validator');
@@ -279,7 +280,7 @@ router.put('/admin/meetings/:id', requireAdmin, ...meetingChain, handleValidatio
 });
 
 // ---------------------------------------------------------------------------
-// Advance meeting status
+// Advance meeting status (lifecycle owned by picks service)
 // PUT /api/admin/meetings/:id/status
 // ---------------------------------------------------------------------------
 router.put('/admin/meetings/:id/status', requireAdmin, ...meetingStatusChain, handleValidationErrors, (req, res) => {
@@ -288,7 +289,7 @@ router.put('/admin/meetings/:id/status', requireAdmin, ...meetingStatusChain, ha
 
   const newStatus = req.body.status; // already trimmed + validated by chain
 
-  const result = meetings.advanceStatus(id, newStatus);
+  const result = picksService.advanceMeetingStatus(id, newStatus);
   if (result.error) {
     return res.status(400).json({ error: result.error });
   }
@@ -319,6 +320,11 @@ router.put('/admin/meetings/:id/force-status', requireAdmin, ...meetingStatusCha
   }
 
   meetings.forceStatus(id, newStatus);
+
+  // Sync linked pick if one exists
+  if (meeting.monthly_pick_id) {
+    picksService.advanceStatus(meeting.monthly_pick_id, newStatus);
+  }
 
   // Notify SSE clients when status changes to results
   if (newStatus === 'results') {
