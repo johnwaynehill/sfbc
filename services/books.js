@@ -83,6 +83,28 @@ const insertBookStmt = db.prepare(`
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
+const checkSlugCollisionStmt = db.prepare(
+  'SELECT id FROM books WHERE author_slug = ? AND title_slug = ?'
+);
+
+/**
+ * Generate a unique (author_slug, title_slug) pair by appending a numeric
+ * suffix if the base slug pair already exists for a different book.
+ */
+function uniqueTitleSlug(authorSlug, baseTitleSlug) {
+  if (!checkSlugCollisionStmt.get(authorSlug, baseTitleSlug)) {
+    return baseTitleSlug;
+  }
+  for (let i = 2; i <= 99; i++) {
+    const candidate = baseTitleSlug + '-' + i;
+    if (!checkSlugCollisionStmt.get(authorSlug, candidate)) {
+      return candidate;
+    }
+  }
+  // Extremely unlikely fallback
+  return baseTitleSlug + '-' + Date.now();
+}
+
 /**
  * Look up a book by title + author. If it doesn't exist, create it with
  * slugs and any metadata we got from the API search.
@@ -100,7 +122,7 @@ function findOrCreateBook(title, author, metadata = {}) {
   if (book) return book;
 
   const authorSlug = slugify(trimAuthor);
-  const titleSlug = slugify(trimTitle);
+  const titleSlug = uniqueTitleSlug(authorSlug, slugify(trimTitle));
 
   insertBookStmt.run(
     trimTitle,

@@ -72,7 +72,11 @@ router.get('/results/:slug', (req, res) => {
   }
 
   const isVotingOpen = meeting.status === 'voting';
-  const results = calculateResults(meeting.id);
+
+  // During voting: always calculate live. After voting: prefer cached JSON.
+  const results = (!isVotingOpen && meeting.vote_results_json)
+    ? JSON.parse(meeting.vote_results_json)
+    : calculateResults(meeting.id);
 
   // Assign colors to each nominee
   const colors = {};

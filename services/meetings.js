@@ -111,6 +111,10 @@ const setVotingCloseStmt = db.prepare(
   "UPDATE meetings SET voting_close_at = datetime('now') WHERE id = ?"
 );
 
+const setResultsJsonStmt = db.prepare(
+  "UPDATE meetings SET vote_results_json = ? WHERE id = ?"
+);
+
 const getNextUpcomingWithBookStmt = db.prepare(`
   SELECT id FROM meetings
   WHERE status = 'upcoming' AND winning_book_id IS NOT NULL
@@ -289,6 +293,8 @@ function advanceStatus(id, newStatus) {
         if (results.rankings.length > 0) {
           setWinnerStmt.run(results.rankings[0].book_id, id);
         }
+        // Persist full results JSON for instant loading and archival
+        setResultsJsonStmt.run(JSON.stringify(results), id);
       }
     }
 

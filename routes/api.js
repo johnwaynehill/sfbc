@@ -349,6 +349,7 @@ router.post('/admin/meetings/:id/nominees', requireAdmin, ...nominationChain, ha
 
   meetings.addNominee(meetingId, book.id);
   broadcastAdminMeetingNominees(meetingId);
+  broadcastPublicNominees(meetingId);
   broadcastHomeActivity();
 
   res.status(201).json({ success: true, book: { id: book.id, title: book.title, author: book.author } });
@@ -367,6 +368,7 @@ router.delete('/admin/meetings/:id/nominees/:bookId', requireAdmin, (req, res) =
 
   meetings.removeNominee(meetingId, bookId);
   broadcastAdminMeetingNominees(meetingId);
+  broadcastPublicNominees(meetingId);
   res.json({ success: true });
 });
 
@@ -863,6 +865,7 @@ router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nomination
   })();
 
   broadcastAdminMeetingNominees(meetingId);
+  broadcastPublicNominees(meetingId);
   broadcastHomeActivity();
 
   const slug = monthYearSlug(meeting.month_year);
@@ -930,6 +933,22 @@ function broadcastAdminMeetingVoteCount(meetingId) {
   const { getVoteCount } = require('../services/voting');
   const voteCount = getVoteCount(meetingId);
   const payload = `event: voteCount\ndata: ${JSON.stringify({ voteCount })}\n\n`;
+  for (const client of clients) {
+    client.write(payload);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// SSE client pool for public nominations page (live nominee list)
+// ---------------------------------------------------------------------------
+const publicNominationSseClients = new Map(); // meetingId → Set<res>
+
+function broadcastPublicNominees(meetingId) {
+  const clients = publicNominationSseClients.get(meetingId);
+  if (!clients || clients.size === 0) return;
+
+  const nominees = meetings.getNominees(meetingId);
+  const payload = `event: nominees\ndata: ${JSON.stringify(nominees)}\n\n`;
   for (const client of clients) {
     client.write(payload);
   }
@@ -1199,6 +1218,54 @@ router.get('/admin/meetings/:meetingId/stream', requireAdmin, (req, res) => {
       clients.delete(res);
       if (clients.size === 0) {
         adminMeetingSseClients.delete(meetingId);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SSE stream for public nominations page (live nominee list)
+// GET /api/meetings/:meetingId/nominations/stream
+// ---------------------------------------------------------------------------
+router.get('/meetings/:meetingId/nominations/stream', (req, res) => {
+  const meetingId = parseInt(req.params.meetingId, 10);
+  if (isNaN(meetingId)) return res.status(400).end();
+
+  const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId);
+  if (!meeting || meeting.status !== 'nominations') {
+    return res.status(404).end();
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+
+  // Send initial nominees
+  const nominees = meetings.getNominees(meetingId);
+  res.write(`event: nominees\ndata: ${JSON.stringify(nominees)}\n\n`);
+
+  // Register client
+  if (!publicNominationSseClients.has(meetingId)) {
+    publicNominationSseClients.set(meetingId, new Set());
+  }
+  publicNominationSseClients.get(meetingId).add(res);
+
+  // Heartbeat every 30s
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 30000);
+
+  // Cleanup on disconnect
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    const clients = publicNominationSseClients.get(meetingId);
+    if (clients) {
+      clients.delete(res);
+      if (clients.size === 0) {
+        publicNominationSseClients.delete(meetingId);
       }
     }
   });

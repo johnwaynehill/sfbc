@@ -40,25 +40,34 @@
           <div class="ballot-card__body">
             <span class="ballot-card__title t-body-bold"><%= nom.title %></span>
             <span class="ballot-card__author t-caption text-secondary"><%= nom.author %><% if (nom.publication_year) { %> (<%= nom.publication_year %>)<% } %></span>
-            <% if (nom.page_count) { %>
-              <span class="ballot-card__pages t-caption text-secondary"><%= nom.page_count %> pages</span>
+            <% var hasDetails = nom.reason || nom.nominator_name || nom.page_count || nom.google_books_id || nom.open_library_id; %>
+            <% if (hasDetails) { %>
+              <button type="button" class="ballot-card__details-toggle t-caption text-tertiary" aria-expanded="false">
+                <svg class="ballot-card__details-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                Details
+              </button>
+              <div class="ballot-card__details" hidden>
+                <% if (nom.page_count) { %>
+                  <span class="ballot-card__pages t-caption text-secondary"><%= nom.page_count %> pages</span>
+                <% } %>
+                <% if (nom.nominator_name) { %>
+                  <span class="ballot-card__nominator t-caption text-secondary">Nominated by <%= nom.nominator_name %></span>
+                <% } %>
+                <% if (nom.reason) { %>
+                  <p class="ballot-card__reason t-caption">&ldquo;<%= nom.reason %>&rdquo;</p>
+                <% } %>
+                <div class="ballot-card__links">
+                  <% if (nom.google_books_id) { %>
+                    <a href="https://books.google.com/books?id=<%= nom.google_books_id %>"
+                       target="_blank" rel="noopener" class="ballot-card__link t-caption">Google Books</a>
+                  <% } %>
+                  <% if (nom.open_library_id) { %>
+                    <a href="https://openlibrary.org/works/<%= nom.open_library_id %>"
+                       target="_blank" rel="noopener" class="ballot-card__link t-caption">Open Library</a>
+                  <% } %>
+                </div>
+              </div>
             <% } %>
-            <% if (nom.reason) { %>
-              <p class="ballot-card__reason t-caption">&ldquo;<%= nom.reason %>&rdquo;</p>
-            <% } %>
-            <% if (nom.nominator_name) { %>
-              <span class="ballot-card__nominator t-caption text-secondary">Nominated by <%= nom.nominator_name %></span>
-            <% } %>
-            <div class="ballot-card__links">
-              <% if (nom.google_books_id) { %>
-                <a href="https://books.google.com/books?id=<%= nom.google_books_id %>"
-                   target="_blank" rel="noopener" class="ballot-card__link t-caption">Google Books</a>
-              <% } %>
-              <% if (nom.open_library_id) { %>
-                <a href="https://openlibrary.org/works/<%= nom.open_library_id %>"
-                   target="_blank" rel="noopener" class="ballot-card__link t-caption">Open Library</a>
-              <% } %>
-            </div>
           </div>
 
           <div class="ballot-card__controls">

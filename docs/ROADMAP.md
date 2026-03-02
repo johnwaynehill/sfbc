@@ -89,7 +89,7 @@ Almost every feature below benefits from this refactor. It should be done first,
   - Create nomination form / open nominations
   - Close nominations, open voting
   - Close voting, select winner
-  - Tie winner to next month's artifact
+  - Tie winner to "next" month's artifact (next as determined by the admin pipeline, not a caledar date)
 - [ ] **Create meetings / link to Meetup.com** — Multiple meetings per monthly pick [M]
 - [✅] **Sort and filter reviews in Admin** — Search, sort by date/grade/book [M]
 - [✅] **Sort and filter users in Admin** — Search, sort by name/join date [M]

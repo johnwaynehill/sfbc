@@ -1,0 +1,49 @@
+<section class="nominations-page">
+  <header class="nominations-page__header">
+    <h1 class="t-section nominations-page__heading"><%= pageTitle %></h1>
+    <p class="t-body text-secondary">for <%= formatMonthYear(meeting.month_year) %></p>
+    <p class="t-caption text-secondary nominations-page__count">
+      <span id="nominee-count"><%= nominees.length %></span> nomination<%= nominees.length === 1 ? '' : 's' %> so far
+    </p>
+  </header>
+
+  <div class="nominations-page__actions">
+    <a href="/nominate/<%= meetingSlug %>" class="btn btn--primary btn--sm">
+      Nominate a Book
+    </a>
+  </div>
+
+  <div class="nominee-grid" id="nominee-grid">
+    <% if (nominees.length === 0) { %>
+      <p class="t-body text-secondary nominations-page__empty" id="nominee-empty">
+        No nominations yet &mdash; be the first!
+      </p>
+    <% } %>
+    <% nominees.forEach(function(nom) { %>
+      <div class="nominee-card" data-book-id="<%= nom.book_id %>">
+        <div class="book-cover book-cover--sm nominee-card__cover">
+          <% if (nom.cover_url) { %>
+            <img src="<%= nom.cover_url %>" alt="<%= nom.title %> cover" loading="lazy">
+          <% } else { %>
+            <div class="placeholder-cover placeholder-cover--sm">
+              <span class="placeholder-cover__title"><%= nom.title %></span>
+            </div>
+          <% } %>
+        </div>
+        <div class="nominee-card__body">
+          <span class="nominee-card__title t-body-bold"><%= nom.title %></span>
+          <span class="nominee-card__author t-caption text-secondary"><%= nom.author %></span>
+          <% if (nom.nominator_name) { %>
+            <span class="nominee-card__nominator t-caption text-tertiary">Nominated by <%= nom.nominator_name %></span>
+          <% } %>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</section>
+
+<script>
+  window.__NOMINATIONS_CONFIG__ = {
+    meetingId: <%= meeting.id %>,
+  };
+</script>

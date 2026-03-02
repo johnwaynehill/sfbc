@@ -175,10 +175,23 @@
   list.addEventListener('touchcancel', endTouch);
 
   // -----------------------------------------------------------------------
-  // Up/down arrow buttons
+  // Details toggle (collapsible card details)
   // -----------------------------------------------------------------------
 
   list.addEventListener('click', function (e) {
+    var toggle = e.target.closest('.ballot-card__details-toggle');
+    if (toggle) {
+      var details = toggle.nextElementSibling;
+      if (!details) return;
+      var expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', !expanded);
+      details.hidden = expanded;
+      return; // Don't fall through to move handler
+    }
+
+    // -----------------------------------------------------------------------
+    // Up/down arrow buttons
+    // -----------------------------------------------------------------------
     var btn = e.target.closest('.ballot-card__move');
     if (!btn || btn.disabled) return;
 

@@ -160,6 +160,7 @@ app.get('/health', (_req, res) => {
 // ---------------------------------------------------------------------------
 app.use('/', require('./routes/public'));
 app.use('/', require('./routes/nominate'));
+app.use('/', require('./routes/nominations'));
 app.use('/', require('./routes/vote'));
 app.use('/', require('./routes/results'));
 app.use('/', require('./routes/auth'));
