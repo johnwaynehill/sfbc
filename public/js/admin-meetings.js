@@ -380,4 +380,145 @@
       deleteBtn.textContent = 'Delete Meeting';
     });
   }
+
+  // -----------------------------------------------------------------------
+  // SSE: live nominee + vote count updates
+  // -----------------------------------------------------------------------
+
+  var meetingConfig = window.__MEETING_CONFIG__;
+  if (meetingConfig && meetingConfig.meetingId) {
+    var nomineesContainer = document.querySelector('.admin-nominees');
+    var nomineesHeading = document.querySelector('.admin-page__subheading');
+    var isFirstNominees = true;
+    var isFirstVoteCount = true;
+    var sseDelay = 1000;
+    var sseMaxDelay = 30000;
+    var meetingEs = null;
+
+    function esc(str) {
+      var d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    function renderNominees(nominees) {
+      if (!nomineesContainer) return;
+
+      // Update count in heading
+      if (nomineesHeading) {
+        nomineesHeading.textContent = 'Nominees (' + nominees.length + ')';
+      }
+
+      if (nominees.length === 0) {
+        nomineesContainer.innerHTML = '<p class="t-body text-secondary">No nominees yet.</p>';
+        return;
+      }
+
+      var canRemove = meetingConfig.status === 'nominations' || meetingConfig.status === 'voting';
+      var html = '';
+
+      for (var i = 0; i < nominees.length; i++) {
+        var nom = nominees[i];
+        html += '<div class="admin-nominee" data-book-id="' + nom.book_id + '">';
+
+        if (nom.cover_url) {
+          html += '<div class="book-cover book-cover--xs">'
+            + '<img src="' + esc(nom.cover_url) + '" alt="' + esc(nom.title) + '" loading="lazy">'
+            + '</div>';
+        }
+
+        html += '<div class="admin-nominee__info">'
+          + '<span class="t-body">' + esc(nom.title) + '</span>'
+          + '<span class="t-caption text-secondary">' + esc(nom.author) + '</span>'
+          + '<span class="t-caption text-secondary" style="opacity: 0.5;">';
+
+        if (nom.nominator_name) {
+          html += 'Nominated by ' + esc(nom.nominator_name);
+        } else {
+          html += esc(nom.source || '');
+        }
+
+        html += '</span></div>';
+
+        if (canRemove) {
+          html += '<button class="btn btn--danger btn--sm js-remove-nominee"'
+            + ' data-meeting-id="' + meetingConfig.meetingId + '"'
+            + ' data-book-id="' + nom.book_id + '"'
+            + ' data-title="' + esc(nom.title) + '">Remove</button>';
+        }
+
+        html += '</div>';
+      }
+
+      nomineesContainer.innerHTML = html;
+
+      // Re-bind remove buttons for newly rendered nominees
+      nomineesContainer.querySelectorAll('.js-remove-nominee').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          var mId = btn.dataset.meetingId;
+          var bId = btn.dataset.bookId;
+          var t = btn.dataset.title;
+
+          if (!confirm('Remove "' + t + '" from nominees?')) return;
+
+          btn.disabled = true;
+          btn.textContent = 'Removing\u2026';
+
+          try {
+            var r = await fetch('/api/admin/meetings/' + mId + '/nominees/' + bId, {
+              method: 'DELETE',
+              headers: { 'Accept': 'application/json' },
+            });
+            var d = await r.json();
+            if (r.ok && d.success) {
+              var row = btn.closest('.admin-nominee');
+              if (row) row.remove();
+              return;
+            }
+            alert(d.error || 'Something went wrong.');
+          } catch (err) {
+            alert('Network error.');
+          }
+          btn.disabled = false;
+          btn.textContent = 'Remove';
+        });
+      });
+    }
+
+    function connectMeetingSse() {
+      meetingEs = new EventSource('/api/admin/meetings/' + meetingConfig.meetingId + '/stream');
+
+      meetingEs.onopen = function () {
+        sseDelay = 1000;
+      };
+
+      meetingEs.addEventListener('nominees', function (e) {
+        try {
+          var data = JSON.parse(e.data);
+          if (isFirstNominees) { isFirstNominees = false; return; }
+          renderNominees(data);
+        } catch (err) {}
+      });
+
+      meetingEs.addEventListener('voteCount', function (e) {
+        try {
+          var data = JSON.parse(e.data);
+          if (isFirstVoteCount) { isFirstVoteCount = false; return; }
+          // Update vote count display if present
+          var vcEl = document.getElementById('admin-vote-count');
+          if (vcEl) vcEl.textContent = data.voteCount;
+        } catch (err) {}
+      });
+
+      meetingEs.onerror = function () {
+        meetingEs.close();
+        isFirstNominees = true;
+        isFirstVoteCount = true;
+        setTimeout(connectMeetingSse, sseDelay);
+        sseDelay = Math.min(sseDelay * 2, sseMaxDelay);
+      };
+    }
+
+    connectMeetingSse();
+  }
 })();

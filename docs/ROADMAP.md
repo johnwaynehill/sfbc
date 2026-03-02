@@ -162,6 +162,7 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Pull Meetup.com details** — Attendee count, rating [L]
   - Cache and refresh every 7 days
 - [ ] **Meeting check-in button** — Attendees confirm presence [S]
+- [ ] **Nominations page** - Users can see Nominations come in live before Voting is enabled
 
 ### Guides
 

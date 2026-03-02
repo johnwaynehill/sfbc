@@ -848,6 +848,111 @@
   height: 0;
 }
 
+/* ---- Activity Feed ---- */
+.activity-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-item__avatar {
+  margin-top: 1px;
+}
+
+.activity-item__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--s-2);
+}
+
+.activity-item__text {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.activity-item__actor {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a.activity-item__actor:hover {
+  text-decoration: underline;
+}
+
+.activity-item__book {
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a.activity-item__book:hover {
+  text-decoration: underline;
+}
+
+.activity-item__target {
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a.activity-item__target:hover {
+  text-decoration: underline;
+}
+
+.activity-item__emoji {
+  font-size: var(--t-base);
+  line-height: 1;
+}
+
+.activity-item__time {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Stagger entrance */
+.activity-item {
+  animation: activitySlideIn 350ms ease both;
+}
+
+@keyframes activitySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.activity-item:nth-child(1)  { animation-delay: 0ms; }
+.activity-item:nth-child(2)  { animation-delay: 30ms; }
+.activity-item:nth-child(3)  { animation-delay: 60ms; }
+.activity-item:nth-child(4)  { animation-delay: 90ms; }
+.activity-item:nth-child(5)  { animation-delay: 120ms; }
+.activity-item:nth-child(6)  { animation-delay: 150ms; }
+.activity-item:nth-child(7)  { animation-delay: 180ms; }
+.activity-item:nth-child(8)  { animation-delay: 210ms; }
+.activity-item:nth-child(9)  { animation-delay: 240ms; }
+.activity-item:nth-child(10) { animation-delay: 270ms; }
+.activity-item:nth-child(n+11) { animation-delay: 300ms; }
+
 /* ---- Upcoming Docket ---- */
 .upcoming-section {
   padding-bottom: var(--s-5);
@@ -3947,6 +4052,17 @@ textarea.form-input {
   width: 36px;
   height: 36px;
   font-size: var(--t-sm);
+}
+
+.grade-badge--xs {
+  width: auto;
+  height: 20px;
+  min-width: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  line-height: 20px;
+  vertical-align: middle;
 }
 
 /* ---- Spoiler ---- */

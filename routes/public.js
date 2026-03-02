@@ -8,10 +8,12 @@ const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
 const { buildGradeGradient, gradeToPercent, gradeTier } = require('../utils/gradeGradient');
+const { timeAgo } = require('../utils/format');
 const meetingsService = require('../services/meetings');
 const reactionsService = require('../services/reactions');
 const repliesService = require('../services/replies');
 const announcementsService = require('../services/announcements');
+const activityService = require('../services/activity');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -130,6 +132,9 @@ router.get('/', (req, res) => {
   // Active announcements (max 3, non-expired)
   const announcements = announcementsService.getActive();
 
+  // Recent activity feed
+  const activity = activityService.getRecentActivity(15);
+
   res.render('home', {
     pageTitle: 'Home',
     currentMeeting,
@@ -139,10 +144,13 @@ router.get('/', (req, res) => {
     totalBooks,
     heroSubjects,
     announcements,
+    activity,
     getCoverUrl,
     weightToGrade,
     formatMonthYear,
     bookPath,
+    gradeTier,
+    timeAgo,
   });
 });
 

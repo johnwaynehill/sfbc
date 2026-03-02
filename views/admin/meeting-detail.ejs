@@ -190,8 +190,8 @@
       Nominees (<%= nominees.length %>)
     </h2>
 
-    <% if (nominees.length > 0) { %>
-      <div class="admin-nominees">
+    <div class="admin-nominees">
+      <% if (nominees.length > 0) { %>
         <% nominees.forEach(function(nom) { %>
           <div class="admin-nominee" data-book-id="<%= nom.book_id %>">
             <% if (nom.cover_url) { %>
@@ -218,10 +218,10 @@
             <% } %>
           </div>
         <% }); %>
-      </div>
-    <% } else { %>
-      <p class="t-body text-secondary">No nominees yet.</p>
-    <% } %>
+      <% } else { %>
+        <p class="t-body text-secondary">No nominees yet.</p>
+      <% } %>
+    </div>
 
     <!-- Add nominee (only during nominations) -->
     <% if (meeting.status === 'nominations') { %>
@@ -278,3 +278,12 @@
     <% } %>
   <% } %>
 </section>
+
+<% if (meeting) { %>
+<script>
+  window.__MEETING_CONFIG__ = {
+    meetingId: <%= meeting.id %>,
+    status: '<%= meeting.status %>'
+  };
+</script>
+<% } %>

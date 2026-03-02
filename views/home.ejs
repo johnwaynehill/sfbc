@@ -1,6 +1,5 @@
 <!-- ===== Announcements ===== -->
-<% if (announcements && announcements.length > 0) { %>
-<div class="announcements">
+<div id="home-announcements" class="announcements"<%= (announcements && announcements.length > 0) ? '' : ' hidden' %>>
   <% for (const a of announcements) { %>
     <div class="announcement announcement--<%= a.type %>">
       <div class="announcement__icon">
@@ -21,7 +20,6 @@
     </div>
   <% } %>
 </div>
-<% } %>
 
 <% if (currentMeeting) { %>
 <!-- ===== Book Hero ===== -->
@@ -168,6 +166,68 @@
 </section>
 <% } %>
 
+<!-- ===== Activity Feed ===== -->
+<section class="section" id="home-activity-section"<%= (typeof activity === 'undefined' || activity.length === 0) ? ' hidden' : '' %>>
+  <div class="section-header">
+    <h2 class="t-section">Recent Activity</h2>
+  </div>
+  <ol id="home-activity-list" class="activity-feed">
+    <% if (typeof activity !== 'undefined' && activity.length > 0) { %>
+    <% for (const item of activity) { %>
+      <%
+        var actorName = item.actor_name || item.actor_email || 'Someone';
+        var bookHref = '/books/' + item.author_slug + '/' + item.title_slug;
+      %>
+      <li class="activity-item activity-item--<%= item.type %>">
+        <%- include('partials/avatar', { avatarUser: { display_name: item.actor_name, email: item.actor_email, avatar_style: item.actor_avatar }, avatarSize: 'sm', avatarClass: 'activity-item__avatar' }) %>
+        <div class="activity-item__body">
+          <p class="activity-item__text">
+            <% if (item.actor_slug) { %>
+              <a href="/members/<%= item.actor_slug %>" class="activity-item__actor"><%= actorName %></a>
+            <% } else { %>
+              <strong class="activity-item__actor"><%= actorName %></strong>
+            <% } %>
+
+            <% if (item.type === 'review') { %>
+              reviewed
+              <a href="<%= bookHref %>" class="activity-item__book"><%= item.book_title %></a>
+              <% if (item.grade) { %>
+                <span class="grade-badge grade-badge--xs <%= gradeTier(item.grade) %>"><%= item.grade %></span>
+              <% } %>
+            <% } else if (item.type === 'reply') { %>
+              replied to
+              <% if (item.target_slug) { %>
+                <a href="/members/<%= item.target_slug %>" class="activity-item__target"><%= item.target_name || 'someone' %></a>'s
+              <% } else { %>
+                <strong><%= item.target_name || 'someone' %></strong>'s
+              <% } %>
+              review of
+              <a href="<%= bookHref %>" class="activity-item__book"><%= item.book_title %></a>
+            <% } else if (item.type === 'reaction') { %>
+              reacted <span class="activity-item__emoji"><%= item.emoji %></span> to
+              <% if (item.target_slug) { %>
+                <a href="/members/<%= item.target_slug %>" class="activity-item__target"><%= item.target_name || 'someone' %></a>'s
+              <% } else { %>
+                <strong><%= item.target_name || 'someone' %></strong>'s
+              <% } %>
+              review of
+              <a href="<%= bookHref %>" class="activity-item__book"><%= item.book_title %></a>
+            <% } else if (item.type === 'nomination') { %>
+              nominated
+              <a href="<%= bookHref %>" class="activity-item__book"><%= item.book_title %></a>
+              <% if (item.meeting_month_year) { %>
+                for <strong><%= formatMonthYear(item.meeting_month_year) %></strong>
+              <% } %>
+            <% } %>
+          </p>
+          <time class="activity-item__time t-caption text-tertiary"><%= timeAgo(item.created_at) %></time>
+        </div>
+      </li>
+    <% } %>
+    <% } %>
+  </ol>
+</section>
+
 <!-- ===== Upcoming Books ===== -->
 <% if (upcomingMeetings && upcomingMeetings.length > 0) { %>
 <section class="section upcoming-section">
@@ -251,3 +311,7 @@
     </div>
   </div>
 </section>
+
+<!-- SSE live updates config -->
+<script>window.__HOME_CONFIG__ = { live: true };</script>
+<script src="/js/home-live.js?v=3" defer></script>

@@ -96,4 +96,25 @@ function formatMeetingTime(dtStr, style) {
   return `${DAY_NAMES[dow]}, ${MONTH_NAMES_SHORT[month]} ${day} at ${timeStr}`;
 }
 
-module.exports = { formatMonthYear, formatStatus, monthYearSlug, parseMonthYearSlug, formatMeetingTime };
+/**
+ * Relative time string from an ISO-ish datetime string (e.g. "2026-02-28 14:23:00").
+ * Returns a human-friendly label: "just now", "5m ago", "3h ago", "2d ago", "Feb 25".
+ */
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  // Parse SQLite datetime format "YYYY-MM-DD HH:MM:SS"
+  const ts = Date.parse(dateStr.replace(' ', 'T') + 'Z');
+  if (isNaN(ts)) return '';
+  const seconds = Math.floor((Date.now() - ts) / 1000);
+
+  if (seconds < 60)    return 'just now';
+  if (seconds < 3600)  return Math.floor(seconds / 60) + 'm ago';
+  if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+  if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+
+  // Older than a week — show "Feb 25" style
+  const d = new Date(ts);
+  return MONTH_NAMES_SHORT[d.getUTCMonth()] + ' ' + d.getUTCDate();
+}
+
+module.exports = { formatMonthYear, formatStatus, monthYearSlug, parseMonthYearSlug, formatMeetingTime, timeAgo };

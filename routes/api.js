@@ -348,6 +348,8 @@ router.post('/admin/meetings/:id/nominees', requireAdmin, ...nominationChain, ha
   const book = findOrCreateBook(title, author, metadata);
 
   meetings.addNominee(meetingId, book.id);
+  broadcastAdminMeetingNominees(meetingId);
+  broadcastHomeActivity();
 
   res.status(201).json({ success: true, book: { id: book.id, title: book.title, author: book.author } });
 });
@@ -364,6 +366,7 @@ router.delete('/admin/meetings/:id/nominees/:bookId', requireAdmin, (req, res) =
   }
 
   meetings.removeNominee(meetingId, bookId);
+  broadcastAdminMeetingNominees(meetingId);
   res.json({ success: true });
 });
 
@@ -507,6 +510,7 @@ router.post('/admin/announcements', requireAdmin, ...announcementChain, handleVa
     expiresAt,
   });
 
+  broadcastHomeAnnouncements();
   res.status(201).json({ success: true, id: result.id });
 });
 
@@ -519,6 +523,7 @@ router.put('/admin/announcements/:id/deactivate', requireAdmin, (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Announcement not found.' });
 
   announcementsService.deactivate(id);
+  broadcastHomeAnnouncements();
   res.json({ success: true });
 });
 
@@ -531,6 +536,7 @@ router.put('/admin/announcements/:id/activate', requireAdmin, (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Announcement not found.' });
 
   announcementsService.activate(id);
+  broadcastHomeAnnouncements();
   res.json({ success: true });
 });
 
@@ -543,6 +549,7 @@ router.delete('/admin/announcements/:id', requireAdmin, (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Announcement not found.' });
 
   announcementsService.deleteById(id);
+  broadcastHomeAnnouncements();
   res.json({ success: true });
 });
 
@@ -569,6 +576,7 @@ router.post('/reviews/:reviewId/reactions', requireMember, ...emojiChain, handle
   if (!review) return res.status(404).json({ error: 'Review not found.' });
 
   const result = reactionsService.toggleReaction(reviewId, req.user.id, emoji);
+  broadcastHomeActivity();
   res.json(result);
 });
 
@@ -594,6 +602,7 @@ router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValid
 
   const hasSpoilers = !!req.body.has_spoilers;
   reviewsService.create(bookId, req.user.id, grade, body, hasSpoilers);
+  broadcastHomeActivity();
   res.status(201).json({ success: true });
 });
 
@@ -661,6 +670,7 @@ router.post('/reviews/:reviewId/replies', requireMember, ...replyChain, handleVa
 
   const replyBody = req.body.body;
   const newId = repliesService.create(reviewId, req.user.id, replyBody);
+  broadcastHomeActivity();
 
   // Return the newly created reply so the client can render it immediately
   const reply = repliesService.getById(newId);
@@ -852,6 +862,9 @@ router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nomination
     insertNominee.run(meetingId, book.id);
   })();
 
+  broadcastAdminMeetingNominees(meetingId);
+  broadcastHomeActivity();
+
   const slug = monthYearSlug(meeting.month_year);
   const wantsJson = req.get('Accept')?.includes('application/json');
   if (wantsJson) {
@@ -869,6 +882,58 @@ router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nomination
   // Non-JS fallback: redirect back to the nomination page (which will show "already nominated")
   res.redirect(`/nominate/${slug}`);
 });
+
+// ---------------------------------------------------------------------------
+// SSE client pool for home page (announcements + activity feed)
+// ---------------------------------------------------------------------------
+const activityService = require('../services/activity');
+const homeSseClients = new Set();
+
+function broadcastHomeAnnouncements() {
+  if (homeSseClients.size === 0) return;
+  const announcements = announcementsService.getActive();
+  const payload = `event: announcements\ndata: ${JSON.stringify(announcements)}\n\n`;
+  for (const client of homeSseClients) {
+    client.write(payload);
+  }
+}
+
+function broadcastHomeActivity() {
+  if (homeSseClients.size === 0) return;
+  const activity = activityService.getRecentActivity(15);
+  const payload = `event: activity\ndata: ${JSON.stringify(activity)}\n\n`;
+  for (const client of homeSseClients) {
+    client.write(payload);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// SSE client pool for admin meeting detail (live nominees + vote count)
+// ---------------------------------------------------------------------------
+const adminMeetingSseClients = new Map(); // meetingId → Set<res>
+
+function broadcastAdminMeetingNominees(meetingId) {
+  const clients = adminMeetingSseClients.get(meetingId);
+  if (!clients || clients.size === 0) return;
+
+  const nominees = meetings.getNominees(meetingId);
+  const payload = `event: nominees\ndata: ${JSON.stringify(nominees)}\n\n`;
+  for (const client of clients) {
+    client.write(payload);
+  }
+}
+
+function broadcastAdminMeetingVoteCount(meetingId) {
+  const clients = adminMeetingSseClients.get(meetingId);
+  if (!clients || clients.size === 0) return;
+
+  const { getVoteCount } = require('../services/voting');
+  const voteCount = getVoteCount(meetingId);
+  const payload = `event: voteCount\ndata: ${JSON.stringify({ voteCount })}\n\n`;
+  for (const client of clients) {
+    client.write(payload);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // SSE client pool for live results
@@ -993,6 +1058,7 @@ router.post('/meetings/:meetingId/votes', submissionLimiter, (req, res) => {
 
   // Broadcast updated results to SSE clients
   broadcastResults(meetingId);
+  broadcastAdminMeetingVoteCount(meetingId);
 
   const wantsJson = req.get('Accept')?.includes('application/json');
   if (wantsJson) {
@@ -1048,6 +1114,91 @@ router.get('/meetings/:meetingId/results/stream', (req, res) => {
       clients.delete(res);
       if (clients.size === 0) {
         sseClients.delete(meetingId);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SSE stream for home page (announcements + activity)
+// GET /api/home/stream
+// ---------------------------------------------------------------------------
+router.get('/home/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+
+  // Send initial state
+  const announcements = announcementsService.getActive();
+  res.write(`event: announcements\ndata: ${JSON.stringify(announcements)}\n\n`);
+
+  const activity = activityService.getRecentActivity(15);
+  res.write(`event: activity\ndata: ${JSON.stringify(activity)}\n\n`);
+
+  // Register client
+  homeSseClients.add(res);
+
+  // Heartbeat every 30s
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 30000);
+
+  // Cleanup on disconnect
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    homeSseClients.delete(res);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SSE stream for admin meeting detail (live nominees + vote count)
+// GET /api/admin/meetings/:meetingId/stream
+// ---------------------------------------------------------------------------
+router.get('/admin/meetings/:meetingId/stream', requireAdmin, (req, res) => {
+  const meetingId = parseInt(req.params.meetingId, 10);
+  if (isNaN(meetingId)) return res.status(400).end();
+
+  const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId);
+  if (!meeting) return res.status(404).end();
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+
+  // Send initial nominees
+  const nominees = meetings.getNominees(meetingId);
+  res.write(`event: nominees\ndata: ${JSON.stringify(nominees)}\n\n`);
+
+  // Send initial vote count
+  const { getVoteCount } = require('../services/voting');
+  const voteCount = getVoteCount(meetingId);
+  res.write(`event: voteCount\ndata: ${JSON.stringify({ voteCount })}\n\n`);
+
+  // Register client
+  if (!adminMeetingSseClients.has(meetingId)) {
+    adminMeetingSseClients.set(meetingId, new Set());
+  }
+  adminMeetingSseClients.get(meetingId).add(res);
+
+  // Heartbeat every 30s
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n');
+  }, 30000);
+
+  // Cleanup on disconnect
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    const clients = adminMeetingSseClients.get(meetingId);
+    if (clients) {
+      clients.delete(res);
+      if (clients.size === 0) {
+        adminMeetingSseClients.delete(meetingId);
       }
     }
   });
