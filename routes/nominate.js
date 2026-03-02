@@ -3,24 +3,8 @@
 const router = require('express').Router();
 const db = require('../db');
 const { getFingerprint } = require('../services/fingerprint');
-const { monthYearSlug, parseMonthYearSlug } = require('../utils/format');
-
-// ---------------------------------------------------------------------------
-// Helper: resolve a meeting from a slug or numeric ID param
-// ---------------------------------------------------------------------------
-function resolveMeeting(param) {
-  // Try month-year slug first (e.g. "january-2026")
-  const monthYear = parseMonthYearSlug(param);
-  if (monthYear) {
-    return db.prepare('SELECT * FROM meetings WHERE month_year = ?').get(monthYear) || null;
-  }
-  // Fall back to numeric ID for backward compatibility
-  const id = parseInt(param, 10);
-  if (!isNaN(id)) {
-    return db.prepare('SELECT * FROM meetings WHERE id = ?').get(id) || null;
-  }
-  return null;
-}
+const { monthYearSlug } = require('../utils/format');
+const { resolveMonth } = require('../utils/resolve-month');
 
 // ---------------------------------------------------------------------------
 // GET /nominate — auto-find current nominations-open meeting
@@ -40,14 +24,15 @@ router.get('/nominate', (req, res) => {
 // GET /nominate/:slug
 // ---------------------------------------------------------------------------
 router.get('/nominate/:slug', (req, res) => {
-  const meeting = resolveMeeting(req.params.slug);
-  if (!meeting) return res.redirect('/');
+  const resolved = resolveMonth(req.params.slug);
+  if (!resolved) return res.redirect('/');
+
+  const { meeting, pick, slug } = resolved;
 
   // Backward compat: if accessed by numeric ID, redirect to slug
-  const expectedSlug = monthYearSlug(meeting.month_year);
-  if (req.params.slug !== expectedSlug) {
+  if (req.params.slug !== slug) {
     const qs = req.query.edit === '1' ? '?edit=1' : '';
-    return res.redirect('/nominate/' + expectedSlug + qs);
+    return res.redirect('/nominate/' + slug + qs);
   }
 
   if (meeting.status !== 'nominations') {
@@ -74,7 +59,8 @@ router.get('/nominate/:slug', (req, res) => {
     pageTitle: wantsEdit ? 'Edit Nomination' : 'Nominate a Book',
     pageScript: '/js/nominate-form.js',
     meeting,
-    meetingSlug: expectedSlug,
+    pick,
+    meetingSlug: slug,
     alreadyNominated: !wantsEdit && !!existing,
     existingNomination: existing || null,
     editMode: !!wantsEdit,

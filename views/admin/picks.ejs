@@ -1,7 +1,7 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
     <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
-    <a href="/admin/meetings/new" class="btn btn--primary btn--sm">New Meeting</a>
+    <a href="/admin/picks/new" class="btn btn--primary btn--sm">New Pick</a>
   </div>
 
   <% if (activeMeetings.length > 0) { %>
@@ -30,7 +30,7 @@
                 <% } %>
               </td>
               <td>
-                <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
+                <a href="/admin/picks/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
               </td>
             </tr>
           <% }); %>
@@ -39,7 +39,7 @@
     </div>
   <% } else { %>
     <div class="admin-empty">
-      <p class="t-body text-secondary">No active meetings. Create your first one.</p>
+      <p class="t-body text-secondary">No active picks. Create your first one.</p>
     </div>
   <% } %>
 
@@ -77,7 +77,7 @@
                     <% } %>
                   </td>
                   <td>
-                    <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
+                    <a href="/admin/picks/<%= monthYearSlug(m.month_year) %>" class="btn btn--secondary btn--sm">Manage</a>
                   </td>
                 </tr>
               <% }); %>

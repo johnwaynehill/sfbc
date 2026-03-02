@@ -4828,7 +4828,8 @@ textarea.form-input {
 /* Date/time inputs — native icons adapt to dark mode */
 :is([data-theme="dark"], :root:not([data-theme="light"])) input[type="date"],
 :is([data-theme="dark"], :root:not([data-theme="light"])) input[type="datetime-local"],
-:is([data-theme="dark"], :root:not([data-theme="light"])) input[type="time"] {
+:is([data-theme="dark"], :root:not([data-theme="light"])) input[type="time"],
+:is([data-theme="dark"], :root:not([data-theme="light"])) input[type="month"] {
   color-scheme: dark;
 }
 

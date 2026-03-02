@@ -1,11 +1,11 @@
 <section class="admin-page">
   <% if (!meeting) { %>
-    <!-- Create new meeting form -->
-    <h1 class="t-section admin-page__heading">New Meeting</h1>
+    <!-- Create new pick form -->
+    <h1 class="t-section admin-page__heading">New Pick</h1>
 
     <form id="create-meeting-form" class="admin-form">
       <label class="form-label">
-        Meeting Month
+        Pick Month
         <input type="month" name="month_year" class="form-input" required autofocus>
       </label>
 
@@ -16,7 +16,7 @@
       </label>
 
       <label class="form-label">
-        Meeting Date &amp; Time <span class="text-secondary">(optional)</span>
+        Event Date &amp; Time <span class="text-secondary">(optional)</span>
         <input type="datetime-local" name="meeting_time" class="form-input">
       </label>
 
@@ -29,13 +29,13 @@
       <div id="create-message" hidden></div>
 
       <button type="submit" class="btn btn--primary" id="create-submit">
-        Create Meeting
+        Create Pick
       </button>
     </form>
 
   <% } else { %>
-    <!-- Existing meeting detail -->
-    <a href="/admin/meetings" class="admin-back-link t-caption">&larr; All Meetings</a>
+    <!-- Existing pick detail -->
+    <a href="/admin/picks" class="admin-back-link t-caption">&larr; All Picks</a>
 
     <div class="admin-page__header-row">
       <h1 class="t-section"><%= formatMonthYear(meeting.month_year) %></h1>
@@ -215,14 +215,14 @@
               <% if (meeting.book_title) { %>
                 Winner: <strong><%= meeting.book_title %></strong> by <%= meeting.book_author %>.
               <% } else { %>
-                This meeting is finished.
+                This pick is finished.
               <% } %>
             </span>
           </div>
         </div>
         <div class="pipeline-panel__actions">
-          <a href="/admin/meetings/new?month=<%= encodeURIComponent(_nextMonth) %>" class="btn btn--primary pipeline-cta">
-            Create Next Meeting →
+          <a href="/admin/picks/new?month=<%= encodeURIComponent(_nextMonth) %>" class="btn btn--primary pipeline-cta">
+            Create Next Pick →
           </a>
           <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
             📊 View public results <span class="pipeline-link__arrow">↗</span>
@@ -293,15 +293,15 @@
           <% } %>
         </div>
       <% } else { %>
-        <p class="t-caption text-secondary" style="margin-top: var(--s-2);">No meeting details set. Click "Edit Details" to add.</p>
+        <p class="t-caption text-secondary" style="margin-top: var(--s-2);">No event details set. Click "Edit Details" to add.</p>
       <% } %>
     </div>
 
-    <!-- Meeting details (edit form, animated reveal) -->
+    <!-- Event details (edit form, animated reveal) -->
     <div id="meeting-details-edit" class="admin-edit-reveal">
       <form id="edit-meeting-form" class="admin-form" data-meeting-id="<%= meeting.id %>">
         <label class="form-label">
-          Meeting Month
+          Pick Month
           <input type="month" name="month_year" class="form-input"
                  value="<%= meeting.month_year %>">
         </label>
@@ -314,7 +314,7 @@
         </label>
 
         <label class="form-label">
-          Meeting Date &amp; Time <span class="text-secondary">(optional)</span>
+          Event Date &amp; Time <span class="text-secondary">(optional)</span>
           <input type="datetime-local" name="meeting_time" class="form-input"
                  value="<%= meeting.meeting_time || '' %>">
         </label>
@@ -415,14 +415,14 @@
       <div class="admin-danger-zone">
         <h2 class="t-body-bold admin-page__subheading">Danger Zone</h2>
         <p class="t-caption text-secondary" style="margin-bottom: var(--s-2);">
-          Permanently delete this meeting and all associated nominations, votes, and results.
+          Permanently delete this pick and all associated nominations, votes, and results.
         </p>
         <button type="button"
                 class="btn btn--danger btn--sm"
                 id="delete-meeting-btn"
                 data-meeting-id="<%= meeting.id %>"
                 data-meeting-label="<%= formatMonthYear(meeting.month_year) %>">
-          Delete Meeting
+          Delete Pick
         </button>
       </div>
     <% } %>

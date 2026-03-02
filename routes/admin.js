@@ -6,6 +6,7 @@ const QRCode = require('qrcode');
 const config = require('../config');
 const { requireAdmin } = require('../middleware/auth');
 const meetings = require('../services/meetings');
+const picksService = require('../services/monthly-picks');
 const { calculateResults, getVoteCount } = require('../services/voting');
 const { formatMonthYear, parseMonthYearSlug, monthYearSlug } = require('../utils/format');
 
@@ -64,19 +65,55 @@ router.use((req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
+// 301 redirects: /admin/meetings → /admin/picks
+// ---------------------------------------------------------------------------
+router.get('/meetings', (req, res) => res.redirect(301, '/admin/picks'));
+router.get('/meetings/new', (req, res) => {
+  const qs = req.originalUrl.split('?')[1];
+  res.redirect(301, '/admin/picks/new' + (qs ? '?' + qs : ''));
+});
+router.get('/meetings/:slug', (req, res) => {
+  res.redirect(301, '/admin/picks/' + req.params.slug);
+});
+
+// ---------------------------------------------------------------------------
 // Overview dashboard
 // ---------------------------------------------------------------------------
 router.get('/', async (req, res) => {
-  const current = meetings.getCurrent();
+  const currentPick = picksService.getCurrent();
   const upcoming = meetings.getUpcoming();
   const stats = meetings.getStats();
+
+  // Build `current` for the template.
+  // Strategy: start from the pick (authoritative lifecycle entity, always has book),
+  // then find *its* linked meeting for nominee/vote data.
+  // Fall back to meetings.getCurrent() only when there's no pick at all
+  // (nominations phase with no book selected yet).
+  let current = null;
+  if (currentPick) {
+    // Find the meeting linked to THIS pick (not just any current meeting)
+    const linked = meetings.getByPickId(currentPick.id);
+    current = {
+      id: linked ? linked.id : null,
+      month_year: currentPick.month_year,
+      status: currentPick.status,
+      book_title: currentPick.title,
+      book_author: currentPick.author,
+      book_cover_url: currentPick.cover_url,
+      winning_book_id: currentPick.book_id,
+    };
+  } else {
+    // No pick — fall back to meetings (nominations phase, no book yet)
+    const currentMeeting = meetings.getCurrent();
+    if (currentMeeting) current = currentMeeting;
+  }
 
   let nominees = [];
   let voteCount = 0;
   let results = null;
   let qrCodes = [];
 
-  if (current) {
+  if (current && current.id) {
     nominees = meetings.getNominees(current.id);
     voteCount = getVoteCount(current.id);
     if (current.status === 'voting' || current.status === 'results') {
@@ -98,14 +135,14 @@ router.get('/', async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Meetings list
+// Picks list
 // ---------------------------------------------------------------------------
-router.get('/meetings', (req, res) => {
+router.get('/picks', (req, res) => {
   const allMeetings = meetings.getAll();
   const activeMeetings = allMeetings.filter(m => m.status !== 'results');
   const finishedMeetings = allMeetings.filter(m => m.status === 'results');
-  res.render('admin/meetings', {
-    pageTitle: 'Meetings',
+  res.render('admin/picks', {
+    pageTitle: 'Picks',
     meetings: allMeetings,
     activeMeetings,
     finishedMeetings,
@@ -113,12 +150,12 @@ router.get('/meetings', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// New meeting form
+// New pick form
 // ---------------------------------------------------------------------------
-router.get('/meetings/new', (req, res) => {
-  res.render('admin/meeting-detail', {
-    pageTitle: 'New Meeting',
-    pageScript: '/js/admin-meetings.js',
+router.get('/picks/new', (req, res) => {
+  res.render('admin/pick-detail', {
+    pageTitle: 'New Pick',
+    pageScript: '/js/admin-picks.js',
     meeting: null,
     nominees: [],
     voteCount: 0,
@@ -128,9 +165,9 @@ router.get('/meetings/new', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Meeting detail (supports slug like "february-2026" or numeric ID for backward compat)
+// Pick detail (supports slug like "february-2026" or numeric ID for backward compat)
 // ---------------------------------------------------------------------------
-router.get('/meetings/:slug', async (req, res) => {
+router.get('/picks/:slug', async (req, res) => {
   const slug = req.params.slug;
   let meeting;
 
@@ -145,12 +182,12 @@ router.get('/meetings/:slug', async (req, res) => {
       meeting = meetings.getById(id);
       // Redirect numeric ID to slug URL
       if (meeting) {
-        return res.redirect(`/admin/meetings/${monthYearSlug(meeting.month_year)}`);
+        return res.redirect(`/admin/picks/${monthYearSlug(meeting.month_year)}`);
       }
     }
   }
 
-  if (!meeting) return res.redirect('/admin/meetings');
+  if (!meeting) return res.redirect('/admin/picks');
 
   const nominees = meetings.getNominees(meeting.id);
   const voteCount = getVoteCount(meeting.id);
@@ -161,10 +198,14 @@ router.get('/meetings/:slug', async (req, res) => {
 
   const qrCodes = await generateQrCodes(meeting.month_year, meeting.status);
 
-  res.render('admin/meeting-detail', {
+  // Also resolve the linked pick for future use
+  const pick = picksService.getByMonthYear(meeting.month_year);
+
+  res.render('admin/pick-detail', {
     pageTitle: formatMonthYear(meeting.month_year),
-    pageScript: '/js/admin-meetings.js',
+    pageScript: '/js/admin-picks.js',
     meeting,
+    pick,
     nominees,
     voteCount,
     results,

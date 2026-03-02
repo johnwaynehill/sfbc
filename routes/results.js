@@ -3,8 +3,10 @@
 const router = require('express').Router();
 const db = require('../db');
 const { calculateResults } = require('../services/voting');
+const picksService = require('../services/monthly-picks');
 const { bookPath } = require('../utils/slug');
-const { monthYearSlug, parseMonthYearSlug } = require('../utils/format');
+const { monthYearSlug } = require('../utils/format');
+const { resolveMonth } = require('../utils/resolve-month');
 
 // Accessible 8-color palette for bar chart fills
 const BAR_COLORS = [
@@ -17,21 +19,6 @@ const BAR_COLORS = [
   '#06B6D4', // cyan
   '#84CC16', // lime
 ];
-
-// ---------------------------------------------------------------------------
-// Helper: resolve a meeting from a slug or numeric ID param
-// ---------------------------------------------------------------------------
-function resolveMeeting(param) {
-  const monthYear = parseMonthYearSlug(param);
-  if (monthYear) {
-    return db.prepare('SELECT * FROM meetings WHERE month_year = ?').get(monthYear) || null;
-  }
-  const id = parseInt(param, 10);
-  if (!isNaN(id)) {
-    return db.prepare('SELECT * FROM meetings WHERE id = ?').get(id) || null;
-  }
-  return null;
-}
 
 // ---------------------------------------------------------------------------
 // GET /results — auto-find current voting/results meeting
@@ -57,11 +44,12 @@ router.get('/results', (req, res) => {
 // GET /results/:slug
 // ---------------------------------------------------------------------------
 router.get('/results/:slug', (req, res) => {
-  const meeting = resolveMeeting(req.params.slug);
-  if (!meeting) return res.redirect('/');
+  const resolved = resolveMonth(req.params.slug);
+  if (!resolved) return res.redirect('/');
+
+  const { meeting, pick, slug } = resolved;
 
   // Backward compat: if accessed by numeric ID, redirect to slug
-  const slug = monthYearSlug(meeting.month_year);
   if (req.params.slug !== slug) {
     return res.redirect('/results/' + slug);
   }
@@ -73,9 +61,10 @@ router.get('/results/:slug', (req, res) => {
 
   const isVotingOpen = meeting.status === 'voting';
 
-  // During voting: always calculate live. After voting: prefer cached JSON.
-  const results = (!isVotingOpen && meeting.vote_results_json)
-    ? JSON.parse(meeting.vote_results_json)
+  // Prefer pick's results JSON when available; fall back to meeting's; recalculate live during voting
+  const cachedJson = (pick && pick.vote_results_json) || meeting.vote_results_json;
+  const results = (!isVotingOpen && cachedJson)
+    ? JSON.parse(cachedJson)
     : calculateResults(meeting.id);
 
   // Assign colors to each nominee
@@ -89,18 +78,27 @@ router.get('/results/:slug', (req, res) => {
     ? results.rankings[0]
     : null;
 
+  // Build barMeeting: prefer event data from pick, fall back to meeting
+  let barMeeting = meeting;
+  if (pick) {
+    const event = picksService.getFirstEvent(pick.id);
+    if (event) barMeeting = event;
+  }
+
   res.locals.layout = 'layouts/focus-shell';
 
   res.render('results', {
     pageTitle: isVotingOpen ? 'Live Results' : 'Final Results',
     pageScript: '/js/results-live.js',
     meeting,
+    pick,
     meetingSlug: slug,
     results,
     isVotingOpen,
     winner,
     bookPath,
     colors,
+    barMeeting,
   });
 });
 

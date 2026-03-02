@@ -1,7 +1,7 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
     <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
-    <a href="/admin/meetings/new" class="btn btn--primary btn--sm">+ New Meeting</a>
+    <a href="/admin/picks/new" class="btn btn--primary btn--sm">+ New Pick</a>
   </div>
 
   <!-- Stats row -->
@@ -20,8 +20,8 @@
     </div>
   </div>
 
-  <!-- Current meeting -->
-  <h2 class="t-body-bold admin-page__subheading">Current Meeting</h2>
+  <!-- Current pick -->
+  <h2 class="t-body-bold admin-page__subheading">Current Pick</h2>
 
   <% if (current) { %>
     <div class="admin-meeting-card<%= current.book_cover_url ? ' admin-meeting-card--with-cover' : '' %>">
@@ -49,12 +49,12 @@
         </div>
 
         <div class="admin-meeting-card__actions">
-          <a href="/admin/meetings/<%= monthYearSlug(current.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
+          <a href="/admin/picks/<%= monthYearSlug(current.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
 
           <% if (current.status === 'reading') { %>
             <button class="btn btn--secondary btn--sm js-advance-status"
                     data-meeting-id="<%= current.id %>"
-                    data-new-status="results">Close Meeting</button>
+                    data-new-status="results">Close Pick</button>
           <% } else if (current.status === 'nominations') { %>
             <button class="btn btn--secondary btn--sm js-advance-status"
                     data-meeting-id="<%= current.id %>"
@@ -69,7 +69,7 @@
     </div>
   <% } else { %>
     <div class="admin-empty">
-      <p class="t-body text-secondary">No active meeting. Create one or open nominations on an upcoming meeting.</p>
+      <p class="t-body text-secondary">No active pick. Create one or open nominations on an upcoming pick.</p>
     </div>
   <% } %>
 
@@ -99,9 +99,9 @@
     </table>
   <% } %>
 
-  <!-- Upcoming meetings -->
+  <!-- Upcoming picks -->
   <% if (upcoming.length > 0) { %>
-    <h2 class="t-body-bold admin-page__subheading">Upcoming Meetings</h2>
+    <h2 class="t-body-bold admin-page__subheading">Upcoming Picks</h2>
 
     <% upcoming.forEach(function(m) { %>
       <div class="admin-meeting-card<%= m.book_cover_url ? ' admin-meeting-card--with-cover' : '' %>">
@@ -123,7 +123,7 @@
             </div>
           <% } %>
           <div class="admin-meeting-card__actions">
-            <a href="/admin/meetings/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
+            <a href="/admin/picks/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
             <% if (m.winning_book_id) { %>
               <button class="btn btn--secondary btn--sm js-advance-status"
                       data-meeting-id="<%= m.id %>"
@@ -151,7 +151,7 @@
         reading: 'mark as reading',
         nominations: 'open nominations',
         voting: 'start voting',
-        results: 'close this meeting',
+        results: 'finalize results',
       };
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
 
@@ -170,7 +170,7 @@
         } else {
           alert(data.error || 'Something went wrong.');
           btn.disabled = false;
-          var labelMap = { reading: 'Mark as Reading', nominations: 'Open Nominations', voting: 'Start Voting', results: 'Close Meeting' };
+          var labelMap = { reading: 'Mark as Reading', nominations: 'Open Nominations', voting: 'Start Voting', results: 'Finalize Results' };
           btn.textContent = labelMap[btn.dataset.newStatus] || btn.dataset.newStatus;
         }
       } catch (err) {

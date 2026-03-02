@@ -3,28 +3,15 @@
 const router = require('express').Router();
 const db = require('../db');
 const { getFingerprint } = require('../services/fingerprint');
+const picksService = require('../services/monthly-picks');
 const {
   getNomineesForBallot,
   seededShuffle,
   hasVoted,
   getVoteCount,
 } = require('../services/voting');
-const { monthYearSlug, parseMonthYearSlug } = require('../utils/format');
-
-// ---------------------------------------------------------------------------
-// Helper: resolve a meeting from a slug or numeric ID param
-// ---------------------------------------------------------------------------
-function resolveMeeting(param) {
-  const monthYear = parseMonthYearSlug(param);
-  if (monthYear) {
-    return db.prepare('SELECT * FROM meetings WHERE month_year = ?').get(monthYear) || null;
-  }
-  const id = parseInt(param, 10);
-  if (!isNaN(id)) {
-    return db.prepare('SELECT * FROM meetings WHERE id = ?').get(id) || null;
-  }
-  return null;
-}
+const { monthYearSlug } = require('../utils/format');
+const { resolveMonth } = require('../utils/resolve-month');
 
 // ---------------------------------------------------------------------------
 // GET /vote — auto-find current voting-open meeting
@@ -43,11 +30,12 @@ router.get('/vote', (req, res) => {
 // GET /vote/:slug
 // ---------------------------------------------------------------------------
 router.get('/vote/:slug', (req, res) => {
-  const meeting = resolveMeeting(req.params.slug);
-  if (!meeting) return res.redirect('/');
+  const resolved = resolveMonth(req.params.slug);
+  if (!resolved) return res.redirect('/');
+
+  const { meeting, pick, slug } = resolved;
 
   // Backward compat: if accessed by numeric ID, redirect to slug
-  const slug = monthYearSlug(meeting.month_year);
   if (req.params.slug !== slug) {
     return res.redirect('/vote/' + slug);
   }
@@ -76,15 +64,24 @@ router.get('/vote/:slug', (req, res) => {
 
   const voteCount = getVoteCount(meeting.id);
 
+  // Build barMeeting: prefer event data from pick, fall back to meeting
+  let barMeeting = meeting;
+  if (pick) {
+    const event = picksService.getFirstEvent(pick.id);
+    if (event) barMeeting = event;
+  }
+
   res.locals.layout = 'layouts/focus-shell';
 
   res.render('vote', {
     pageTitle: 'Cast Your Vote',
     pageScript: '/js/vote-ballot.js',
     meeting,
+    pick,
     meetingSlug: slug,
     nominees,
     voteCount,
+    barMeeting,
   });
 });
 

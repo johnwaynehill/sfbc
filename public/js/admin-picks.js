@@ -1,7 +1,7 @@
 /**
- * admin-meetings.js — Progressive enhancement for admin meeting management.
+ * admin-picks.js — Progressive enhancement for admin pick management.
  *
- * 1. Create meeting form submission
+ * 1. Create pick form submission
  * 2. Status transition buttons
  * 3. Add nominee form submission
  * 4. Remove nominee buttons
@@ -31,7 +31,7 @@
   }
 
   // -----------------------------------------------------------------------
-  // Create meeting form
+  // Create pick form
   // -----------------------------------------------------------------------
 
   var createForm = document.getElementById('create-meeting-form');
@@ -40,7 +40,7 @@
     var createBtn = document.getElementById('create-submit');
     var createMsg = document.getElementById('create-message');
 
-    // Pre-fill from URL params (for "Create Next Meeting" flow)
+    // Pre-fill from URL params (for "Create Next Pick" flow)
     var _params = new URLSearchParams(window.location.search);
     var _prefillMonth = _params.get('month');
     if (_prefillMonth) {
@@ -68,7 +68,7 @@
         var data = await res.json();
 
         if (res.ok && data.success) {
-          window.location.href = '/admin/meetings/' + monthYearSlug(data.meeting.month_year);
+          window.location.href = '/admin/picks/' + monthYearSlug(data.meeting.month_year);
           return;
         }
 
@@ -78,7 +78,7 @@
       }
 
       createBtn.disabled = false;
-      createBtn.textContent = 'Create Meeting';
+      createBtn.textContent = 'Create Pick';
     });
   }
 
@@ -94,7 +94,7 @@
         reading: 'start the reading period',
         nominations: 'open nominations',
         voting: 'close nominations and open voting',
-        results: 'finalize this meeting',
+        results: 'finalize this pick',
       };
 
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
@@ -279,7 +279,7 @@
 
         if (res.ok && data.success) {
           // Redirect to the new slug URL (month_year might have changed)
-          window.location.href = '/admin/meetings/' + monthYearSlug(data.meeting.month_year);
+          window.location.href = '/admin/picks/' + monthYearSlug(data.meeting.month_year);
           return;
         }
 
@@ -344,7 +344,7 @@
   }
 
   // -----------------------------------------------------------------------
-  // Delete meeting (super-admin only)
+  // Delete pick (super-admin only)
   // -----------------------------------------------------------------------
 
   var deleteBtn = document.getElementById('delete-meeting-btn');
@@ -352,7 +352,7 @@
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async function () {
       var meetingId = deleteBtn.dataset.meetingId;
-      var label = deleteBtn.dataset.meetingLabel || 'this meeting';
+      var label = deleteBtn.dataset.meetingLabel || 'this pick';
 
       if (!confirm('Are you sure you want to permanently delete "' + label + '"?\n\nThis will remove all nominations, votes, and results. This cannot be undone.')) {
         return;
@@ -375,7 +375,7 @@
         var data = await res.json();
 
         if (res.ok && data.success) {
-          window.location.href = '/admin/meetings';
+          window.location.href = '/admin/picks';
           return;
         }
 
@@ -385,7 +385,7 @@
       }
 
       deleteBtn.disabled = false;
-      deleteBtn.textContent = 'Delete Meeting';
+      deleteBtn.textContent = 'Delete Pick';
     });
   }
 
