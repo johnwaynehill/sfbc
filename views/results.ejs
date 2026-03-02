@@ -12,6 +12,8 @@
     </div>
   </header>
 
+  <%- include('partials/meeting-details-bar', { barMeeting: meeting }) %>
+
   <% if (winner) { %>
     <div class="results-winner" data-winner-cover="<%= winner.cover_url || '' %>" data-winner-title="<%= winner.title %>">
       <div class="results-winner__ribbon">

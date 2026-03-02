@@ -40,6 +40,14 @@
     var createBtn = document.getElementById('create-submit');
     var createMsg = document.getElementById('create-message');
 
+    // Pre-fill from URL params (for "Create Next Meeting" flow)
+    var _params = new URLSearchParams(window.location.search);
+    var _prefillMonth = _params.get('month');
+    if (_prefillMonth) {
+      var _monthInput = createForm.querySelector('[name="month_year"]');
+      if (_monthInput) _monthInput.value = _prefillMonth;
+    }
+
     createForm.addEventListener('submit', async function (e) {
       e.preventDefault();
 
@@ -83,10 +91,10 @@
       var meetingId = btn.dataset.meetingId;
       var newStatus = btn.dataset.newStatus;
       var labels = {
-        reading: 'mark as reading',
+        reading: 'start the reading period',
         nominations: 'open nominations',
-        voting: 'start voting',
-        results: 'close this meeting',
+        voting: 'close nominations and open voting',
+        results: 'finalize this meeting',
       };
 
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
@@ -409,6 +417,24 @@
         nomineesHeading.textContent = 'Nominees (' + nominees.length + ')';
       }
 
+      // Update pipeline nominee count + readiness check
+      var pnc = document.getElementById('pipeline-nominee-count');
+      if (pnc) {
+        pnc.textContent = nominees.length;
+        var pnCheck = pnc.closest('.pipeline-check');
+        if (pnCheck) {
+          var pnReady = nominees.length >= 2;
+          pnCheck.classList.toggle('pipeline-check--ok', pnReady);
+          pnCheck.classList.toggle('pipeline-check--warn', !pnReady);
+          var pnIcon = pnCheck.querySelector('.pipeline-check__icon');
+          if (pnIcon) pnIcon.textContent = pnReady ? '\u2713' : '!';
+          var pnHint = pnCheck.querySelector('.pipeline-check__hint');
+          if (pnHint) pnHint.hidden = pnReady;
+          var pnCta = document.querySelector('.pipeline-cta[data-new-status="voting"]');
+          if (pnCta) pnCta.disabled = !pnReady;
+        }
+      }
+
       if (nominees.length === 0) {
         nomineesContainer.innerHTML = '<p class="t-body text-secondary">No nominees yet.</p>';
         return;
@@ -504,9 +530,23 @@
         try {
           var data = JSON.parse(e.data);
           if (isFirstVoteCount) { isFirstVoteCount = false; return; }
-          // Update vote count display if present
           var vcEl = document.getElementById('admin-vote-count');
-          if (vcEl) vcEl.textContent = data.voteCount;
+          if (vcEl) {
+            vcEl.textContent = data.voteCount;
+            // Update pipeline check state
+            var vcCheck = vcEl.closest('.pipeline-check');
+            if (vcCheck) {
+              var vcReady = data.voteCount >= 1;
+              vcCheck.classList.toggle('pipeline-check--ok', vcReady);
+              vcCheck.classList.toggle('pipeline-check--warn', !vcReady);
+              var vcIcon = vcCheck.querySelector('.pipeline-check__icon');
+              if (vcIcon) vcIcon.textContent = vcReady ? '\u2713' : '!';
+              var vcHint = vcCheck.querySelector('.pipeline-check__hint');
+              if (vcHint) vcHint.hidden = vcReady;
+              var vcCta = document.querySelector('.pipeline-cta[data-new-status="results"]');
+              if (vcCta) vcCta.disabled = !vcReady;
+            }
+          }
         } catch (err) {}
       });
 

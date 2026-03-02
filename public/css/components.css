@@ -1745,6 +1745,57 @@ textarea.form-input {
 
 
 /* ============================================
+   MEETING DETAILS BAR — Shared partial (nominations, vote, results)
+   ============================================ */
+
+.meeting-details-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  margin-top: var(--s-3);
+  margin-bottom: var(--s-4);
+  padding: var(--s-2) var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  color: var(--text2);
+}
+
+.meeting-details-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.meeting-details-bar__item svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.meeting-details-bar__link {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.meeting-details-bar__link:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .meeting-details-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-1);
+  }
+}
+
+/* ============================================
    NOMINATIONS PAGE — Sprint 5
    ============================================ */
 
@@ -3362,17 +3413,26 @@ textarea.form-input {
     display: block;
   }
 
-  /* ---- Actions row: stack on mobile ---- */
-  .admin-actions {
+  /* ---- Pipeline panel: stack on mobile ---- */
+  .pipeline-panel__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pipeline-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .pipeline-panel__footer {
     flex-direction: column;
     align-items: stretch;
     gap: var(--s-2);
   }
 
-  .admin-actions .btn {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
+  .pipeline-override {
+    margin-left: 0;
   }
 
   /* ---- Status override: stack on mobile ---- */
@@ -3562,7 +3622,7 @@ textarea.form-input {
 @media print {
   .global-nav,
   .admin-shell__nav,
-  .admin-actions,
+  .pipeline-panel,
   .admin-nominees,
   .admin-form,
   .admin-settings-card:last-child {
@@ -3906,6 +3966,182 @@ textarea.form-input {
 }
 
 /* Mobile layout handled in Responsive: Admin section */
+
+/* ---- Pipeline Panel (Admin Meeting Wizard) ---- */
+.pipeline-panel {
+  margin-top: var(--s-3);
+  padding: var(--s-4);
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--border);
+}
+
+.pipeline-panel--upcoming  { border-left-color: #78716C; }
+.pipeline-panel--reading   { border-left-color: #3B82F6; }
+.pipeline-panel--nominations { border-left-color: #EA580C; }
+.pipeline-panel--voting    { border-left-color: #8B5CF6; }
+.pipeline-panel--results   { border-left-color: #059669; }
+
+.pipeline-panel__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+
+.pipeline-panel__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pipeline-panel__titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+.pipeline-panel__label {
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.pipeline-panel__desc {
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.pipeline-panel__checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  margin-bottom: var(--s-3);
+}
+
+.pipeline-check {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  color: var(--text2);
+}
+
+.pipeline-check__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--border);
+  color: var(--text3);
+}
+
+.pipeline-check--ok .pipeline-check__icon {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.pipeline-check--warn .pipeline-check__icon {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.pipeline-check__hint {
+  color: var(--text3);
+  font-size: var(--t-xs);
+}
+
+.pipeline-panel__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-3);
+}
+
+.pipeline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: var(--text2);
+  text-decoration: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.pipeline-link:hover {
+  color: var(--text);
+  border-color: var(--text3);
+  text-decoration: none;
+}
+
+.pipeline-link__arrow {
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.pipeline-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+.pipeline-cta {
+  font-weight: 600;
+}
+
+.pipeline-cta[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pipeline-panel__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--admin-border);
+}
+
+.pipeline-override {
+  margin-left: auto;
+}
+
+.pipeline-override__toggle {
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  color: var(--text3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.pipeline-override__toggle:hover {
+  color: var(--text2);
+}
+
+.pipeline-override__body {
+  margin-top: var(--s-2);
+}
 
 /* ---- Edit Form Slide Animation ---- */
 .admin-edit-reveal {
@@ -4642,6 +4878,22 @@ textarea.form-input {
 
 /* Admin winner — dark mode */
 :is([data-theme="dark"], :root:not([data-theme="light"])) .admin-winner {
+  background: var(--surface2);
+  border-color: var(--border);
+}
+
+/* Pipeline panel — dark mode */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .pipeline-check--ok .pipeline-check__icon {
+  background: rgba(5, 150, 105, 0.2);
+  color: #34D399;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .pipeline-check--warn .pipeline-check__icon {
+  background: rgba(217, 119, 6, 0.2);
+  color: #FBBF24;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .pipeline-link {
   background: var(--surface2);
   border-color: var(--border);
 }
