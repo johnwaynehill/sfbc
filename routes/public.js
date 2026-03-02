@@ -7,7 +7,7 @@ const { formatMonthYear } = require('../utils/format');
 const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
-const { buildGradeGradient, gradeToPercent, gradeTier } = require('../utils/gradeGradient');
+const { buildGradeGradient, gradeToPercent } = require('../utils/gradeGradient');
 const { timeAgo } = require('../utils/format');
 const meetingsService = require('../services/meetings');
 const reactionsService = require('../services/reactions');
@@ -149,7 +149,6 @@ router.get('/', (req, res) => {
     weightToGrade,
     formatMonthYear,
     bookPath,
-    gradeTier,
     timeAgo,
   });
 });
@@ -417,8 +416,6 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   // Pre-compute gradient strip values for the template
   const gradeGradient = buildGradeGradient(gradeDistribution);
   const avgGradePercent = avgGrade ? gradeToPercent(avgGrade) : null;
-  const avgGradeTier = avgGrade ? gradeTier(avgGrade) : null;
-
   res.render('book-detail', {
     pageTitle: `${book.title} by ${book.author}`,
     book,
@@ -429,7 +426,6 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     gradeDistribution,
     gradeGradient,
     avgGradePercent,
-    avgGradeTier,
     reactionCounts,
     userReactions,
     repliesMap,

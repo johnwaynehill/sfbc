@@ -23,10 +23,10 @@
   var isFirstAnnounce  = true;
   var isFirstActivity  = true;
 
-  // Tier helper (same as server's gradeTier)
+  // Tier helper — returns BEM modifier class (e.g. "grade-badge--a")
   function gradeTier(grade) {
     if (!grade) return '';
-    return grade.charAt(0).toLowerCase();
+    return 'grade-badge--' + grade.charAt(0).toLowerCase();
   }
 
   // ── Announcement type → SVG icon ─────────────────────────
