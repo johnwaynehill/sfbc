@@ -85,21 +85,21 @@ Almost every feature below benefits from this refactor. It should be done first,
 
 ### Admin Operations
 
-- [ ] **Nomination → Voting → Winner flow** — Streamlined admin pipeline [L]
+- [✅] **Nomination → Voting → Winner flow** — Streamlined admin pipeline [L]
   - Create nomination form / open nominations
   - Close nominations, open voting
   - Close voting, select winner
   - Tie winner to "next" month's artifact (next as determined by the admin pipeline, not a caledar date)
-- [ ] **Create meetings / link to Meetup.com** — Multiple meetings per monthly pick [M]
+- [✅] **Create meetings / link to Meetup.com** — Multiple meetings per monthly pick [M]
 - [✅] **Sort and filter reviews in Admin** — Search, sort by date/grade/book [M]
 - [✅] **Sort and filter users in Admin** — Search, sort by name/join date [M]
 - [✅] **Promote user to Admin** — Add promote/demote action on /admin/users [S]
 - [✅] **Link to profile from Admin users** — Quick link to member's public profile [S]
-- [ ] **Preserve vote results as archive** — Keep past vote tallies accessible, not just the winner [M]
-- [ ] **Prevent past nominations from interfering with winner URLs** — Ensure canonical slugs for winning books aren't affected by prior nomination data [S]
+- [✅] **Preserve vote results as archive** — Keep past vote tallies accessible, not just the winner [M]
+- [✅] **Prevent past nominations from interfering with winner URLs** — Ensure canonical slugs for winning books aren't affected by prior nomination data [S]
 - [✅] **Block nominations for already-read books** — Prevent re-nomination with a gentle, warm message explaining the book was already read [S]
 - [✅] **Live SSE for admin meeting detail** — Nominations appear in real-time on the admin meeting page as they come in [M]
-- [ ] **Voting page UX overhaul** — Reduce card height (nominated-by + rationale make cards too big), rethink rank number placement, top-align cover with title; reference strawpoll.com for inspiration [M]
+- [✅] **Voting page UX overhaul** — Reduce card height (nominated-by + rationale make cards too big), rethink rank number placement, top-align cover with title; reference strawpoll.com for inspiration [M]
 - [✅] **Admin form field icons — dark mode contrast** — Invert or brighten icons inside admin form fields so they're visible in dark mode [S]
 
 ---

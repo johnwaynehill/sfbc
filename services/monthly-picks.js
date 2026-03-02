@@ -57,6 +57,104 @@ const getByBookAndMonthStmt = db.prepare(`
 `);
 
 /* ------------------------------------------------------------------ */
+/*  Read-side queries (Phase 3: books as primary entity)               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Home hero: the current active pick with full book data.
+ * Prefers non-results (active lifecycle), falls back to most recent completed.
+ */
+const getHeroStmt = db.prepare(`
+  SELECT mp.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
+         b.publication_year, b.page_count, b.author_slug, b.title_slug,
+         b.description, b.subjects
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.status != 'results'
+  ORDER BY mp.month_year ASC
+  LIMIT 1
+`);
+
+const getHeroFallbackStmt = db.prepare(`
+  SELECT mp.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
+         b.publication_year, b.page_count, b.author_slug, b.title_slug,
+         b.description, b.subjects
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.status = 'results'
+  ORDER BY mp.month_year DESC
+  LIMIT 1
+`);
+
+/**
+ * Recent completed picks for home page strip.
+ * Optionally excludes a specific pick (the hero).
+ */
+const getRecentPicksStmt = db.prepare(`
+  SELECT mp.month_year, mp.status, b.id AS book_id, b.title, b.author,
+         b.cover_url, b.open_library_id, b.author_slug, b.title_slug,
+         (SELECT AVG(gw.weight) FROM reviews r2
+          JOIN grade_weights gw ON gw.grade = r2.grade
+          WHERE r2.book_id = b.id) AS avg_weight,
+         (SELECT COUNT(*) FROM reviews r3 WHERE r3.book_id = b.id) AS review_count
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.status = 'results'
+  ORDER BY mp.month_year DESC
+`);
+
+const getRecentPicksExcludingStmt = db.prepare(`
+  SELECT mp.month_year, mp.status, b.id AS book_id, b.title, b.author,
+         b.cover_url, b.open_library_id, b.author_slug, b.title_slug,
+         (SELECT AVG(gw.weight) FROM reviews r2
+          JOIN grade_weights gw ON gw.grade = r2.grade
+          WHERE r2.book_id = b.id) AS avg_weight,
+         (SELECT COUNT(*) FROM reviews r3 WHERE r3.book_id = b.id) AS review_count
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.status = 'results' AND mp.id != ?
+  ORDER BY mp.month_year DESC
+`);
+
+/** Total completed picks count. */
+const countCompletedStmt = db.prepare(
+  "SELECT COUNT(*) AS cnt FROM monthly_picks WHERE status = 'results'"
+);
+
+/** History page: all completed picks with grade + review info. */
+const getHistoryStmt = db.prepare(`
+  SELECT mp.month_year, mp.status, b.id AS book_id, b.title, b.author,
+         b.cover_url, b.open_library_id, b.author_slug, b.title_slug,
+         b.subjects,
+         (SELECT AVG(gw.weight) FROM reviews r2
+          JOIN grade_weights gw ON gw.grade = r2.grade
+          WHERE r2.book_id = b.id) AS avg_weight,
+         (SELECT COUNT(*) FROM reviews r3 WHERE r3.book_id = b.id) AS review_count
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.status = 'results'
+  ORDER BY mp.month_year DESC
+`);
+
+/** Book detail lookup: find pick info for a specific book. */
+const getPickForBookStmt = db.prepare(`
+  SELECT mp.month_year, mp.status AS pick_status
+  FROM monthly_picks mp
+  WHERE mp.book_id = ?
+  ORDER BY mp.month_year DESC
+  LIMIT 1
+`);
+
+/** Get the first event for a pick (for meeting-details-bar display). */
+const getFirstEventStmt = db.prepare(`
+  SELECT meeting_time, location_text, meetup_event_url
+  FROM events
+  WHERE monthly_pick_id = ?
+  ORDER BY meeting_time ASC
+  LIMIT 1
+`);
+
+/* ------------------------------------------------------------------ */
 /*  Exported functions                                                 */
 /* ------------------------------------------------------------------ */
 
@@ -120,6 +218,60 @@ function findByBookAndMonth(bookId, monthYear) {
   return getByBookAndMonthStmt.get(bookId, monthYear) || null;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Phase 3: Read-side functions (books as primary entity)             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Get the hero pick for the home page.
+ * Prefers active lifecycle (reading/nominations/voting), falls back to most recent completed.
+ */
+function getHero() {
+  return getHeroStmt.get() || getHeroFallbackStmt.get() || null;
+}
+
+/**
+ * Get recent completed picks for the home page strip.
+ * @param {number} limit - Max picks to return
+ * @param {number|null} [excludePickId] - Pick to exclude (e.g., the hero)
+ */
+function getRecentPicks(limit, excludePickId = null) {
+  if (excludePickId) {
+    return getRecentPicksExcludingStmt.all(excludePickId).slice(0, limit);
+  }
+  return getRecentPicksStmt.all().slice(0, limit);
+}
+
+/**
+ * Count total completed picks (books the club has read).
+ */
+function countCompleted() {
+  return countCompletedStmt.get().cnt;
+}
+
+/**
+ * Get all completed picks for the history page.
+ */
+function getHistory() {
+  return getHistoryStmt.all();
+}
+
+/**
+ * Get pick info for a specific book (for book detail page).
+ * Returns { month_year, pick_status } or null.
+ */
+function getPickForBook(bookId) {
+  return getPickForBookStmt.get(bookId) || null;
+}
+
+/**
+ * Get the first scheduled event for a pick.
+ * Returns { meeting_time, location_text, meetup_event_url } or null.
+ */
+function getFirstEvent(pickId) {
+  return getFirstEventStmt.get(pickId) || null;
+}
+
 module.exports = {
   getCurrent,
   getByMonthYear,
@@ -128,4 +280,10 @@ module.exports = {
   create,
   advanceStatus,
   findByBookAndMonth,
+  getHero,
+  getRecentPicks,
+  countCompleted,
+  getHistory,
+  getPickForBook,
+  getFirstEvent,
 };

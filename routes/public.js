@@ -10,6 +10,7 @@ const { renderMarkdown } = require('../utils/markdown');
 const { buildGradeGradient, gradeToPercent } = require('../utils/gradeGradient');
 const { timeAgo } = require('../utils/format');
 const meetingsService = require('../services/meetings');
+const picksService = require('../services/monthly-picks');
 const reactionsService = require('../services/reactions');
 const repliesService = require('../services/replies');
 const announcementsService = require('../services/announcements');
@@ -60,49 +61,14 @@ function weightToGrade(weight) {
 // GET / — Home page
 // ---------------------------------------------------------------------------
 router.get('/', (req, res) => {
-  // Current meeting: prefer the nearest active (non-results) meeting,
+  // Current pick: prefer the nearest active (non-results) pick,
   // fall back to the most recent completed one
-  const currentMeeting = (
-    db.prepare(`
-      SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
-             b.publication_year, b.page_count, b.author_slug, b.title_slug,
-             b.description, b.subjects
-      FROM meetings m
-      JOIN books b ON b.id = m.winning_book_id
-      WHERE m.status != 'results'
-      ORDER BY m.month_year ASC
-      LIMIT 1
-    `).get()
-    ||
-    db.prepare(`
-      SELECT m.*, b.id AS book_id, b.title, b.author, b.cover_url, b.open_library_id,
-             b.publication_year, b.page_count, b.author_slug, b.title_slug,
-             b.description, b.subjects
-      FROM meetings m
-      JOIN books b ON b.id = m.winning_book_id
-      WHERE m.status = 'results'
-      ORDER BY m.month_year DESC
-      LIMIT 1
-    `).get()
-  );
+  const currentMeeting = picksService.getHero();
 
   // Last 6 finished books (skip the current one)
-  const recentBooks = db.prepare(`
-    SELECT m.month_year, m.status, b.id AS book_id, b.title, b.author,
-           b.cover_url, b.open_library_id, b.author_slug, b.title_slug,
-           (SELECT AVG(gw.weight) FROM reviews r2
-            JOIN grade_weights gw ON gw.grade = r2.grade
-            WHERE r2.book_id = b.id) AS avg_weight,
-           (SELECT COUNT(*) FROM reviews r3 WHERE r3.book_id = b.id) AS review_count
-    FROM meetings m
-    JOIN books b ON b.id = m.winning_book_id
-    WHERE m.status = 'results'
-    ${currentMeeting ? 'AND m.id != ?' : ''}
-    ORDER BY m.month_year DESC
-    LIMIT 6
-  `).all(...(currentMeeting ? [currentMeeting.id] : []));
+  const recentBooks = picksService.getRecentPicks(6, currentMeeting ? currentMeeting.id : null);
 
-  const totalBooks = db.prepare("SELECT COUNT(*) AS count FROM meetings WHERE status = 'results' AND winning_book_id IS NOT NULL").get().count;
+  const totalBooks = picksService.countCompleted();
 
   // Active participation meeting (nominations or voting) — may or may not have a book
   const activeMeeting = db.prepare(`
@@ -157,18 +123,7 @@ router.get('/', (req, res) => {
 // GET /history — All past books
 // ---------------------------------------------------------------------------
 router.get('/history', (req, res) => {
-  const books = db.prepare(`
-    SELECT m.month_year, m.status, b.id AS book_id, b.title, b.author,
-           b.cover_url, b.open_library_id, b.author_slug, b.title_slug,
-           (SELECT AVG(gw.weight) FROM reviews r2
-            JOIN grade_weights gw ON gw.grade = r2.grade
-            WHERE r2.book_id = b.id) AS avg_weight,
-           (SELECT COUNT(*) FROM reviews r3 WHERE r3.book_id = b.id) AS review_count
-    FROM meetings m
-    JOIN books b ON b.id = m.winning_book_id
-    WHERE m.status = 'results'
-    ORDER BY m.month_year DESC
-  `).all();
+  const books = picksService.getHistory();
 
   res.render('history', {
     pageTitle: 'History',
@@ -184,7 +139,7 @@ router.get('/history', (req, res) => {
 // GET /about — About the club
 // ---------------------------------------------------------------------------
 router.get('/about', (req, res) => {
-  const totalBooks = db.prepare("SELECT COUNT(*) AS count FROM meetings WHERE status = 'results' AND winning_book_id IS NOT NULL").get().count;
+  const totalBooks = picksService.countCompleted();
   const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
   const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
 
@@ -310,12 +265,11 @@ router.get('/members/:slug', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   let book = db.prepare(`
-    SELECT b.*, m.month_year, m.meeting_time, m.location_text,
-           m.meetup_event_url, m.status AS meeting_status
+    SELECT b.*, mp.month_year, mp.status AS meeting_status
     FROM books b
-    LEFT JOIN meetings m ON m.winning_book_id = b.id
+    LEFT JOIN monthly_picks mp ON mp.book_id = b.id
     WHERE b.author_slug = ? AND b.title_slug = ?
-    ORDER BY m.month_year DESC
+    ORDER BY mp.month_year DESC
     LIMIT 1
   `).get(req.params.authorSlug, req.params.titleSlug);
 
@@ -327,21 +281,46 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     });
   }
 
+  // Attach event data (meeting_time, location, meetup URL) from events table
+  const pick = picksService.getPickForBook(book.id);
+  if (pick) {
+    const pickRow = picksService.getByMonthYear(book.month_year);
+    if (pickRow) {
+      const event = picksService.getFirstEvent(pickRow.id);
+      if (event) {
+        book.meeting_time = event.meeting_time;
+        book.location_text = event.location_text;
+        book.meetup_event_url = event.meetup_event_url;
+      }
+    }
+  }
+
   // Lazy-enrich metadata if description is missing
   if (book.description == null) {
     try {
       const enriched = await enrichBookMetadata(book.id);
       if (enriched) {
-        // Re-fetch with meeting join to keep all fields
+        // Re-fetch with pick join to keep all fields
         book = db.prepare(`
-          SELECT b.*, m.month_year, m.meeting_time, m.location_text,
-                 m.meetup_event_url, m.status AS meeting_status
+          SELECT b.*, mp.month_year, mp.status AS meeting_status
           FROM books b
-          LEFT JOIN meetings m ON m.winning_book_id = b.id
+          LEFT JOIN monthly_picks mp ON mp.book_id = b.id
           WHERE b.id = ?
-          ORDER BY m.month_year DESC
+          ORDER BY mp.month_year DESC
           LIMIT 1
         `).get(book.id) || book;
+        // Re-attach event data
+        if (pick) {
+          const pickRow = picksService.getByMonthYear(book.month_year);
+          if (pickRow) {
+            const event = picksService.getFirstEvent(pickRow.id);
+            if (event) {
+              book.meeting_time = event.meeting_time;
+              book.location_text = event.location_text;
+              book.meetup_event_url = event.meetup_event_url;
+            }
+          }
+        }
       }
     } catch (err) {
       // Enrichment failure is non-fatal

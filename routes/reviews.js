@@ -16,11 +16,11 @@ function getCoverUrl(book) {
 }
 
 const lookupBook = db.prepare(`
-  SELECT b.*, m.month_year
+  SELECT b.*, mp.month_year
   FROM books b
-  LEFT JOIN meetings m ON m.winning_book_id = b.id
+  LEFT JOIN monthly_picks mp ON mp.book_id = b.id
   WHERE b.author_slug = ? AND b.title_slug = ?
-  ORDER BY m.month_year DESC
+  ORDER BY mp.month_year DESC
   LIMIT 1
 `);
 

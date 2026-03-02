@@ -41,6 +41,7 @@ function migrate() {
   // ---------------------------------------------------------------------------
   seedUserSlugs();
   seedMonthlyPicks();
+  seedPicksLifecycle();
 }
 
 /**
@@ -127,6 +128,94 @@ function seedMonthlyPicks() {
   })();
 
   console.log(`  [migrate] Backfilled ${rows.length} monthly pick(s).`);
+}
+
+/**
+ * Backfill lifecycle columns on monthly_picks from their linked meetings.
+ * Also creates events rows from meeting scheduling data.
+ * Idempotent — safe to run on every startup.
+ */
+function seedPicksLifecycle() {
+  // Guard: monthly_picks must have the new columns (migration 015)
+  const cols = db.prepare("PRAGMA table_info(monthly_picks)").all().map(c => c.name);
+  if (!cols.includes('nominations_open_at')) return;
+
+  // Guard: events table must exist
+  const tables = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='events'"
+  ).all();
+  if (tables.length === 0) return;
+
+  // --- 1. Copy lifecycle timestamps from meetings → monthly_picks ---
+  const picksNeedingTimestamps = db.prepare(`
+    SELECT mp.id AS pick_id,
+           m.nominations_open_at, m.nominations_close_at,
+           m.voting_open_at, m.voting_close_at,
+           m.vote_results_json
+    FROM monthly_picks mp
+    JOIN meetings m ON m.monthly_pick_id = mp.id
+    WHERE mp.nominations_open_at IS NULL
+      AND m.nominations_open_at IS NOT NULL
+  `).all();
+
+  if (picksNeedingTimestamps.length > 0) {
+    const updatePickTimestamps = db.prepare(`
+      UPDATE monthly_picks
+      SET nominations_open_at = ?,
+          nominations_close_at = ?,
+          voting_open_at = ?,
+          voting_close_at = ?,
+          vote_results_json = ?
+      WHERE id = ?
+    `);
+
+    db.transaction(() => {
+      for (const row of picksNeedingTimestamps) {
+        updatePickTimestamps.run(
+          row.nominations_open_at,
+          row.nominations_close_at,
+          row.voting_open_at,
+          row.voting_close_at,
+          row.vote_results_json,
+          row.pick_id
+        );
+      }
+    })();
+
+    console.log(`  [migrate] Backfilled timestamps for ${picksNeedingTimestamps.length} pick(s).`);
+  }
+
+  // --- 2. Create events from meetings that have scheduling data ---
+  const meetingsNeedingEvents = db.prepare(`
+    SELECT m.id AS meeting_id, m.monthly_pick_id,
+           m.meeting_time, m.location_text, m.meetup_event_url
+    FROM meetings m
+    WHERE m.monthly_pick_id IS NOT NULL
+      AND (m.meeting_time IS NOT NULL OR m.location_text IS NOT NULL OR m.meetup_event_url IS NOT NULL)
+      AND NOT EXISTS (
+        SELECT 1 FROM events e WHERE e.monthly_pick_id = m.monthly_pick_id
+      )
+  `).all();
+
+  if (meetingsNeedingEvents.length > 0) {
+    const insertEvent = db.prepare(`
+      INSERT INTO events (monthly_pick_id, meeting_time, location_text, meetup_event_url)
+      VALUES (?, ?, ?, ?)
+    `);
+
+    db.transaction(() => {
+      for (const m of meetingsNeedingEvents) {
+        insertEvent.run(
+          m.monthly_pick_id,
+          m.meeting_time,
+          m.location_text,
+          m.meetup_event_url
+        );
+      }
+    })();
+
+    console.log(`  [migrate] Created ${meetingsNeedingEvents.length} event(s) from meetings.`);
+  }
 }
 
 module.exports = migrate;

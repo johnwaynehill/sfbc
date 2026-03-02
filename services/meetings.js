@@ -154,7 +154,7 @@ const voteCountStmt = db.prepare(
   'SELECT COUNT(*) AS cnt FROM votes WHERE meeting_id = ?'
 );
 
-const countBooksStmt = db.prepare("SELECT COUNT(*) AS cnt FROM meetings WHERE status = 'results' AND winning_book_id IS NOT NULL");
+const countBooksStmt = db.prepare("SELECT COUNT(*) AS cnt FROM monthly_picks WHERE status = 'results'");
 const countMembersStmt = db.prepare("SELECT COUNT(*) AS cnt FROM users WHERE role = 'member'");
 const countReviewsStmt = db.prepare('SELECT COUNT(*) AS cnt FROM reviews');
 
