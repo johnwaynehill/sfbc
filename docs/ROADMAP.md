@@ -47,8 +47,8 @@ Almost every feature below benefits from this refactor. It should be done first,
 
 ### Security (prerequisite for all user-input features)
 
-- [ ] **Input sanitization** — Validate/sanitize emails, display names, reviews, and all future user inputs [M]
-- [ ] **Industry standard security measures** — CSP headers, rate limiting, etc. [M]
+- [✅] **Input sanitization** — Validate/sanitize emails, display names, reviews, and all future user inputs [M]
+- [✅] **Industry standard security measures** — CSP headers, rate limiting, etc. [M]
 
 ### Engagement (small, high-impact, ships fast)
 
@@ -69,15 +69,15 @@ Almost every feature below benefits from this refactor. It should be done first,
 
 ### Social
 
-- [ ] **Reply to reviews** — Members can have conversations about books [M]
-- [ ] **Activity feed on Home page** — Shows reviews, replies, reactions, nominations as they happen [L]
+- [✅] **Reply to reviews** — Members can have conversations about books [M]
+- [✅] **Activity feed on Home page** — Shows reviews, replies, reactions, nominations as they happen [L]
   - *Depends on: reactions and replies existing to populate the feed*
 - [ ] **User-submitted discussion questions** — Members contribute questions for the current book [Future] (not sure how much value this adds now)
 
 ### Reviews & Reading
 
-- [ ] **Streamline review page** — Lower friction to write reviews [M]
-- [ ] **Text formatting buttons** — Keep markdown underneath, add toolbar on top [M]
+- [✅] **Streamline review page** — Lower friction to write reviews [M]
+- [✅] **Text formatting buttons** — Keep markdown underneath, add toolbar on top [M]
 - [ ] **Reading status per member** — Mark books as Reading, Read, DNF, Did Not Read [Future] (not sure how much value this adds now)
   - Per-member tracking with stats on the book detail page
   - No defaults — explicit opt-in
@@ -91,16 +91,16 @@ Almost every feature below benefits from this refactor. It should be done first,
   - Close voting, select winner
   - Tie winner to next month's artifact
 - [ ] **Create meetings / link to Meetup.com** — Multiple meetings per monthly pick [M]
-- [ ] **Sort and filter reviews in Admin** — Search, sort by date/grade/book [M]
-- [ ] **Sort and filter users in Admin** — Search, sort by name/join date [M]
-- [ ] **Promote user to Admin** — Add promote/demote action on /admin/users [S]
-- [ ] **Link to profile from Admin users** — Quick link to member's public profile [S]
+- [✅] **Sort and filter reviews in Admin** — Search, sort by date/grade/book [M]
+- [✅] **Sort and filter users in Admin** — Search, sort by name/join date [M]
+- [✅] **Promote user to Admin** — Add promote/demote action on /admin/users [S]
+- [✅] **Link to profile from Admin users** — Quick link to member's public profile [S]
 - [ ] **Preserve vote results as archive** — Keep past vote tallies accessible, not just the winner [M]
 - [ ] **Prevent past nominations from interfering with winner URLs** — Ensure canonical slugs for winning books aren't affected by prior nomination data [S]
 - [✅] **Block nominations for already-read books** — Prevent re-nomination with a gentle, warm message explaining the book was already read [S]
-- [ ] **Live SSE for admin meeting detail** — Nominations appear in real-time on the admin meeting page as they come in [M]
+- [✅] **Live SSE for admin meeting detail** — Nominations appear in real-time on the admin meeting page as they come in [M]
 - [ ] **Voting page UX overhaul** — Reduce card height (nominated-by + rationale make cards too big), rethink rank number placement, top-align cover with title; reference strawpoll.com for inspiration [M]
-- [ ] **Admin form field icons — dark mode contrast** — Invert or brighten icons inside admin form fields so they're visible in dark mode [S]
+- [✅] **Admin form field icons — dark mode contrast** — Invert or brighten icons inside admin form fields so they're visible in dark mode [S]
 
 ---
 
@@ -215,10 +215,23 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **@ Mentions**
   - Add ability to "@" mention another user
 - [ ] Add pagination to Admin/Reviews, Admin/Meetings, and Admin/Users
+- [ ] Make sure Nominations are limited to one per user for each Nomination cycle (unique nomination)
+- [ ] 
 
 ---
 
 ## Parked Ideas
+
+### Social
+- [ ] **Custom Emoji**
+  - Ability for each club to add Custom Emoji
+  - Sent to Admins to approve
+
+### Safety
+I need to consider safety of users on this platform, much like any social platform. Since most clubs will meet in person, safety issues are not nearly as likely. But, it's still important.
+- [ ] Allow users to block another user; per club
+  - User A who Blocks User B will not see User B's Reviews, Replies, Profile. User A will still see any Nominations from User B.
+  - User B who is blocked by User A will not see User A's Profile (should this also include Reviews and Replies?)
 
 ### Quotes
 
@@ -243,6 +256,12 @@ Reward members for showing up, contributing, and engaging:
   - Pester 'em (nominating the same book repeatedly without it winning)
   - Kingmaker (nominations that get selected)
 
+### Analytics
+- [ ] Admins can see last login time/date for users
+- [ ] Add some sort of Visitor stats (Google Analytics or something else, keep lightweight, Research first)
+- [ ] Add # of Members/Users to the "About the club" section on Home, and to the About page itself
+- [ ] 
+
 ### Integrations
 - [ ] **StoryGraph integration** [XL]
   - Possible community API: [python api](https://github.com/ym496/storygraph-api)
@@ -265,9 +284,9 @@ Good ideas that don't justify the effort right now:
 ## Page-Specific Updates
 
 ### Home Page
-- [ ] Announcements section (admin-published) — Phase 1
-- [ ] Live status updates — Nominations open, Voting open, and Announcements update live as meeting status changes (SSE) — Phase 2
-- [ ] Activity feed (reviews, replies, reactions, nominations) — Phase 2
+- [✅] Announcements section (admin-published) — Phase 1
+- [✅] Live status updates — Nominations open, Voting open, and Announcements update live as meeting status changes (SSE) — Phase 2
+- [✅] Activity feed (reviews, replies, reactions, nominations) — Phase 2
 - [ ] Random quotes from past books — Phase 3
 - [ ] Meetup.com rating in About section (cached 7 days) — Phase 4
 
