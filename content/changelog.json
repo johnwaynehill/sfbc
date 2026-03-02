@@ -1,5 +1,38 @@
 [
   {
+    "version": "0.6",
+    "date": "2026-03-01",
+    "title": "Live Activity Feed & Review Upgrades",
+    "intro": "The home page is alive now \u2014 you can see what everyone\u2019s been up to in real time, and writing reviews just got a whole lot nicer.",
+    "entries": [
+      {
+        "icon": "book",
+        "text": "Live activity feed on the home page \u2014 see reviews, replies, reactions, and nominations as they happen. No refresh needed."
+      },
+      {
+        "icon": "magic",
+        "text": "Reply to reviews \u2014 start conversations under any review. Edit or delete your own replies anytime."
+      },
+      {
+        "icon": "user",
+        "text": "Review writing upgrades \u2014 auto-save drafts so you never lose your work, live markdown preview, formatting toolbar (bold, italic, lists, quotes, spoiler tags, links), and a character counter."
+      },
+      {
+        "icon": "calendar",
+        "text": "Grade distribution strip on book pages \u2014 a color gradient showing how the club rated each book at a glance, with the average grade marked."
+      },
+      {
+        "icon": "qr",
+        "text": "Live announcements \u2014 club news now appears instantly on the home page when an admin posts, updates, or removes an announcement."
+      },
+      {
+        "icon": "moon",
+        "text": "Admin improvements \u2014 search and sort reviews and users, promote or demote members, live nomination tracking on meeting pages, and better dark mode throughout."
+      }
+    ],
+    "outro": "Up next: voting page improvements, a live nominations page, and a streamlined meeting management flow for admins."
+  },
+  {
     "version": "0.5",
     "date": "2026-02-28",
     "title": "Reactions, Announcements & More",
