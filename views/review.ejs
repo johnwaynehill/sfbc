@@ -22,7 +22,8 @@
   <!-- Review form -->
   <form id="review-form" class="review-form" method="POST"
         action="/api/books/<%= book.id %>/reviews"
-        data-book-path="<%= bookPath(book.title, book.author) %>">
+        data-book-path="<%= bookPath(book.title, book.author) %>"
+        data-book-id="<%= book.id %>">
     <% if (review) { %>
       <input type="hidden" name="_method" value="PUT">
     <% } %>
@@ -54,17 +55,62 @@
       </div>
     </div>
 
+    <!-- Review section (optional) -->
     <div class="form-label">
       <div style="display:flex;align-items:baseline;gap:var(--s-2);">
         <span>Review</span>
         <span class="text-secondary" style="font-weight:400;font-size:var(--t-xs);">optional</span>
       </div>
-      <textarea name="body" id="review-body" class="form-textarea" rows="8"
-                placeholder="What did you think of this book?"><%= review ? review.body_markdown : '' %></textarea>
     </div>
-    <p class="formatting-hint">
-      Markdown: <code>**bold**</code> <code>*italic*</code> <code>- list</code> <code>> quote</code> <code>||spoiler||</code>
-    </p>
+
+    <div id="review-editor">
+      <!-- Markdown toolbar -->
+      <div class="md-toolbar" id="md-toolbar">
+        <button type="button" class="md-toolbar__btn" data-action="bold" title="Bold (**text**)">
+          <strong>B</strong>
+        </button>
+        <button type="button" class="md-toolbar__btn" data-action="italic" title="Italic (*text*)">
+          <em>I</em>
+        </button>
+        <button type="button" class="md-toolbar__btn" data-action="list" title="Bulleted list (- item)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </button>
+        <button type="button" class="md-toolbar__btn" data-action="quote" title="Blockquote (> text)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="3" y1="6" x2="3" y2="18"/>
+            <line x1="7" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="15" y2="14"/>
+          </svg>
+        </button>
+        <button type="button" class="md-toolbar__btn" data-action="spoiler" title="Spoiler (||text||)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+        <button type="button" class="md-toolbar__btn" data-action="link" title="Link ([text](url))">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </button>
+        <span class="md-toolbar__spacer"></span>
+        <button type="button" class="md-toolbar__btn md-toolbar__btn--preview" data-action="preview" id="toolbar-preview" title="Toggle preview">
+          Preview
+        </button>
+      </div>
+
+      <!-- Textarea + Preview pane -->
+      <textarea name="body" id="review-body" class="form-textarea form-textarea--toolbar" rows="8"
+                placeholder="What did you think of this book?"><%= review ? review.body_markdown : '' %></textarea>
+      <div class="review-preview" id="review-preview" hidden></div>
+
+      <!-- Character count -->
+      <div class="char-count" id="char-count">0 / 10,000</div>
+    </div>
 
     <label class="spoiler-checkbox">
       <input type="checkbox" name="has_spoilers" id="has-spoilers" value="1"
@@ -83,160 +129,4 @@
   </form>
 </section>
 
-<script>
-(function () {
-  'use strict';
-
-  var form = document.getElementById('review-form');
-  if (!form) return;
-
-  // ---- Grade Picker (pill strip) ----
-  var gradeInput = document.getElementById('grade-input');
-  var display = document.getElementById('grade-display');
-  var strip = document.getElementById('grade-strip');
-
-  var TIER_COLORS = {
-    f:  { bg: 'linear-gradient(135deg, #FEF2F2, #FECACA)', text: '#991B1B', border: '#FECACA', darkBg: 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08))', darkText: '#f87171', darkBorder: 'rgba(239,68,68,0.3)' },
-    d:  { bg: 'linear-gradient(135deg, #FFF7ED, #FED7AA)', text: '#9A3412', border: '#FED7AA', darkBg: 'linear-gradient(135deg, rgba(249,115,22,0.18), rgba(249,115,22,0.08))', darkText: '#fb923c', darkBorder: 'rgba(249,115,22,0.3)' },
-    c:  { bg: 'linear-gradient(135deg, #F5F5F4, #E7E5E4)', text: '#57534E', border: '#D6D3D1', darkBg: 'linear-gradient(135deg, rgba(168,162,158,0.15), rgba(168,162,158,0.06))', darkText: '#a8a29e', darkBorder: 'rgba(168,162,158,0.3)' },
-    b:  { bg: 'linear-gradient(135deg, #EFF6FF, #BFDBFE)', text: '#1E3A5F', border: '#93C5FD', darkBg: 'linear-gradient(135deg, rgba(59,130,246,0.18), rgba(59,130,246,0.08))', darkText: '#60a5fa', darkBorder: 'rgba(59,130,246,0.3)' },
-    a:  { bg: 'linear-gradient(135deg, #ECFDF5, #A7F3D0)', text: '#065F46', border: '#6EE7B7', darkBg: 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08))', darkText: '#4ade80', darkBorder: 'rgba(34,197,94,0.3)' },
-    s:  { bg: 'linear-gradient(135deg, #FEF3C7, #FDE68A, #FCD34D)', text: '#78350F', border: '#FCD34D', darkBg: 'linear-gradient(135deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08))', darkText: '#fbbf24', darkBorder: 'rgba(245,158,11,0.35)' },
-  };
-
-  function getTier(grade) {
-    if (!grade) return null;
-    return grade.charAt(0).toLowerCase();
-  }
-
-  function isDark() {
-    var theme = document.documentElement.getAttribute('data-theme');
-    if (theme === 'dark') return true;
-    if (theme === 'light') return false;
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-
-  function updateDisplay(grade) {
-    var tier = getTier(grade);
-    var colors = tier ? TIER_COLORS[tier] : null;
-    var dark = isDark();
-
-    display.textContent = grade || '—';
-
-    if (colors) {
-      display.style.background = dark ? colors.darkBg : colors.bg;
-      display.style.color = dark ? colors.darkText : colors.text;
-      display.style.boxShadow = tier === 's'
-        ? (dark ? '0 2px 12px rgba(245,158,11,0.15)' : '0 2px 12px rgba(245,158,11,0.2)')
-        : 'none';
-    } else {
-      display.style.background = 'var(--surface)';
-      display.style.color = 'var(--text3)';
-      display.style.boxShadow = 'none';
-    }
-  }
-
-  function selectGrade(grade) {
-    hasInteracted = true;
-    gradeInput.value = grade;
-    updateDisplay(grade);
-
-    var dark = isDark();
-    var pills = strip.querySelectorAll('.grade-pill');
-    for (var i = 0; i < pills.length; i++) {
-      var pill = pills[i];
-      var g = pill.getAttribute('data-grade');
-      var isSelected = g === grade;
-      pill.classList.toggle('is-selected', isSelected);
-
-      if (isSelected) {
-        var colors = TIER_COLORS[getTier(g)];
-        pill.style.background = dark ? colors.darkBg : colors.bg;
-        pill.style.color = dark ? colors.darkText : colors.text;
-        pill.style.borderColor = dark ? colors.darkBorder : colors.border;
-      } else {
-        pill.style.background = '';
-        pill.style.color = '';
-        pill.style.borderColor = '';
-      }
-    }
-  }
-
-  // Event listener — single delegated click on the strip
-  strip.addEventListener('click', function (e) {
-    var pill = e.target.closest('.grade-pill');
-    if (!pill) return;
-    selectGrade(pill.getAttribute('data-grade'));
-    // Scroll selected pill into center view
-    pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  });
-
-  // Edit mode: pre-select existing grade
-  var existingGrade = gradeInput.value;
-  var hasInteracted = !!existingGrade;
-
-  if (existingGrade) {
-    selectGrade(existingGrade);
-    // Scroll to selected pill after render
-    var sel = strip.querySelector('.grade-pill.is-selected');
-    if (sel) setTimeout(function () { sel.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 50);
-  } else {
-    updateDisplay(null);
-  }
-
-  // ---- Form Submission ----
-  var submitBtn = document.getElementById('review-submit');
-  var messageEl = document.getElementById('review-message');
-  var methodField = form.querySelector('[name="_method"]');
-  var isPut = methodField && methodField.value === 'PUT';
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    if (!hasInteracted || !gradeInput.value) {
-      messageEl.hidden = false;
-      messageEl.className = 'nom-message nom-message--error';
-      messageEl.textContent = 'Please select a grade.';
-      return;
-    }
-
-    var grade = gradeInput.value;
-    var body = form.querySelector('[name="body"]').value.trim();
-    var hasSpoilers = document.getElementById('has-spoilers').checked;
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = isPut ? 'Updating\u2026' : 'Submitting\u2026';
-
-    try {
-      var action = form.getAttribute('action');
-      var res = await fetch(action, {
-        method: isPut ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ grade: grade, body: body, has_spoilers: hasSpoilers }),
-      });
-
-      var data = await res.json();
-
-      if (res.ok && data.success) {
-        var bookPath = form.dataset.bookPath;
-        window.location.href = bookPath;
-        return;
-      }
-
-      messageEl.hidden = false;
-      messageEl.className = 'nom-message nom-message--error';
-      messageEl.textContent = data.error || 'Something went wrong.';
-    } catch (err) {
-      messageEl.hidden = false;
-      messageEl.className = 'nom-message nom-message--error';
-      messageEl.textContent = 'Network error. Please try again.';
-    }
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = isPut ? 'Update Review' : 'Submit Review';
-  });
-})();
-</script>
+<script src="/js/review-form.js" defer></script>

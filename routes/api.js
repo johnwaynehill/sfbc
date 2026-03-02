@@ -28,6 +28,7 @@ const {
   meetingStatusChain,
   announcementChain,
   emojiChain,
+  sanitizeTextChain,
 } = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
@@ -522,6 +523,7 @@ router.delete('/admin/announcements/:id', requireAdmin, (req, res) => {
 // ---------------------------------------------------------------------------
 const reviewsService = require('../services/reviews');
 const reactionsService = require('../services/reactions');
+const repliesService = require('../services/replies');
 
 // ---------------------------------------------------------------------------
 // Toggle emoji reaction on a review
@@ -604,6 +606,81 @@ router.delete('/books/:bookId/reviews', requireMember, (req, res) => {
   }
 
   reviewsService.deleteByBookAndUser(bookId, req.user.id);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// Review Replies — flat replies under reviews
+// POST   /api/reviews/:reviewId/replies       → create
+// PUT    /api/replies/:replyId                 → update (author only)
+// DELETE /api/replies/:replyId                 → delete (author only)
+// ---------------------------------------------------------------------------
+
+const replyChain = sanitizeTextChain('body', {
+  max: 2000,
+  required: true,
+  label: 'Reply',
+});
+
+router.post('/reviews/:reviewId/replies', requireMember, ...replyChain, handleValidationErrors, (req, res) => {
+  const reviewId = parseInt(req.params.reviewId, 10);
+  if (isNaN(reviewId)) return res.status(400).json({ error: 'Invalid review ID.' });
+
+  // Verify the review exists
+  const review = db.prepare('SELECT id FROM reviews WHERE id = ?').get(reviewId);
+  if (!review) return res.status(404).json({ error: 'Review not found.' });
+
+  const replyBody = req.body.body;
+  const newId = repliesService.create(reviewId, req.user.id, replyBody);
+
+  // Return the newly created reply so the client can render it immediately
+  const reply = repliesService.getById(newId);
+  res.status(201).json({
+    success: true,
+    reply: {
+      id: reply.id,
+      review_id: reply.review_id,
+      user_id: reply.user_id,
+      body_markdown: reply.body_markdown,
+      created_at: reply.created_at,
+      updated_at: reply.updated_at,
+      display_name: req.user.display_name,
+      avatar_style: req.user.avatar_style,
+      user_slug: req.user.user_slug,
+      email: req.user.email,
+    },
+  });
+});
+
+router.put('/replies/:replyId', requireMember, ...replyChain, handleValidationErrors, (req, res) => {
+  const replyId = parseInt(req.params.replyId, 10);
+  if (isNaN(replyId)) return res.status(400).json({ error: 'Invalid reply ID.' });
+
+  const reply = repliesService.getById(replyId);
+  if (!reply) return res.status(404).json({ error: 'Reply not found.' });
+
+  // Only the author can edit
+  if (reply.user_id !== req.user.id) {
+    return res.status(403).json({ error: 'You can only edit your own replies.' });
+  }
+
+  repliesService.update(replyId, req.body.body);
+  res.json({ success: true });
+});
+
+router.delete('/replies/:replyId', requireMember, (req, res) => {
+  const replyId = parseInt(req.params.replyId, 10);
+  if (isNaN(replyId)) return res.status(400).json({ error: 'Invalid reply ID.' });
+
+  const reply = repliesService.getById(replyId);
+  if (!reply) return res.status(404).json({ error: 'Reply not found.' });
+
+  // Only the author can delete
+  if (reply.user_id !== req.user.id) {
+    return res.status(403).json({ error: 'You can only delete your own replies.' });
+  }
+
+  repliesService.remove(replyId);
   res.json({ success: true });
 });
 

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade Distribution Strip — Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ivory:      #FAF8F4;
+      --pebble:     #EAE7E2;
+      --pebble-dark:#D5D1CB;
+      --ink:        #1C1917;
+      --ink2:       #44403C;
+      --ink3:       #78716C;
+      --ink4:       #A8A29E;
+
+      /* tier palette — same as app */
+      --c-f:   #EF4444;
+      --c-d:   #F97316;
+      --c-c:   #78716C;
+      --c-b:   #3B82F6;
+      --c-a:   #22C55E;
+      --c-s:   #F59E0B;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--ivory);
+      color: var(--ink);
+      padding: 64px 40px 100px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── Page header ────────────────────────────────────────────────── */
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .page-sub {
+      font-size: 13px;
+      color: var(--ink3);
+      margin-bottom: 56px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── Variation block ────────────────────────────────────────────── */
+    .variation {
+      margin-bottom: 52px;
+    }
+    .variation-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .variation-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--pebble);
+      padding: 3px 9px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+    .variation-desc {
+      font-size: 13px;
+      color: var(--ink3);
+    }
+
+    /* ── The component ──────────────────────────────────────────────── */
+    .grade-dist {
+      background: #fff;
+      border: 1px solid var(--pebble-dark);
+      border-radius: 12px;
+      padding: 20px 22px 16px;
+    }
+
+    .grade-dist__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .grade-dist__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: -0.2px;
+      color: var(--ink);
+    }
+    .grade-dist__right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .grade-dist__avg-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 5px;
+      letter-spacing: 0.02em;
+    }
+    .grade-dist__avg-badge--b { background: rgba(59,130,246,0.12); color: #1D4ED8; }
+    .grade-dist__avg-badge--a { background: rgba(34,197,94,0.12);  color: #15803D; }
+    .grade-dist__avg-badge--c { background: rgba(120,113,108,0.12); color: #57534E; }
+
+    .grade-dist__count {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    /* ── Strip ──────────────────────────────────────────────────────── */
+    .grade-dist__strip-wrap {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .grade-dist__strip {
+      height: 52px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow:
+        inset 0 2px 8px rgba(0,0,0,0.07),
+        inset 0 -1px 3px rgba(255,255,255,0.6),
+        0 1px 3px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      /* develop animation */
+      animation: develop 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* grain overlay — tactile print feel */
+    .grade-dist__strip::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      border-radius: 8px;
+    }
+
+    /* average-grade tick mark */
+    .grade-dist__tick {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 2px;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+    .grade-dist__tick::before {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(0,0,0,0.15);
+    }
+
+    /* ── Axis ───────────────────────────────────────────────────────── */
+    .grade-dist__axis {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+    .grade-dist__axis span {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink4);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .grade-dist__axis span.active {
+      color: var(--ink2);
+      font-weight: 500;
+    }
+
+    /* ── Develop animation ──────────────────────────────────────────── */
+    @keyframes develop {
+      0%   { filter: saturate(0) brightness(1.08); opacity: 0.5; }
+      40%  { filter: saturate(0.3) brightness(1.04); opacity: 0.8; }
+      100% { filter: saturate(1) brightness(1); opacity: 1; }
+    }
+
+    /* stagger animations for each variation */
+    .variation:nth-child(2) .grade-dist__strip { animation-delay: 0ms;   }
+    .variation:nth-child(3) .grade-dist__strip { animation-delay: 120ms; }
+    .variation:nth-child(4) .grade-dist__strip { animation-delay: 240ms; }
+    .variation:nth-child(5) .grade-dist__strip { animation-delay: 360ms; }
+    .variation:nth-child(6) .grade-dist__strip { animation-delay: 480ms; }
+
+    /* ── Divider ─────────────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--pebble);
+      margin: 56px 0;
+    }
+
+    /* ── Code section ───────────────────────────────────────────────── */
+    .code-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    pre {
+      background: #1C1917;
+      color: #E7E5E4;
+      padding: 20px 22px;
+      border-radius: 10px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .kw  { color: #F59E0B; }
+    .fn  { color: #22C55E; }
+    .str { color: #86EFAC; }
+    .cm  { color: #57534E; }
+    .num { color: #93C5FD; }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Grade Distribution Strip</h1>
+  <p class="page-sub">linear-gradient() • 5 review-count variations</p>
+
+  <!-- ── Variation 1: 1 review ──────────────────────────────────── -->
+  <div class="variation">
+    <div class="variation-meta">
+      <span class="variation-count">1 review</span>
+      <span class="variation-desc">Single opinion. Soft glow marks where it landed.</span>
+    </div>
+    <div class="grade-dist">
+      <div class="grade-dist__header">
+        <span class="grade-dist__title">Grade Distribution</span>
+        <div class="grade-dist__right">
+          <span class="grade-dist__avg-badge grade-dist__avg-badge--a">A</span>
+          <span class="grade-dist__count">1 review</span>
+        </div>
+      </div>
+      <div class="grade-dist__strip-wrap">
+        <div class="grade-dist__strip" id="strip-1"></div>
+        <div class="grade-dist__tick" id="tick-1"></div>
+      </div>
+      <div class="grade-dist__axis">
+        <span>F</span><span>D</span><span>C</span><span>B</span><span class="active">A</span><span>S</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Variation 2: 3 reviews ─────────────────────────────────── -->
+  <div class="variation">
+    <div class="variation-meta">
+      <span class="variation-count">3 reviews</span>
+      <span class="variation-desc">Tight cluster. Group is largely in agreement.</span>
+    </div>
+    <div class="grade-dist">
+      <div class="grade-dist__header">
+        <span class="grade-dist__title">Grade Distribution</span>
+        <div class="grade-dist__right">
+          <span class="grade-dist__avg-badge grade-dist__avg-badge--b">B+</span>
+          <span class="grade-dist__count">3 reviews</span>
+        </div>
+      </div>
+      <div class="grade-dist__strip-wrap">
+        <div class="grade-dist__strip" id="strip-2"></div>
+        <div class="grade-dist__tick" id="tick-2"></div>
+      </div>
+      <div class="grade-dist__axis">
+        <span>F</span><span>D</span><span>C</span><span class="active">B</span><span>A</span><span>S</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Variation 3: 7 reviews ─────────────────────────────────── -->
+  <div class="variation">
+    <div class="variation-meta">
+      <span class="variation-count">7 reviews</span>
+      <span class="variation-desc">Pattern emerging. Blue-to-green shift is legible.</span>
+    </div>
+    <div class="grade-dist">
+      <div class="grade-dist__header">
+        <span class="grade-dist__title">Grade Distribution</span>
+        <div class="grade-dist__right">
+          <span class="grade-dist__avg-badge grade-dist__avg-badge--b">B+</span>
+          <span class="grade-dist__count">7 reviews</span>
+        </div>
+      </div>
+      <div class="grade-dist__strip-wrap">
+        <div class="grade-dist__strip" id="strip-3"></div>
+        <div class="grade-dist__tick" id="tick-3"></div>
+      </div>
+      <div class="grade-dist__axis">
+        <span>F</span><span>D</span><span class="active">C</span><span class="active">B</span><span class="active">A</span><span>S</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Variation 4: 15 reviews ────────────────────────────────── -->
+  <div class="variation">
+    <div class="variation-meta">
+      <span class="variation-count">15 reviews</span>
+      <span class="variation-desc">Clear peak at B+. Tail bleeds warmly into A.</span>
+    </div>
+    <div class="grade-dist">
+      <div class="grade-dist__header">
+        <span class="grade-dist__title">Grade Distribution</span>
+        <div class="grade-dist__right">
+          <span class="grade-dist__avg-badge grade-dist__avg-badge--b">B+</span>
+          <span class="grade-dist__count">15 reviews</span>
+        </div>
+      </div>
+      <div class="grade-dist__strip-wrap">
+        <div class="grade-dist__strip" id="strip-4"></div>
+        <div class="grade-dist__tick" id="tick-4"></div>
+      </div>
+      <div class="grade-dist__axis">
+        <span>F</span><span>D</span><span class="active">C</span><span class="active">B</span><span class="active">A</span><span>S</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Variation 5: 40 reviews ────────────────────────────────── -->
+  <div class="variation">
+    <div class="variation-meta">
+      <span class="variation-count">40 reviews</span>
+      <span class="variation-desc">Rich bimodal split. B+ and A- camps visible.</span>
+    </div>
+    <div class="grade-dist">
+      <div class="grade-dist__header">
+        <span class="grade-dist__title">Grade Distribution</span>
+        <div class="grade-dist__right">
+          <span class="grade-dist__avg-badge grade-dist__avg-badge--b">B+</span>
+          <span class="grade-dist__count">40 reviews</span>
+        </div>
+      </div>
+      <div class="grade-dist__strip-wrap">
+        <div class="grade-dist__strip" id="strip-5"></div>
+        <div class="grade-dist__tick" id="tick-5"></div>
+      </div>
+      <div class="grade-dist__axis">
+        <span>F</span><span>D</span><span class="active">C</span><span class="active">B</span><span class="active">A</span><span>S</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── Helper function (EJS-ready) ────────────────────────────── -->
+  <p class="code-label">Helper — drop into utils/ or inline in EJS</p>
+  <pre><code><span class="cm">// gradeDistribution = [{ grade, count, pct }, ...]</span>
+<span class="kw">function</span> <span class="fn">buildGradeGradient</span>(gradeDistribution) {
+  <span class="kw">const</span> GRADES = [
+    <span class="str">'F'</span>,<span class="str">'D-'</span>,<span class="str">'D'</span>,<span class="str">'D+'</span>,<span class="str">'C-'</span>,<span class="str">'C'</span>,<span class="str">'C+'</span>,
+    <span class="str">'B-'</span>,<span class="str">'B'</span>,<span class="str">'B+'</span>,<span class="str">'A-'</span>,<span class="str">'A'</span>,<span class="str">'A+'</span>,<span class="str">'S'</span>
+  ];
+  <span class="kw">const</span> COLORS = {
+    <span class="str">'F'</span>:  [<span class="num">239</span>,<span class="num">68</span>,<span class="num">68</span>],   <span class="cm">// red</span>
+    <span class="str">'D-'</span>:[<span class="num">249</span>,<span class="num">115</span>,<span class="num">22</span>], <span class="cm">// orange</span>
+    <span class="str">'D'</span>: [<span class="num">249</span>,<span class="num">115</span>,<span class="num">22</span>],
+    <span class="str">'D+'</span>:[<span class="num">249</span>,<span class="num">115</span>,<span class="num">22</span>],
+    <span class="str">'C-'</span>:[<span class="num">120</span>,<span class="num">113</span>,<span class="num">108</span>], <span class="cm">// warm stone</span>
+    <span class="str">'C'</span>: [<span class="num">120</span>,<span class="num">113</span>,<span class="num">108</span>],
+    <span class="str">'C+'</span>:[<span class="num">120</span>,<span class="num">113</span>,<span class="num">108</span>],
+    <span class="str">'B-'</span>:[<span class="num">59</span>,<span class="num">130</span>,<span class="num">246</span>],  <span class="cm">// blue</span>
+    <span class="str">'B'</span>: [<span class="num">59</span>,<span class="num">130</span>,<span class="num">246</span>],
+    <span class="str">'B+'</span>:[<span class="num">59</span>,<span class="num">130</span>,<span class="num">246</span>],
+    <span class="str">'A-'</span>:[<span class="num">34</span>,<span class="num">197</span>,<span class="num">94</span>],   <span class="cm">// green</span>
+    <span class="str">'A'</span>: [<span class="num">34</span>,<span class="num">197</span>,<span class="num">94</span>],
+    <span class="str">'A+'</span>:[<span class="num">34</span>,<span class="num">197</span>,<span class="num">94</span>],
+    <span class="str">'S'</span>: [<span class="num">245</span>,<span class="num">158</span>,<span class="num">11</span>],  <span class="cm">// gold</span>
+  };
+  <span class="cm">// Warm pebble base — blended toward for empty grades</span>
+  <span class="kw">const</span> BASE = [<span class="num">228</span>,<span class="num">224</span>,<span class="num">218</span>];
+
+  <span class="kw">const</span> counts = <span class="kw">new</span> Map(gradeDistribution.map(r => [r.grade, r.count]));
+  <span class="kw">const</span> maxCount = Math.max(<span class="num">0</span>, ...[...counts.values()]);
+  <span class="kw">if</span> (maxCount === <span class="num">0</span>) <span class="kw">return</span> <span class="str">`rgb(${BASE.join(',')})`</span>;
+
+  <span class="kw">const</span> stops = GRADES.map((g, i) => {
+    <span class="kw">const</span> pct  = ((i / (GRADES.length - <span class="num">1</span>)) * <span class="num">100</span>).toFixed(<span class="num">2</span>);
+    <span class="kw">const</span> t    = (counts.get(g) ?? <span class="num">0</span>) / maxCount; <span class="cm">// 0–1</span>
+    <span class="kw">const</span> [cr,cg,cb] = COLORS[g];
+    <span class="kw">const</span> r = Math.round(BASE[<span class="num">0</span>] + (cr - BASE[<span class="num">0</span>]) * t);
+    <span class="kw">const</span> g_ = Math.round(BASE[<span class="num">1</span>] + (cg - BASE[<span class="num">1</span>]) * t);
+    <span class="kw">const</span> b = Math.round(BASE[<span class="num">2</span>] + (cb - BASE[<span class="num">2</span>]) * t);
+    <span class="kw">return</span> <span class="str">`rgb(${r},${g_},${b}) ${pct}%`</span>;
+  });
+
+  <span class="kw">return</span> <span class="str">`linear-gradient(to right, ${stops.join(', ')})`</span>;
+}
+
+<span class="cm">// Returns 0–100 — use as `left` % on the tick element</span>
+<span class="kw">function</span> <span class="fn">gradeToPercent</span>(grade) {
+  <span class="kw">const</span> GRADES = [<span class="str">'F'</span>,<span class="str">'D-'</span>,<span class="str">'D'</span>,<span class="str">'D+'</span>,<span class="str">'C-'</span>,<span class="str">'C'</span>,<span class="str">'C+'</span>,
+                   <span class="str">'B-'</span>,<span class="str">'B'</span>,<span class="str">'B+'</span>,<span class="str">'A-'</span>,<span class="str">'A'</span>,<span class="str">'A+'</span>,<span class="str">'S'</span>];
+  <span class="kw">const</span> i = GRADES.indexOf(grade);
+  <span class="kw">return</span> i &lt; <span class="num">0</span> ? <span class="num">50</span> : +((i / (GRADES.length - <span class="num">1</span>)) * <span class="num">100</span>).toFixed(<span class="num">2</span>);
+}</code></pre>
+
+  <script>
+    // ── Same helper, client-side for preview ────────────────────────
+    const GRADES = ['F','D-','D','D+','C-','C','C+','B-','B','B+','A-','A','A+','S'];
+    const COLORS = {
+      'F':  [239,68,68],
+      'D-': [249,115,22], 'D': [249,115,22], 'D+': [249,115,22],
+      'C-': [120,113,108], 'C': [120,113,108], 'C+': [120,113,108],
+      'B-': [59,130,246],  'B': [59,130,246],  'B+': [59,130,246],
+      'A-': [34,197,94],   'A': [34,197,94],   'A+': [34,197,94],
+      'S':  [245,158,11],
+    };
+    const BASE = [228, 224, 218];
+
+    function buildGradient(dist) {
+      const counts = new Map(dist.map(r => [r.grade, r.count]));
+      const maxCount = Math.max(0, ...[...counts.values()]);
+      if (maxCount === 0) return `rgb(${BASE.join(',')})`;
+      const stops = GRADES.map((g, i) => {
+        const pct  = ((i / (GRADES.length - 1)) * 100).toFixed(2);
+        const t    = (counts.get(g) ?? 0) / maxCount;
+        const [cr,cg,cb] = COLORS[g];
+        const r  = Math.round(BASE[0] + (cr - BASE[0]) * t);
+        const g_ = Math.round(BASE[1] + (cg - BASE[1]) * t);
+        const b  = Math.round(BASE[2] + (cb - BASE[2]) * t);
+        return `rgb(${r},${g_},${b}) ${pct}%`;
+      });
+      return `linear-gradient(to right, ${stops.join(', ')})`;
+    }
+
+    function gradeToPercent(grade) {
+      const i = GRADES.indexOf(grade);
+      return i < 0 ? 50 : +((i / (GRADES.length - 1)) * 100).toFixed(2);
+    }
+
+    function applyStrip(stripId, tickId, dist, avgGrade) {
+      const strip = document.getElementById(stripId);
+      const tick  = document.getElementById(tickId);
+      if (strip) strip.style.background = buildGradient(dist);
+      if (tick)  tick.style.left = gradeToPercent(avgGrade) + '%';
+    }
+
+    // ── Variation datasets ────────────────────────────────────────
+    // 1 review: A
+    applyStrip('strip-1', 'tick-1', [
+      { grade: 'A', count: 1 }
+    ], 'A');
+
+    // 3 reviews: B+×2, A-×1
+    applyStrip('strip-2', 'tick-2', [
+      { grade: 'B+', count: 2 },
+      { grade: 'A-', count: 1 }
+    ], 'B+');
+
+    // 7 reviews: C+(1), B(1), B+(2), A-(2), A(1)
+    applyStrip('strip-3', 'tick-3', [
+      { grade: 'C+', count: 1 },
+      { grade: 'B',  count: 1 },
+      { grade: 'B+', count: 2 },
+      { grade: 'A-', count: 2 },
+      { grade: 'A',  count: 1 }
+    ], 'B+');
+
+    // 15 reviews: C(1), B(2), B+(5), A-(4), A(3)
+    applyStrip('strip-4', 'tick-4', [
+      { grade: 'C',  count: 1 },
+      { grade: 'B',  count: 2 },
+      { grade: 'B+', count: 5 },
+      { grade: 'A-', count: 4 },
+      { grade: 'A',  count: 3 }
+    ], 'B+');
+
+    // 40 reviews: C+(2), B-(3), B(6), B+(10), A-(9), A(7), A+(3)
+    applyStrip('strip-5', 'tick-5', [
+      { grade: 'C+', count: 2 },
+      { grade: 'B-', count: 3 },
+      { grade: 'B',  count: 6 },
+      { grade: 'B+', count: 10 },
+      { grade: 'A-', count: 9 },
+      { grade: 'A',  count: 7 },
+      { grade: 'A+', count: 3 }
+    ], 'B+');
+  </script>
+</body>
+</html>

@@ -7,8 +7,10 @@ const { formatMonthYear } = require('../utils/format');
 const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
+const { buildGradeGradient, gradeToPercent, gradeTier } = require('../utils/gradeGradient');
 const meetingsService = require('../services/meetings');
 const reactionsService = require('../services/reactions');
+const repliesService = require('../services/replies');
 const announcementsService = require('../services/announcements');
 
 // ---------------------------------------------------------------------------
@@ -373,6 +375,9 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     ? reactionsService.getUserReactionsBatch(reviewIds, userId)
     : new Map();
 
+  // Replies — batch-fetch for all reviews
+  const repliesMap = repliesService.getRepliesBatch(reviewIds);
+
   // Grade stats
   let avgWeight = null;
   let avgGrade = null;
@@ -401,6 +406,11 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     }
   }
 
+  // Pre-compute gradient strip values for the template
+  const gradeGradient = buildGradeGradient(gradeDistribution);
+  const avgGradePercent = avgGrade ? gradeToPercent(avgGrade) : null;
+  const avgGradeTier = avgGrade ? gradeTier(avgGrade) : null;
+
   res.render('book-detail', {
     pageTitle: `${book.title} by ${book.author}`,
     book,
@@ -409,8 +419,12 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     userReview,
     avgGrade,
     gradeDistribution,
+    gradeGradient,
+    avgGradePercent,
+    avgGradeTier,
     reactionCounts,
     userReactions,
+    repliesMap,
     getCoverUrl,
     formatMonthYear,
     bookPath,

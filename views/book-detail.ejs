@@ -76,18 +76,36 @@
 
 <!-- ===== Grade Distribution ===== -->
 <% if (gradeDistribution.length > 0) { %>
+<%
+  // Collect which tier letters have at least one review
+  const activeTiers = new Set(gradeDistribution.map(r => r.grade.charAt(0).toUpperCase()));
+  const totalReviews = gradeDistribution.reduce((s, r) => s + r.count, 0);
+%>
 <section class="section">
-  <h2 class="t-section" style="margin-bottom: var(--s-3);">Grade Distribution</h2>
-  <div class="grade-distribution">
-    <% for (const row of gradeDistribution) { %>
-      <div class="grade-row">
-        <span class="grade-row__label"><%= row.grade %></span>
-        <div class="grade-row__track">
-          <div class="grade-row__fill" style="width: <%= row.pct %>%;"></div>
-        </div>
-        <span class="grade-row__count"><%= row.count %></span>
+  <div class="grade-dist">
+    <div class="grade-dist__header">
+      <span class="grade-dist__title">Grade Distribution</span>
+      <div class="grade-dist__right">
+        <% if (avgGrade) { %>
+          <span class="grade-dist__avg-badge grade-dist__avg-badge--<%= avgGrade.charAt(0).toLowerCase() %>"><%= avgGrade %></span>
+        <% } %>
+        <span class="grade-dist__count"><%= totalReviews %> review<%= totalReviews !== 1 ? 's' : '' %></span>
       </div>
-    <% } %>
+    </div>
+    <div class="grade-dist__strip-wrap">
+      <div class="grade-dist__strip" style="background: <%= gradeGradient %>;"></div>
+      <% if (avgGradePercent != null) { %>
+        <div class="grade-dist__tick" style="left: <%= avgGradePercent %>%;"></div>
+      <% } %>
+    </div>
+    <div class="grade-dist__axis">
+      <span<%= activeTiers.has('F') ? ' class="active"' : '' %>>F</span>
+      <span<%= activeTiers.has('D') ? ' class="active"' : '' %>>D</span>
+      <span<%= activeTiers.has('C') ? ' class="active"' : '' %>>C</span>
+      <span<%= activeTiers.has('B') ? ' class="active"' : '' %>>B</span>
+      <span<%= activeTiers.has('A') ? ' class="active"' : '' %>>A</span>
+      <span<%= activeTiers.has('S') ? ' class="active"' : '' %>>S</span>
+    </div>
   </div>
 </section>
 <% } %>
@@ -188,6 +206,56 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
+            <% } %>
+          </div>
+
+          <!-- Replies -->
+          <% const reviewReplies = repliesMap.get(review.id) || []; %>
+          <div class="reply-section" data-review-id="<%= review.id %>">
+            <% if (reviewReplies.length > 0) { %>
+              <div class="reply-list">
+                <% for (const reply of reviewReplies) { %>
+                  <div class="reply" data-reply-id="<%= reply.id %>" data-user-id="<%= reply.user_id %>">
+                    <div class="reply__meta">
+                      <% if (user && reply.user_slug) { %>
+                        <a href="/members/<%= reply.user_slug %>" class="reply__author-link">
+                          <%- include('partials/avatar', { avatarUser: reply, avatarSize: 'sm', avatarClass: '' }) %>
+                          <span class="reply__author"><%= reply.display_name %></span>
+                        </a>
+                      <% } else { %>
+                        <span class="reply__author-link">
+                          <%- include('partials/avatar', { avatarUser: reply, avatarSize: 'sm', avatarClass: '' }) %>
+                          <span class="reply__author"><%= reply.display_name || 'Anonymous' %></span>
+                        </span>
+                      <% } %>
+                      <span class="reply__date"><%= new Date(reply.created_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %><% if (reply.updated_at && reply.updated_at !== reply.created_at) { %><span class="reply__edited">&nbsp;(edited)</span><% } %></span>
+                    </div>
+                    <div class="reply__body"><%- renderMarkdown(reply.body_markdown) %></div>
+                    <% if (user && user.id === reply.user_id) { %>
+                      <div class="reply__actions">
+                        <button type="button" class="reply__edit-btn" data-reply-id="<%= reply.id %>">Edit</button>
+                        <button type="button" class="reply__delete-btn" data-reply-id="<%= reply.id %>">Delete</button>
+                      </div>
+                    <% } %>
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
+            <% if (user) { %>
+              <button type="button" class="reply-trigger" data-review-id="<%= review.id %>">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Reply<% if (reviewReplies.length > 0) { %> (<%= reviewReplies.length %>)<% } %>
+              </button>
+              <div class="reply-form-wrap" data-review-id="<%= review.id %>" hidden>
+                <textarea class="reply-form__textarea" placeholder="Write a reply…" maxlength="2000" rows="3"></textarea>
+                <div class="reply-form__footer">
+                  <span class="reply-form__char-count">0 / 2,000</span>
+                  <div class="reply-form__btns">
+                    <button type="button" class="btn btn--ghost btn--xs reply-form__cancel">Cancel</button>
+                    <button type="button" class="btn btn--primary btn--xs reply-form__submit">Reply</button>
+                  </div>
+                </div>
+              </div>
             <% } %>
           </div>
         </div>

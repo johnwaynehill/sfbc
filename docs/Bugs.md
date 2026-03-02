@@ -28,7 +28,7 @@
 ------
 
 ## Not able to test
-- [ ] Changelong only has one entry, so I unable to verify if collapse/show functionality works
+- [x] Changelong only has one entry, so I unable to verify if collapse/show functionality works
 - [x] Need to seed local database with Reviews, Reactions, and Users for full testing — `node db/seed-test-data.js`
 - [x] No way to test 4H from PR #4 "Member profile reactions" as there isn't proper local data — seeded
 
@@ -42,4 +42,4 @@
   - Similar to Discord
 
 ### Book Detail
-- [ ] Grade distribution should be some kind of chart, not just stacked bar lines
+- [x] Grade distribution should be some kind of chart, not just stacked bar lines

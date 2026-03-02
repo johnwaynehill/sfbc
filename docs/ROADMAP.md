@@ -72,13 +72,13 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Reply to reviews** — Members can have conversations about books [M]
 - [ ] **Activity feed on Home page** — Shows reviews, replies, reactions, nominations as they happen [L]
   - *Depends on: reactions and replies existing to populate the feed*
-- [ ] **User-submitted discussion questions** — Members contribute questions for the current book [M]
+- [ ] **User-submitted discussion questions** — Members contribute questions for the current book [Future] (not sure how much value this adds now)
 
 ### Reviews & Reading
 
 - [ ] **Streamline review page** — Lower friction to write reviews [M]
 - [ ] **Text formatting buttons** — Keep markdown underneath, add toolbar on top [M]
-- [ ] **Reading status per member** — Mark books as Reading, Read, DNF, Did Not Read [M]
+- [ ] **Reading status per member** — Mark books as Reading, Read, DNF, Did Not Read [Future] (not sure how much value this adds now)
   - Per-member tracking with stats on the book detail page
   - No defaults — explicit opt-in
   - *Depends on: artifacts refactor (status lives on the book, not the meeting)*
@@ -110,22 +110,31 @@ Almost every feature below benefits from this refactor. It should be done first,
 
 ### Books
 
-- [ ] **Replace book covers** [M]
+- [ ] **Admins Can Replace book covers** [M]
   - Fetch from online sources via ISBN
   - Upload an image to replace
   - Replace local stored version
+- [ ] **Book Cover as Hero**
+  - Make the Book Cover more like a hero by making it larger, even on mobile
+  - Add subtle background color to section 'book-hero'
 - [ ] **Tag-based filtering on History** — Tap a book's tag to filter the History grid [M]
   - Link to StoryGraph search for that tag
-- [ ] **Related books / Books by same author** — Cross-references on book detail pages [L]
+- [ ] **Author Page**
+  - Using existing canonical URL's /author-name/ to see all the books by that author the group has read
+- [ ] **Related books / Books by same author** — Cross-references on book detail pages [Future]
   - *Requires external data source (OpenLibrary API)*
+- [ ] **Metadata list**
+  - Improve the visual design of the Metadata.
+  - Remove the Meetup.com link
+  - Remove the Google Books link
+  - Add a link to purchase the book from Bookshop.org (affliate link will be added later)
+  - Make these buttons instead of links. Secondary style
 - [ ] **Easy library check out**
   - Add a way to checkout the book from a local library
   - Admin enters local libray URL
+- [ ] **Book to Book Navigation**
+  - Add navigation to all Book Details pages that let users go to the Next and Previous Month's book.
 
-### Quotes
-
-- [ ] **Save quotes from books** — Public or private, attributed to page number [M]
-- [ ] **Random quotes on Home page** — From past books only (current book = spoilers) [S]
 
 ### Reviews
 
@@ -176,7 +185,7 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **More robust profiles** — Richer member pages [L]
 - [ ] **Photo upload avatars** [M]
 - [ ] **Pick any DiceBear avatar** — All styles accessible via [DiceBear JS library](https://www.dicebear.com/how-to-use/js-library/) [S]
-- [ ] **Create custom DiceBear avatar** — Builder UI for personalization [L]
+- [ ] **Create custom DiceBear avatar** — Builder UI for personalization [Future] (not enough value right now)
 - [ ] **Display name collision detection** — Alert + suggest alternatives [S]
 - [ ] **Usernames + display names** — Profile URLs use usernames, admin views show both [M]
 - [ ] **Better UX on Profile Settings page** — Improve layout and flow [M]
@@ -185,6 +194,35 @@ Almost every feature below benefits from this refactor. It should be done first,
 ### Members
 
 - [ ] **Public Members page** — Shows member info, stats, join date, links to profiles [L]
+  - Only for logged-in users (members)
+
+### External Integrations
+
+- [ ] **Share a book externally** — Share link to social/messaging apps [S]
+- [ ] **Invite someone to the club** — Shareable invite link [M]
+
+
+## Phase 6 - UX Polish
+- [ ] Update all dialogs to be rended in the client vs the current implementation of using browswer alerts/dialogs
+- [ ] Update the visual design for Reaction and Reply button
+  - Placement, size, hover effects
+- [ ] Update book-hero section on Home
+  - Add subtle background color
+  - Make it larger
+  - Update information hierarchy for better clarity
+- [ ] Show markdown helper text when writing a Reply
+- [ ] **@ Mentions**
+  - Add ability to "@" mention another user
+  - 
+
+---
+
+## Parked Ideas
+
+### Quotes
+
+- [ ] **Save quotes from books** — Public or private, attributed to page number [M]
+- [ ] **Random quotes on Home page** — From past books only (current book = spoilers) [S]
 
 ### Badges
 
@@ -204,19 +242,12 @@ Reward members for showing up, contributing, and engaging:
   - Pester 'em (nominating the same book repeatedly without it winning)
   - Kingmaker (nominations that get selected)
 
-### External Integrations
-
+### Integrations
 - [ ] **StoryGraph integration** [XL]
   - Possible community API: [python api](https://github.com/ym496/storygraph-api)
   - Pull Currently Reading (up to 3)
   - Pull To-Read list (up to 5)
   - Prominent link to StoryGraph profile
-- [ ] **Share a book externally** — Share link to social/messaging apps [S]
-- [ ] **Invite someone to the club** — Shareable invite link [M]
-
----
-
-## Parked Ideas
 
 Good ideas that don't justify the effort right now:
 
