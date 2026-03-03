@@ -123,17 +123,17 @@ Almost every feature below benefits from this refactor. It should be done first,
   - Using existing canonical URL's /author-name/ to see all the books by that author the group has read
 - [ ] **Related books / Books by same author** — Cross-references on book detail pages [Future]
   - *Requires external data source (OpenLibrary API)*
-- [ ] **Metadata list**
-  - Improve the visual design of the Metadata.
-  - Remove the Meetup.com link
-  - Remove the Google Books link
-  - Add a link to purchase the book from Bookshop.org (affliate link will be added later)
-  - Make these buttons instead of links. Secondary style
+- [✅] **Metadata list**
+  - ~~Remove the Meetup.com link~~
+  - ~~Remove the Google Books link~~
+  - ~~Add a link to purchase the book from Bookshop.org (affiliate link will be added later)~~
+  - ~~Make these buttons instead of links. Secondary style~~
+  - [ ] Improve the visual design and layout of the Metadata section (UX polish)
 - [ ] **Easy library check out**
   - Add a way to checkout the book from a local library
-  - Admin enters local libray URL
-- [ ] **Book to Book Navigation**
-  - Add navigation to all Book Details pages that let users go to the Next and Previous Month's book.
+  - Admin enters local library URL
+- [✅] **Book to Book Navigation**
+  - ~~Add navigation to all Book Details pages that let users go to the Next and Previous Month's book.~~
 
 
 ### Reviews
@@ -162,7 +162,7 @@ Almost every feature below benefits from this refactor. It should be done first,
 - [ ] **Pull Meetup.com details** — Attendee count, rating [L]
   - Cache and refresh every 7 days
 - [ ] **Meeting check-in button** — Attendees confirm presence [S]
-- [ ] **Nominations page** - Users can see Nominations come in live before Voting is enabled
+- [✅] **Nominations page** - Users can see Nominations come in live before Voting is enabled
 
 ### Guides
 

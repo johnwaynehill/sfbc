@@ -395,6 +395,10 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   // Pre-compute gradient strip values for the template
   const gradeGradient = buildGradeGradient(gradeDistribution);
   const avgGradePercent = avgGrade ? gradeToPercent(avgGrade) : null;
+
+  // Book-to-book navigation (prev/next by month)
+  const adjacentPicks = picksService.getAdjacentPicks(book.month_year);
+
   res.render('book-detail', {
     pageTitle: `${book.title} by ${book.author}`,
     book,
@@ -408,6 +412,8 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     reactionCounts,
     userReactions,
     repliesMap,
+    prevBook: adjacentPicks.prev,
+    nextBook: adjacentPicks.next,
     getCoverUrl,
     formatMonthYear,
     bookPath,

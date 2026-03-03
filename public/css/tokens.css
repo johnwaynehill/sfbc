@@ -29,6 +29,7 @@
   --accent: #b45309;    /* amber — detail links, club identity nod */
   --accent2: #0f766e;   /* teal — status dots (e.g., "Currently Reading") */
   --star: #F5A623;      /* gold — star ratings only */
+  --amber: #f59e0b;     /* amber — badges, warnings */
   --danger: #b91c1c;
 
   /* === CTA === */
@@ -99,6 +100,7 @@
     --accent: #d97706;
     --accent2: #14b8a6;
     --star: #F5A623;
+    --amber: #f59e0b;
     --danger: #ef4444;
 
     --cta-bg: #FFFFFF;
@@ -126,6 +128,7 @@
   --accent: #d97706;
   --accent2: #14b8a6;
   --star: #F5A623;
+  --amber: #f59e0b;
   --danger: #ef4444;
 
   --cta-bg: #FFFFFF;

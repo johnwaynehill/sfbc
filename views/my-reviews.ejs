@@ -17,7 +17,35 @@
 %>
 
 <section class="section">
-  <h1 class="t-section" style="margin-bottom: var(--s-4);">My Reviews</h1>
+  <div class="history-header">
+    <h1 class="t-section">My Reviews</h1>
+
+    <% if (reviews.length > 1) { %>
+    <div class="history-controls">
+      <div class="sort-dropdown" id="sortDropdown">
+        <button type="button" class="history-btn" id="sortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
+        </button>
+        <ul class="sort-dropdown__menu" id="sortMenu" role="listbox" aria-label="Sort order">
+          <li class="sort-dropdown__item is-selected" role="option" data-sort="newest" aria-selected="true">Newest first</li>
+          <li class="sort-dropdown__item" role="option" data-sort="oldest" aria-selected="false">Oldest first</li>
+          <li class="sort-dropdown__item" role="option" data-sort="highest" aria-selected="false">Highest grade</li>
+          <li class="sort-dropdown__item" role="option" data-sort="lowest" aria-selected="false">Lowest grade</li>
+        </ul>
+      </div>
+      <button type="button" class="history-btn" id="searchBtn" aria-label="Search reviews" title="Search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <div class="history-search" id="searchWrap">
+        <svg class="history-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" class="history-search__input" placeholder="Search title or author..." autocomplete="off">
+        <button type="button" class="history-search__close" id="searchClose" aria-label="Close search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <% } %>
+  </div>
 
   <% if (reviews.length > 0) { %>
     <!-- Grade Summary -->
@@ -35,9 +63,13 @@
       <% } %>
     </div>
 
-    <div class="my-reviews-list">
+    <div class="my-reviews-list" id="reviewsList">
       <% for (const r of reviews) { %>
-        <div class="review-card review-card--linked">
+        <div class="review-card review-card--linked"
+             data-title="<%= r.title.toLowerCase() %>"
+             data-author="<%= r.author.toLowerCase() %>"
+             data-date="<%= r.updated_at %>"
+             data-weight="<%= r.weight %>">
           <a href="<%= bookPath(r.title, r.author) %>" class="review-card__cover">
             <% if (r.cover_url) { %>
               <img src="<%= r.cover_url %>"
@@ -71,6 +103,8 @@
         </div>
       <% } %>
     </div>
+
+    <p class="history-no-results" id="noResults" hidden>No reviews match your search.</p>
   <% } else { %>
     <div class="empty-state">
       <p class="empty-state__message">You haven't written any reviews yet.</p>
@@ -80,3 +114,5 @@
     </div>
   <% } %>
 </section>
+
+<script src="/js/my-reviews-filter.js" defer></script>

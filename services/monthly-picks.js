@@ -490,6 +490,36 @@ function getFirstEvent(pickId) {
   return getFirstEventStmt.get(pickId) || null;
 }
 
+/**
+ * Get adjacent picks (prev/next) by month_year for book-to-book navigation.
+ * Returns { prev: {...} | null, next: {...} | null }
+ */
+const getPrevPickStmt = db.prepare(`
+  SELECT mp.month_year, b.title, b.author, b.author_slug, b.title_slug
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.month_year < ? AND mp.status = 'results'
+  ORDER BY mp.month_year DESC
+  LIMIT 1
+`);
+
+const getNextPickStmt = db.prepare(`
+  SELECT mp.month_year, b.title, b.author, b.author_slug, b.title_slug
+  FROM monthly_picks mp
+  JOIN books b ON b.id = mp.book_id
+  WHERE mp.month_year > ? AND mp.status IN ('results', 'reading')
+  ORDER BY mp.month_year ASC
+  LIMIT 1
+`);
+
+function getAdjacentPicks(monthYear) {
+  if (!monthYear) return { prev: null, next: null };
+  return {
+    prev: getPrevPickStmt.get(monthYear) || null,
+    next: getNextPickStmt.get(monthYear) || null,
+  };
+}
+
 module.exports = {
   getCurrent,
   getByMonthYear,
@@ -505,4 +535,5 @@ module.exports = {
   getHistory,
   getPickForBook,
   getFirstEvent,
+  getAdjacentPicks,
 };

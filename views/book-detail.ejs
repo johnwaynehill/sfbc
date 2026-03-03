@@ -54,22 +54,14 @@
       <dd><%= book.page_count %></dd>
     <% } %>
     <dt>Goodreads</dt>
-    <dd><a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener">Search on Goodreads</a></dd>
+    <dd><a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Search on Goodreads</a></dd>
     <dt>StoryGraph</dt>
-    <dd><a href="https://app.thestorygraph.com/browse?search_term=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener">Search on StoryGraph</a></dd>
-    <dt>Google Books</dt>
-    <% if (book.google_books_id) { %>
-      <dd><a href="https://books.google.com/books?id=<%= book.google_books_id %>" target="_blank" rel="noopener">View on Google Books</a></dd>
-    <% } else { %>
-      <dd><a href="https://www.google.com/search?tbm=bks&q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener">Search on Google Books</a></dd>
-    <% } %>
-    <% if (book.meetup_event_url) { %>
-      <dt>Meetup</dt>
-      <dd><a href="<%= book.meetup_event_url %>" target="_blank" rel="noopener">View Event</a></dd>
-    <% } %>
+    <dd><a href="https://app.thestorygraph.com/browse?search_term=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Search on StoryGraph</a></dd>
+    <dt>Bookshop</dt>
+    <dd><a href="https://bookshop.org/search?keywords=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Shop on Bookshop.org</a></dd>
     <% if (book.meeting_status === 'results' && book.month_year) { %>
       <dt>Results</dt>
-      <dd><a href="/results/<%= monthYearSlug(book.month_year) %>">View Voting Results</a></dd>
+      <dd><a href="/results/<%= monthYearSlug(book.month_year) %>" class="btn btn--secondary btn--sm">View Voting Results</a></dd>
     <% } %>
   </dl>
 </section>
@@ -268,6 +260,32 @@
   </div>
   <% } %>
 </section>
+
+<!-- ===== Book-to-Book Nav ===== -->
+<% if (prevBook || nextBook) { %>
+<nav class="book-nav" aria-label="Book navigation">
+  <% if (prevBook) { %>
+    <a href="/books/<%= prevBook.author_slug %>/<%= prevBook.title_slug %>" class="book-nav__link book-nav__link--prev">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span class="book-nav__text">
+        <span class="book-nav__label">Previous</span>
+        <span class="book-nav__title"><%= prevBook.title %></span>
+      </span>
+    </a>
+  <% } else { %>
+    <span></span>
+  <% } %>
+  <% if (nextBook) { %>
+    <a href="/books/<%= nextBook.author_slug %>/<%= nextBook.title_slug %>" class="book-nav__link book-nav__link--next">
+      <span class="book-nav__text">
+        <span class="book-nav__label">Next</span>
+        <span class="book-nav__title"><%= nextBook.title %></span>
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  <% } %>
+</nav>
+<% } %>
 
 <% if (book.description && book.description.length > 200) { %>
 <script>
