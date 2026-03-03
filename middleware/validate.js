@@ -133,7 +133,7 @@ const meetingStatusChain = [
   body('status')
     .trim()
     .notEmpty().withMessage('New status is required.')
-    .isIn(['upcoming', 'reading', 'nominations', 'voting', 'results'])
+    .isIn(['scheduled', 'upcoming', 'reading', 'nominations', 'voting', 'results'])
     .withMessage('Invalid meeting status.'),
 ];
 

@@ -44,10 +44,8 @@
 
     <!-- Lifecycle stepper -->
     <%
-      var steps = meeting.winning_book_id
-        ? ['upcoming', 'reading', 'nominations', 'voting', 'results']
-        : ['upcoming', 'nominations', 'voting', 'results'];
-      var stepLabels = { upcoming: 'Upcoming', reading: 'Reading', nominations: 'Nominations', voting: 'Voting', results: 'Finished' };
+      var steps = ['scheduled', 'nominations', 'voting', 'upcoming', 'reading', 'results'];
+      var stepLabels = { scheduled: 'Scheduled', nominations: 'Nominations', voting: 'Voting', upcoming: 'Upcoming', reading: 'Reading', results: 'Finished' };
       var currentIdx = steps.indexOf(meeting.status);
     %>
     <div class="lifecycle-stepper">
@@ -77,51 +75,13 @@
     %>
     <div class="pipeline-panel pipeline-panel--<%= meeting.status %>">
 
-      <% if (meeting.status === 'upcoming') { %>
+      <% if (meeting.status === 'scheduled') { %>
         <div class="pipeline-panel__header">
           <span class="pipeline-panel__icon">📋</span>
           <div class="pipeline-panel__titles">
-            <span class="pipeline-panel__label">Upcoming</span>
+            <span class="pipeline-panel__label">Scheduled</span>
             <span class="pipeline-panel__desc">
-              <% if (meeting.winning_book_id) { %>
-                A book has been selected. Start the reading period when ready.
-              <% } else { %>
-                Open nominations to let members suggest books.
-              <% } %>
-            </span>
-          </div>
-        </div>
-        <% if (meeting.winning_book_id) { %>
-          <div class="pipeline-panel__checks">
-            <span class="pipeline-check pipeline-check--ok">
-              <span class="pipeline-check__icon">✓</span>
-              Book selected: <strong><%= meeting.book_title %></strong>
-            </span>
-          </div>
-        <% } %>
-        <div class="pipeline-panel__actions">
-          <% if (meeting.winning_book_id) { %>
-            <button class="btn btn--primary pipeline-cta js-advance-status"
-                    data-meeting-id="<%= meeting.id %>"
-                    data-new-status="reading">
-              Start Reading Period →
-            </button>
-          <% } else { %>
-            <button class="btn btn--primary pipeline-cta js-advance-status"
-                    data-meeting-id="<%= meeting.id %>"
-                    data-new-status="nominations">
-              Open Nominations →
-            </button>
-          <% } %>
-        </div>
-
-      <% } else if (meeting.status === 'reading') { %>
-        <div class="pipeline-panel__header">
-          <span class="pipeline-panel__icon">📖</span>
-          <div class="pipeline-panel__titles">
-            <span class="pipeline-panel__label">Reading Phase</span>
-            <span class="pipeline-panel__desc">
-              Members are reading <strong><%= meeting.book_title %></strong>. Open nominations when ready.
+              Open nominations to let members suggest books.
             </span>
           </div>
         </div>
@@ -131,11 +91,33 @@
                   data-new-status="nominations">
             Open Nominations →
           </button>
-          <button class="btn btn--secondary btn--sm js-advance-status"
+        </div>
+
+      <% } else if (meeting.status === 'upcoming') { %>
+        <div class="pipeline-panel__header">
+          <span class="pipeline-panel__icon">📚</span>
+          <div class="pipeline-panel__titles">
+            <span class="pipeline-panel__label">Upcoming</span>
+            <span class="pipeline-panel__desc">
+              The winning book has been determined. Start reading when the club is ready.
+            </span>
+          </div>
+        </div>
+        <div class="pipeline-panel__checks">
+          <span class="pipeline-check pipeline-check--ok">
+            <span class="pipeline-check__icon">✓</span>
+            Winner: <strong><%= meeting.book_title %></strong> by <%= meeting.book_author %>
+          </span>
+        </div>
+        <div class="pipeline-panel__actions">
+          <button class="btn btn--primary pipeline-cta js-advance-status"
                   data-meeting-id="<%= meeting.id %>"
-                  data-new-status="results">
-            Close Meeting
+                  data-new-status="reading">
+            Start Reading →
           </button>
+          <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
+            📊 View results <span class="pipeline-link__arrow">↗</span>
+          </a>
         </div>
 
       <% } else if (meeting.status === 'nominations') { %>
@@ -200,10 +182,31 @@
         <div class="pipeline-panel__actions">
           <button class="btn btn--primary pipeline-cta js-advance-status"
                   data-meeting-id="<%= meeting.id %>"
-                  data-new-status="results"
+                  data-new-status="upcoming"
                   <%= !_votesReady ? 'disabled' : '' %>>
-            Close Voting & Reveal Winner →
+            Close Voting & Determine Winner →
           </button>
+        </div>
+
+      <% } else if (meeting.status === 'reading') { %>
+        <div class="pipeline-panel__header">
+          <span class="pipeline-panel__icon">📖</span>
+          <div class="pipeline-panel__titles">
+            <span class="pipeline-panel__label">Currently Reading</span>
+            <span class="pipeline-panel__desc">
+              The club is reading <strong><%= meeting.book_title %></strong>. Mark as finished when the discussion is done.
+            </span>
+          </div>
+        </div>
+        <div class="pipeline-panel__actions">
+          <button class="btn btn--primary pipeline-cta js-advance-status"
+                  data-meeting-id="<%= meeting.id %>"
+                  data-new-status="results">
+            Mark as Finished →
+          </button>
+          <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
+            📊 View results <span class="pipeline-link__arrow">↗</span>
+          </a>
         </div>
 
       <% } else if (meeting.status === 'results') { %>
@@ -242,6 +245,7 @@
                       data-meeting-id="<%= meeting.id %>"
                       data-current-status="<%= meeting.status %>">
                 <option value="">Change&hellip;</option>
+                <option value="scheduled"<%= meeting.status === 'scheduled' ? ' disabled' : '' %>>Scheduled</option>
                 <option value="upcoming"<%= meeting.status === 'upcoming' ? ' disabled' : '' %>>Upcoming</option>
                 <option value="reading"<%= meeting.status === 'reading' ? ' disabled' : '' %>>Reading</option>
                 <option value="nominations"<%= meeting.status === 'nominations' ? ' disabled' : '' %>>Nominations</option>
@@ -360,7 +364,7 @@
                 <% } %>
               </span>
             </div>
-            <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading') { %>
+            <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading' && meeting.status !== 'scheduled') { %>
               <button class="btn btn--danger btn--sm js-remove-nominee"
                       data-meeting-id="<%= meeting.id %>"
                       data-book-id="<%= nom.book_id %>"

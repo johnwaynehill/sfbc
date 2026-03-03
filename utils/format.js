@@ -19,6 +19,7 @@ function formatMonthYear(monthYear) {
  * Human-readable status labels
  */
 const STATUS_LABELS = {
+  scheduled: 'Scheduled',
   upcoming: 'Upcoming',
   reading: 'Currently Reading',
   nominations: 'Nominations Open',

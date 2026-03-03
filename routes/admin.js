@@ -19,7 +19,7 @@ async function generateQrCodes(meeting_month_year, status) {
   const slug = monthYearSlug(meeting_month_year);
   const codes = [];
 
-  if (status === 'nominations' || status === 'voting' || status === 'results') {
+  if (['scheduled', 'nominations', 'voting', 'results'].includes(status)) {
     codes.push({ label: 'Nominate', url: `${base}/nominate/${slug}` });
   }
   if (status === 'voting' || status === 'results') {
@@ -116,7 +116,7 @@ router.get('/', async (req, res) => {
   if (current && current.id) {
     nominees = meetings.getNominees(current.id);
     voteCount = getVoteCount(current.id);
-    if (current.status === 'voting' || current.status === 'results') {
+    if (['voting', 'results', 'reading', 'upcoming'].includes(current.status)) {
       results = calculateResults(current.id);
     }
     qrCodes = await generateQrCodes(current.month_year, current.status);
@@ -192,7 +192,7 @@ router.get('/picks/:slug', async (req, res) => {
   const nominees = meetings.getNominees(meeting.id);
   const voteCount = getVoteCount(meeting.id);
   let results = null;
-  if (meeting.status === 'voting' || meeting.status === 'results') {
+  if (['voting', 'results', 'reading', 'upcoming'].includes(meeting.status)) {
     results = calculateResults(meeting.id);
   }
 

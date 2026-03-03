@@ -20,7 +20,7 @@ const getUpcomingStmt = db.prepare(`
   SELECT m.*, b.title AS book_title, b.author AS book_author, b.cover_url AS book_cover_url
   FROM meetings m
   LEFT JOIN books b ON b.id = m.winning_book_id
-  WHERE m.status = 'upcoming'
+  WHERE m.status IN ('scheduled', 'upcoming')
   ORDER BY m.month_year ASC
 `);
 
@@ -54,7 +54,7 @@ const getAllStmt = db.prepare(`
 
 const createStmt = db.prepare(`
   INSERT INTO meetings (month_year, meetup_event_url, meeting_time, location_text, status)
-  VALUES (?, ?, ?, ?, 'upcoming')
+  VALUES (?, ?, ?, ?, 'scheduled')
 `);
 
 const updateStmt = db.prepare(`

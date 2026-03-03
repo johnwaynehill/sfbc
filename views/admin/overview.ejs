@@ -54,7 +54,7 @@
           <% if (current.status === 'reading') { %>
             <button class="btn btn--secondary btn--sm js-advance-status"
                     data-meeting-id="<%= current.id %>"
-                    data-new-status="results">Close Pick</button>
+                    data-new-status="results">Mark as Finished</button>
           <% } else if (current.status === 'nominations') { %>
             <button class="btn btn--secondary btn--sm js-advance-status"
                     data-meeting-id="<%= current.id %>"
@@ -62,7 +62,11 @@
           <% } else if (current.status === 'voting') { %>
             <button class="btn btn--secondary btn--sm js-advance-status"
                     data-meeting-id="<%= current.id %>"
-                    data-new-status="results">Finalize Results</button>
+                    data-new-status="upcoming">Close Voting</button>
+          <% } else if (current.status === 'scheduled') { %>
+            <button class="btn btn--secondary btn--sm js-advance-status"
+                    data-meeting-id="<%= current.id %>"
+                    data-new-status="nominations">Open Nominations</button>
           <% } %>
         </div>
       </div>
@@ -115,7 +119,7 @@
         <div class="admin-meeting-card__content">
           <div class="admin-meeting-card__header">
             <span class="t-body-bold"><%= formatMonthYear(m.month_year) %></span>
-            <span class="status-pill status-pill--upcoming"><%= formatStatus(m.status) %></span>
+            <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
           </div>
           <% if (m.book_title) { %>
             <div class="admin-meeting-card__body">
@@ -124,11 +128,11 @@
           <% } %>
           <div class="admin-meeting-card__actions">
             <a href="/admin/picks/<%= monthYearSlug(m.month_year) %>" class="btn btn--primary btn--sm">Manage</a>
-            <% if (m.winning_book_id) { %>
+            <% if (m.status === 'upcoming') { %>
               <button class="btn btn--secondary btn--sm js-advance-status"
                       data-meeting-id="<%= m.id %>"
-                      data-new-status="reading">Mark as Reading</button>
-            <% } else { %>
+                      data-new-status="reading">Start Reading</button>
+            <% } else if (m.status === 'scheduled') { %>
               <button class="btn btn--secondary btn--sm js-advance-status"
                       data-meeting-id="<%= m.id %>"
                       data-new-status="nominations">Open Nominations</button>
@@ -148,10 +152,12 @@
       var meetingId = btn.dataset.meetingId;
       var newStatus = btn.dataset.newStatus;
       var labels = {
-        reading: 'mark as reading',
+        reading: 'start reading',
         nominations: 'open nominations',
         voting: 'start voting',
-        results: 'finalize results',
+        upcoming: 'close voting and determine winner',
+        results: 'mark as finished',
+        scheduled: 'open nominations',
       };
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
 
@@ -170,7 +176,7 @@
         } else {
           alert(data.error || 'Something went wrong.');
           btn.disabled = false;
-          var labelMap = { reading: 'Mark as Reading', nominations: 'Open Nominations', voting: 'Start Voting', results: 'Finalize Results' };
+          var labelMap = { reading: 'Start Reading', nominations: 'Open Nominations', voting: 'Start Voting', upcoming: 'Close Voting', results: 'Mark as Finished', scheduled: 'Open Nominations' };
           btn.textContent = labelMap[btn.dataset.newStatus] || btn.dataset.newStatus;
         }
       } catch (err) {

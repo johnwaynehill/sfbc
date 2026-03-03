@@ -289,12 +289,17 @@ router.put('/admin/meetings/:id/status', requireAdmin, ...meetingStatusChain, ha
 
   const newStatus = req.body.status; // already trimmed + validated by chain
 
+  // Capture old status before advancing (for SSE broadcast logic)
+  const oldMeeting = meetings.getById(id);
   const result = picksService.advanceMeetingStatus(id, newStatus);
   if (result.error) {
     return res.status(400).json({ error: result.error });
   }
 
-  // When voting closes, notify all SSE clients so they reload
+  // Notify SSE clients when voting closes or pick finishes
+  if (oldMeeting && oldMeeting.status === 'voting' && newStatus === 'upcoming') {
+    broadcastStatusChange(id, 'votingClosed');
+  }
   if (newStatus === 'results') {
     broadcastStatusChange(id, 'results');
   }

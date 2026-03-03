@@ -24,10 +24,14 @@ const BAR_COLORS = [
 // GET /results — auto-find current voting/results meeting
 // ---------------------------------------------------------------------------
 router.get('/results', (req, res) => {
-  // Prefer a meeting in voting status (live results), fall back to most recent finished
+  // Prefer voting (live), then upcoming/reading with results, then most recent finished
   const meeting = (
     db.prepare(
       "SELECT * FROM meetings WHERE status = 'voting' ORDER BY month_year ASC LIMIT 1"
+    ).get()
+    ||
+    db.prepare(
+      "SELECT * FROM meetings WHERE status IN ('upcoming', 'reading') ORDER BY month_year DESC LIMIT 1"
     ).get()
     ||
     db.prepare(
@@ -54,8 +58,9 @@ router.get('/results/:slug', (req, res) => {
     return res.redirect('/results/' + slug);
   }
 
-  // Allow viewing during voting and after
-  if (meeting.status !== 'voting' && meeting.status !== 'results') {
+  // Allow viewing during voting, upcoming (post-voting), reading, and when finished
+  const canViewResults = ['voting', 'upcoming', 'reading', 'results'].includes(meeting.status);
+  if (!canViewResults) {
     return res.redirect('/');
   }
 

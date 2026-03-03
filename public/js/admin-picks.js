@@ -91,10 +91,12 @@
       var meetingId = btn.dataset.meetingId;
       var newStatus = btn.dataset.newStatus;
       var labels = {
-        reading: 'start the reading period',
         nominations: 'open nominations',
         voting: 'close nominations and open voting',
-        results: 'finalize this pick',
+        upcoming: 'close voting and determine the winner',
+        reading: 'start the reading period',
+        results: 'mark this pick as finished',
+        scheduled: 'open nominations',
       };
 
       if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
@@ -145,6 +147,7 @@
       var currentStatus = statusSelect.dataset.currentStatus;
       var newStatus = statusSelect.value;
       var statusLabels = {
+        scheduled: 'Scheduled',
         upcoming: 'Upcoming',
         reading: 'Reading',
         nominations: 'Nominations',
@@ -543,7 +546,7 @@
               if (vcIcon) vcIcon.textContent = vcReady ? '\u2713' : '!';
               var vcHint = vcCheck.querySelector('.pipeline-check__hint');
               if (vcHint) vcHint.hidden = vcReady;
-              var vcCta = document.querySelector('.pipeline-cta[data-new-status="results"]');
+              var vcCta = document.querySelector('.pipeline-cta[data-new-status="upcoming"]');
               if (vcCta) vcCta.disabled = !vcReady;
             }
           }

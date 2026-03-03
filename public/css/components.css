@@ -3320,6 +3320,7 @@ textarea.form-input {
   letter-spacing: 0.04em;
 }
 
+.status-pill--scheduled { background: #F1F5F9; color: #475569; }
 .status-pill--upcoming { background: #EFECE6; color: #57534E; }
 .status-pill--reading { background: #DBEAFE; color: #1D4ED8; }
 .status-pill--nominations { background: #FFEDD5; color: #C2410C; }
@@ -3977,6 +3978,7 @@ textarea.form-input {
   border-left: 4px solid var(--border);
 }
 
+.pipeline-panel--scheduled { border-left-color: #94A3B8; }
 .pipeline-panel--upcoming  { border-left-color: #78716C; }
 .pipeline-panel--reading   { border-left-color: #3B82F6; }
 .pipeline-panel--nominations { border-left-color: #EA580C; }
@@ -4780,6 +4782,11 @@ textarea.form-input {
 :is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--voting {
   background: rgba(217, 119, 6, 0.25);
   color: #fbbf24;
+}
+
+:is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--scheduled {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
 }
 
 :is([data-theme="dark"], :root:not([data-theme="light"])) .status-pill--upcoming {
@@ -5722,6 +5729,7 @@ a.reply__author-link:hover .reply__author {
 
 /* Scope the @media dark mode selector for components too */
 @media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .status-pill--scheduled { background: rgba(148, 163, 184, 0.1); }
   :root:not([data-theme="light"]) .status-pill--reading { background: rgba(14, 116, 108, 0.15); }
   :root:not([data-theme="light"]) .status-pill--nominations,
   :root:not([data-theme="light"]) .status-pill--voting { background: rgba(217, 119, 6, 0.15); }

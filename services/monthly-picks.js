@@ -20,7 +20,7 @@ const getCurrentStmt = db.prepare(`
   FROM monthly_picks mp
   JOIN books b ON b.id = mp.book_id
   LEFT JOIN users u ON u.id = mp.nominated_by
-  WHERE mp.status IN ('reading', 'nominations', 'voting')
+  WHERE mp.status = 'reading'
   ORDER BY mp.month_year DESC LIMIT 1
 `);
 
@@ -135,7 +135,7 @@ const getHeroStmt = db.prepare(`
          b.description, b.subjects
   FROM monthly_picks mp
   JOIN books b ON b.id = mp.book_id
-  WHERE mp.status != 'results'
+  WHERE mp.status = 'reading'
   ORDER BY mp.month_year ASC
   LIMIT 1
 `);
@@ -278,10 +278,11 @@ function advanceStatus(id, newStatus) {
 /* ------------------------------------------------------------------ */
 
 const TRANSITIONS = {
-  upcoming: ['reading', 'nominations'],
-  reading: ['nominations'],
+  scheduled: ['nominations'],             // open nominations on a new pick
   nominations: ['voting'],
-  voting: ['results'],
+  voting: ['upcoming'],                   // close voting → determine winner → upcoming (with book)
+  upcoming: ['reading'],                  // upcoming (with book) → start reading
+  reading: ['results'],                   // finish reading → done
 };
 
 /**
@@ -292,13 +293,11 @@ const TRANSITIONS = {
  * Entry point: meeting ID (for backward compat with admin UI).
  * Internally writes to both the meeting and its linked pick.
  *
- * Normal flow:  upcoming → reading → nominations → voting → results
- * Alt flow:     upcoming → nominations → voting → results (no pre-selected book)
- * Shortcuts:    reading → voting (skip nominations)
- *               reading → results (close meeting early)
+ * Flow:  scheduled → nominations → voting → upcoming (with book) → reading → results
  *
- * When finalized to results, the next upcoming meeting with a pre-selected
- * book is automatically advanced to "reading".
+ * When voting closes the winner is determined and the meeting returns to
+ * "upcoming" with winning_book_id set. The admin later manually advances
+ * to "reading" when the club is ready.
  *
  * @param {number} meetingId - meetings.id
  * @param {string} newStatus - Target status
@@ -310,11 +309,7 @@ function advanceMeetingStatus(meetingId, newStatus) {
   if (!meeting) return { error: 'Meeting not found.' };
 
   const allowed = TRANSITIONS[meeting.status] || [];
-
-  // Allow normal transitions plus reading→results (close) and reading→voting (skip noms)
-  const isCloseReading = meeting.status === 'reading' && newStatus === 'results';
-  const isSkipToVoting = meeting.status === 'reading' && newStatus === 'voting';
-  if (!isCloseReading && !isSkipToVoting && !allowed.includes(newStatus)) {
+  if (!allowed.includes(newStatus)) {
     return { error: `Cannot transition from "${meeting.status}" to "${newStatus}".` };
   }
 
@@ -326,11 +321,15 @@ function advanceMeetingStatus(meetingId, newStatus) {
     }
   }
 
-  if (newStatus === 'results' && !isCloseReading) {
+  if (meeting.status === 'voting' && newStatus === 'upcoming') {
     const count = voteCountStmt.get(meetingId).cnt;
     if (count < 1) {
-      return { error: 'Need at least 1 vote before finalizing results.' };
+      return { error: 'Need at least 1 vote before closing voting.' };
     }
+  }
+
+  if (newStatus === 'reading' && !meeting.winning_book_id) {
+    return { error: 'Cannot start reading without a selected book. Run nominations and voting first.' };
   }
 
   // Perform transition in a transaction
@@ -355,23 +354,17 @@ function advanceMeetingStatus(meetingId, newStatus) {
     if (newStatus === 'nominations') {
       meetingSetNominationsOpenStmt.run(meetingId);
     } else if (newStatus === 'voting') {
-      if (!isSkipToVoting) {
-        meetingSetNominationsCloseStmt.run(meetingId);
-      }
+      meetingSetNominationsCloseStmt.run(meetingId);
       meetingSetVotingOpenStmt.run(meetingId);
-    } else if (newStatus === 'results') {
-      if (!isCloseReading) {
-        meetingSetVotingCloseStmt.run(meetingId);
-      }
+    } else if (meeting.status === 'voting' && newStatus === 'upcoming') {
+      // Close voting → determine winner
+      meetingSetVotingCloseStmt.run(meetingId);
 
-      // Calculate winner from votes (only if voting occurred)
-      if (!isCloseReading) {
-        const results = calculateResults(meetingId);
-        if (results.rankings.length > 0) {
-          meetingSetWinnerStmt.run(results.rankings[0].book_id, meetingId);
-        }
-        meetingSetResultsJsonStmt.run(JSON.stringify(results), meetingId);
+      const results = calculateResults(meetingId);
+      if (results.rankings.length > 0) {
+        meetingSetWinnerStmt.run(results.rankings[0].book_id, meetingId);
       }
+      meetingSetResultsJsonStmt.run(JSON.stringify(results), meetingId);
     }
 
     // Update meeting status
@@ -389,27 +382,23 @@ function advanceMeetingStatus(meetingId, newStatus) {
       if (newStatus === 'nominations') {
         setPickNominationsOpenStmt.run(updated.monthly_pick_id);
       } else if (newStatus === 'voting') {
-        if (!isSkipToVoting) {
-          setPickNominationsCloseStmt.run(updated.monthly_pick_id);
-        }
+        setPickNominationsCloseStmt.run(updated.monthly_pick_id);
         setPickVotingOpenStmt.run(updated.monthly_pick_id);
-      } else if (newStatus === 'results' && !isCloseReading) {
+      } else if (meeting.status === 'voting' && newStatus === 'upcoming') {
         setPickVotingCloseStmt.run(updated.monthly_pick_id);
-        // Copy results JSON to pick
         if (updated.vote_results_json) {
           setPickResultsJsonStmt.run(updated.vote_results_json, updated.monthly_pick_id);
         }
-        // Update pick's book_id if winner changed
         if (updated.winning_book_id) {
           updatePickBookIdStmt.run(updated.winning_book_id, updated.monthly_pick_id);
         }
       }
-    } else if (updated && updated.winning_book_id && newStatus === 'results') {
+    } else if (updated && updated.winning_book_id && meeting.status === 'voting' && newStatus === 'upcoming') {
       // No pick yet but we have a winner — create the pick
       const existing = getByBookAndMonthStmt.get(updated.winning_book_id, updated.month_year);
       if (existing) {
         // Pick already exists for this book+month — link and sync
-        updateStatusStmt.run(newStatus, existing.id);
+        updateStatusStmt.run('upcoming', existing.id);
         linkPickToMeetingStmt.run(existing.id, meetingId);
         if (updated.vote_results_json) {
           setPickResultsJsonStmt.run(updated.vote_results_json, existing.id);
@@ -422,7 +411,7 @@ function advanceMeetingStatus(meetingId, newStatus) {
         createStmt.run(
           updated.winning_book_id,
           updated.month_year,
-          newStatus,
+          'upcoming',
           nom ? nom.user_id : null
         );
         const newPick = getByBookAndMonthStmt.get(updated.winning_book_id, updated.month_year);
