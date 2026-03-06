@@ -33,6 +33,111 @@
   var lastPreviewData = null;
 
   // -----------------------------------------------------------------------
+  // Search-first nomination flow
+  // -----------------------------------------------------------------------
+  var searchInput = document.getElementById('nom-search-input');
+  var searchResults = document.getElementById('nom-search-results');
+  var searchTimer = null;
+
+  if (searchInput && searchResults) {
+    searchInput.addEventListener('input', function () {
+      var q = searchInput.value.trim();
+      clearTimeout(searchTimer);
+
+      if (q.length < 3) {
+        searchResults.hidden = true;
+        return;
+      }
+
+      searchTimer = setTimeout(function () {
+        fetch('/api/books/search-multi?q=' + encodeURIComponent(q) + '&maxResults=5')
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (!data.results || data.results.length === 0) {
+              searchResults.innerHTML = '<div class="nom-search__empty">No books found. Try entering manually below.</div>';
+              searchResults.hidden = false;
+              return;
+            }
+
+            var html = '';
+            for (var i = 0; i < data.results.length; i++) {
+              var r = data.results[i];
+              html += '<div class="nom-search__item" data-idx="' + i + '"'
+                + ' data-title="' + escapeAttr(r.title) + '"'
+                + ' data-author="' + escapeAttr(r.author) + '"'
+                + ' data-cover="' + escapeAttr(r.coverUrl || '') + '"'
+                + ' data-year="' + (r.year || '') + '"'
+                + ' data-gbid="' + escapeAttr(r.googleBooksId || '') + '"'
+                + ' data-isbn="' + escapeAttr(r.isbn || '') + '"'
+                + ' data-pages="' + (r.pageCount || '') + '">'
+                + (r.coverUrl ? '<img src="' + escapeAttr(r.coverUrl) + '" alt="">' : '')
+                + '<div class="nom-search__item-info">'
+                + '<span class="nom-search__item-title">' + escapeHtml(r.title) + '</span>'
+                + '<span class="nom-search__item-author">' + escapeHtml(r.author) + (r.year ? ' (' + r.year + ')' : '') + '</span>'
+                + '</div></div>';
+            }
+
+            searchResults.innerHTML = html;
+            searchResults.hidden = false;
+          })
+          .catch(function () {
+            searchResults.hidden = true;
+          });
+      }, 350);
+    });
+
+    // Click a search result to fill the form
+    searchResults.addEventListener('click', function (e) {
+      var item = e.target.closest('.nom-search__item');
+      if (!item) return;
+
+      var title = item.dataset.title;
+      var author = item.dataset.author;
+
+      titleInput.value = title;
+      authorInput.value = author;
+
+      // Store preview data for metadata on submit
+      lastPreviewData = {
+        title: title,
+        author: author,
+        coverUrl: item.dataset.cover || null,
+        year: item.dataset.year ? parseInt(item.dataset.year, 10) : null,
+        googleBooksId: item.dataset.gbid || null,
+      };
+
+      // Show the existing preview card
+      if (item.dataset.cover) {
+        previewImg.src = item.dataset.cover;
+        previewImg.alt = title + ' cover';
+        previewTitle.textContent = title;
+        previewAuthor.textContent = author;
+        previewYear.textContent = item.dataset.year ? '(' + item.dataset.year + ')' : '';
+        previewWrap.hidden = false;
+      }
+
+      // Hide search results, clear search input
+      searchResults.hidden = true;
+      searchInput.value = '';
+
+      // Scroll form into view and focus reason
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (reasonInput) setTimeout(function () { reasonInput.focus(); }, 300);
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.nom-search')) {
+        searchResults.hidden = true;
+      }
+    });
+  }
+
+  function escapeAttr(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // -----------------------------------------------------------------------
   // Character counter
   // -----------------------------------------------------------------------
   if (reasonInput && counter) {

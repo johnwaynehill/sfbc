@@ -39,6 +39,21 @@
   <% } else { %>
     <div id="nom-message" hidden></div>
 
+    <!-- Search-first nomination flow -->
+    <div class="nom-search" id="nom-search">
+      <label class="form-label" for="nom-search-input">Find a book</label>
+      <input type="text"
+             id="nom-search-input"
+             class="form-input"
+             autocomplete="off"
+             placeholder="Search by title or author&hellip;">
+      <div class="nom-search__results" id="nom-search-results" hidden></div>
+    </div>
+
+    <div class="nom-divider" id="nom-divider">
+      <span class="nom-divider__text">or enter manually</span>
+    </div>
+
     <form id="nom-form"
           class="nom-form"
           method="POST"

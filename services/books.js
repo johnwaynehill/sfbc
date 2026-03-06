@@ -70,6 +70,52 @@ async function searchGoogleBooks(title, author) {
   }
 }
 
+/**
+ * Search Google Books API with a general query and return up to `max` results.
+ */
+async function searchGoogleBooksMulti(query, max = 5) {
+  if (!API_KEY || !query || query.length < 3) return [];
+
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=${max}&key=${API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    if (!data.items || data.items.length === 0) return [];
+
+    return data.items.map(vol => {
+      const info = vol.volumeInfo || {};
+      let year = null;
+      if (info.publishedDate) {
+        const m = info.publishedDate.match(/^(\d{4})/);
+        if (m) year = parseInt(m[1], 10);
+      }
+      const coverUrl = `https://books.google.com/books/content?id=${vol.id}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
+
+      let isbn = null;
+      if (info.industryIdentifiers) {
+        const isbn13 = info.industryIdentifiers.find(i => i.type === 'ISBN_13');
+        const isbn10 = info.industryIdentifiers.find(i => i.type === 'ISBN_10');
+        isbn = (isbn13 || isbn10)?.identifier || null;
+      }
+
+      return {
+        googleBooksId: vol.id,
+        title: info.title || '',
+        author: (info.authors && info.authors[0]) || '',
+        coverUrl,
+        year,
+        isbn,
+        pageCount: info.pageCount || null,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  Find or create a book in the database                              */
 /* ------------------------------------------------------------------ */
@@ -266,4 +312,4 @@ async function enrichBookMetadata(bookId) {
   return null;
 }
 
-module.exports = { searchGoogleBooks, findOrCreateBook, enrichBookMetadata };
+module.exports = { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook, enrichBookMetadata };

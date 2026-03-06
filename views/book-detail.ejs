@@ -1,7 +1,8 @@
 <!-- ===== Book Hero ===== -->
-<section class="book-hero">
+<% const coverUrl = getCoverUrl(book); %>
+<section class="book-hero-wrap"<% if (coverUrl) { %> style="--cover-url: url('<%= coverUrl %>')"<% } %>>
+<div class="book-hero">
   <div class="book-cover book-cover--lg">
-    <% const coverUrl = getCoverUrl(book); %>
     <% if (coverUrl) { %>
       <img src="<%= coverUrl %>" alt="Cover of <%= book.title %>">
     <% } else { %>
@@ -39,31 +40,52 @@
         <% } %>
       </div>
     <% } %>
+
+    <button type="button" class="share-btn" data-title="<%= book.title %> by <%= book.author %>" data-url="/books/<%= book.author_slug %>/<%= book.title_slug %>">
+      <svg class="share-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      <span class="share-btn__label">Share</span>
+    </button>
   </div>
+</div>
 </section>
 
 <!-- ===== Metadata ===== -->
+<% const hasMetadata = book.publication_year || book.page_count || book.isbn; %>
+<% if (hasMetadata) { %>
 <section class="section" style="padding-top: 0;">
-  <dl class="metadata-list">
-    <% if (book.publication_year) { %>
-      <dt>Published</dt>
-      <dd><%= book.publication_year %></dd>
-    <% } %>
+  <div class="book-metadata">
     <% if (book.page_count) { %>
-      <dt>Pages</dt>
-      <dd><%= book.page_count %></dd>
+      <div class="book-metadata__item">
+        <span class="book-metadata__label">Pages</span>
+        <span class="book-metadata__value"><%= book.page_count %></span>
+      </div>
     <% } %>
-    <dt>Goodreads</dt>
-    <dd><a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Search on Goodreads</a></dd>
-    <dt>StoryGraph</dt>
-    <dd><a href="https://app.thestorygraph.com/browse?search_term=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Search on StoryGraph</a></dd>
-    <dt>Bookshop</dt>
-    <dd><a href="https://bookshop.org/search?keywords=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="btn btn--secondary btn--sm">Shop on Bookshop.org</a></dd>
+    <% if (book.publication_year) { %>
+      <div class="book-metadata__item">
+        <span class="book-metadata__label">Published</span>
+        <span class="book-metadata__value"><%= book.publication_year %></span>
+      </div>
+    <% } %>
+    <% if (book.isbn) { %>
+      <div class="book-metadata__item">
+        <span class="book-metadata__label">ISBN</span>
+        <span class="book-metadata__value"><%= book.isbn %></span>
+      </div>
+    <% } %>
+  </div>
+</section>
+<% } %>
+
+<!-- ===== External Links ===== -->
+<section class="section" style="padding-top: 0;">
+  <div class="book-links">
+    <a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">Goodreads</a>
+    <a href="https://app.thestorygraph.com/browse?search_term=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">StoryGraph</a>
+    <a href="https://bookshop.org/search?keywords=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">Bookshop.org</a>
     <% if (book.meeting_status === 'results' && book.month_year) { %>
-      <dt>Results</dt>
-      <dd><a href="/results/<%= monthYearSlug(book.month_year) %>" class="btn btn--secondary btn--sm">View Voting Results</a></dd>
+      <a href="/results/<%= monthYearSlug(book.month_year) %>" class="book-links__pill">View Results</a>
     <% } %>
-  </dl>
+  </div>
 </section>
 
 <!-- ===== Grade Distribution ===== -->
@@ -137,6 +159,8 @@
         <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--ghost btn--sm">Edit My Review</a>
       <% } else if (user) { %>
         <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review" class="btn btn--primary btn--sm">Write a Review</a>
+      <% } else { %>
+        <a href="/login" class="login-prompt-link">Sign in to review</a>
       <% } %>
     </div>
   </div>
@@ -256,7 +280,11 @@
   </div>
   <% } else { %>
   <div class="empty-state">
-    <p class="empty-state__message">No reviews yet.</p>
+    <% if (user) { %>
+      <p class="empty-state__message">No reviews yet. <a href="/books/<%= book.author_slug %>/<%= book.title_slug %>/review">Be the first!</a></p>
+    <% } else { %>
+      <p class="empty-state__message">No reviews yet. <a href="/login">Sign in</a> to be the first!</p>
+    <% } %>
   </div>
   <% } %>
 </section>

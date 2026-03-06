@@ -4,7 +4,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const config = require('../config');
 const { slugify } = require('../utils/slug');
-const { searchGoogleBooks, findOrCreateBook } = require('../services/books');
+const { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook } = require('../services/books');
 const { getFingerprint } = require('../services/fingerprint');
 const {
   getNomineesForBallot,
@@ -381,6 +381,44 @@ router.delete('/admin/meetings/:id/nominees/:bookId', requireAdmin, (req, res) =
   broadcastAdminMeetingNominees(meetingId);
   broadcastPublicNominees(meetingId);
   res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// Edit nominee (update book title/author + nomination reason)
+// PUT /api/admin/meetings/:id/nominees/:bookId
+// ---------------------------------------------------------------------------
+router.put('/admin/meetings/:id/nominees/:bookId', requireAdmin, (req, res) => {
+  const meetingId = parseInt(req.params.id, 10);
+  const bookId = parseInt(req.params.bookId, 10);
+  if (isNaN(meetingId) || isNaN(bookId)) {
+    return res.status(400).json({ error: 'Invalid IDs.' });
+  }
+
+  const { title, author, reason } = req.body;
+  if (!title || !author) {
+    return res.status(400).json({ error: 'Title and author are required.' });
+  }
+
+  const trimTitle = String(title).trim().slice(0, 200);
+  const trimAuthor = String(author).trim().slice(0, 200);
+  const trimReason = reason ? String(reason).trim().slice(0, 500) : null;
+
+  // Update book title, author, and slugs
+  db.prepare(`
+    UPDATE books SET title = ?, author = ?, title_slug = ?, author_slug = ?
+    WHERE id = ?
+  `).run(trimTitle, trimAuthor, slugify(trimTitle), slugify(trimAuthor), bookId);
+
+  // Update nomination reason (if a nomination row exists)
+  db.prepare(`
+    UPDATE nominations SET reason = ?
+    WHERE meeting_id = ? AND book_id = ?
+  `).run(trimReason, meetingId, bookId);
+
+  broadcastAdminMeetingNominees(meetingId);
+  broadcastPublicNominees(meetingId);
+
+  res.json({ success: true, book: { id: bookId, title: trimTitle, author: trimAuthor, reason: trimReason } });
 });
 
 // ---------------------------------------------------------------------------
@@ -780,6 +818,26 @@ router.get('/books/search', async (req, res) => {
     });
   } catch {
     res.json({ found: false });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Multi-result book search (for nomination search bar)
+// GET /api/books/search-multi?q=...&maxResults=5
+// ---------------------------------------------------------------------------
+router.get('/books/search-multi', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const max = Math.min(parseInt(req.query.maxResults, 10) || 5, 10);
+
+  if (q.length < 3) {
+    return res.json({ results: [] });
+  }
+
+  try {
+    const results = await searchGoogleBooksMulti(q, max);
+    res.json({ results });
+  } catch {
+    res.json({ results: [] });
   }
 });
 

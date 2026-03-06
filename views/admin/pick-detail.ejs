@@ -353,9 +353,9 @@
                 <img src="<%= nom.cover_url %>" alt="<%= nom.title %>" loading="lazy">
               </div>
             <% } %>
-            <div class="admin-nominee__info">
-              <span class="t-body"><%= nom.title %></span>
-              <span class="t-caption text-secondary"><%= nom.author %></span>
+            <div class="admin-nominee__info js-nominee-display" data-book-id="<%= nom.book_id %>">
+              <span class="t-body js-nominee-title"><%= nom.title %></span>
+              <span class="t-caption text-secondary js-nominee-author"><%= nom.author %></span>
               <span class="t-caption text-secondary" style="opacity: 0.5;">
                 <% if (nom.nominator_name) { %>
                   Nominated by <%= nom.nominator_name %>
@@ -363,13 +363,30 @@
                   <%= nom.source %>
                 <% } %>
               </span>
+              <% if (nom.reason) { %>
+                <p class="t-caption text-secondary js-nominee-reason" style="margin-top: var(--s-1); font-style: italic;">&ldquo;<%= nom.reason %>&rdquo;</p>
+              <% } %>
             </div>
-            <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading' && meeting.status !== 'scheduled') { %>
-              <button class="btn btn--danger btn--sm js-remove-nominee"
-                      data-meeting-id="<%= meeting.id %>"
-                      data-book-id="<%= nom.book_id %>"
-                      data-title="<%= nom.title %>">Remove</button>
-            <% } %>
+            <div class="admin-nominee-edit" data-book-id="<%= nom.book_id %>" hidden>
+              <input type="text" class="form-input form-input--sm" name="title" value="<%= nom.title %>" placeholder="Title">
+              <input type="text" class="form-input form-input--sm" name="author" value="<%= nom.author %>" placeholder="Author">
+              <textarea class="form-input form-input--sm" name="reason" rows="2" placeholder="Why this book? (optional)"><%= nom.reason || '' %></textarea>
+              <div style="display: flex; gap: var(--s-2);">
+                <button type="button" class="btn btn--primary btn--xs js-save-nominee"
+                        data-meeting-id="<%= meeting.id %>"
+                        data-book-id="<%= nom.book_id %>">Save</button>
+                <button type="button" class="btn btn--ghost btn--xs js-cancel-edit-nominee">Cancel</button>
+              </div>
+            </div>
+            <div class="admin-nominee__actions">
+              <button type="button" class="btn btn--ghost btn--xs js-edit-nominee" data-book-id="<%= nom.book_id %>">Edit</button>
+              <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading' && meeting.status !== 'scheduled') { %>
+                <button class="btn btn--danger btn--sm js-remove-nominee"
+                        data-meeting-id="<%= meeting.id %>"
+                        data-book-id="<%= nom.book_id %>"
+                        data-title="<%= nom.title %>">Remove</button>
+              <% } %>
+            </div>
           </div>
         <% }); %>
       <% } else { %>
