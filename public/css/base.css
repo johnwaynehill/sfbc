@@ -22,6 +22,7 @@ body {
   color: var(--text);
   background-color: var(--bg);
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 img, picture, video, canvas, svg {

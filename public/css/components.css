@@ -93,59 +93,218 @@
   .book-nav__title { max-width: 120px; }
 }
 
-/* ---- Book Hero Wrap (blurred cover background) ---- */
+/* ---- Book Hero Wrap (immersive cover background) ---- */
 .book-hero-wrap {
   position: relative;
   overflow: hidden;
-  margin: 0 calc(-1 * var(--gutter));
-  padding: 0 var(--gutter);
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding-left: calc(50vw - 50%);
+  padding-right: calc(50vw - 50%);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
+
+.book-hero-wrap .book-description,
+.book-hero-wrap .book-tag,
+.book-hero-wrap .text-secondary {
+  color: inherit;
+}
+
+/* Blurred cover wash layer */
 .book-hero-wrap::before {
   content: '';
   position: absolute;
-  inset: -60px;
+  inset: -80px;
   background-image: var(--cover-url);
   background-size: cover;
-  background-position: center;
-  filter: blur(50px) saturate(1.2);
-  opacity: 0.12;
+  background-position: center 30%;
+  filter: blur(60px) saturate(1.4);
+  opacity: 0.15;
   z-index: 0;
   pointer-events: none;
 }
 
-/* ---- Book Hero ---- */
+/* Bottom gradient fade — dissolve wash into page bg */
+.book-hero-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---- Book Hero (two-column editorial layout) ---- */
 .book-hero {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--s-5);
-  padding: var(--s-6) 0;
+  padding: var(--s-6) 0 var(--s-5);
   align-items: start;
 }
 
-.book-hero > .book-cover {
-  width: 300px;
-  aspect-ratio: 2 / 3;
+/* Cover column */
+.book-hero__cover-col {
   position: sticky;
-  top: var(--s-3);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-  border-radius: var(--radius-md);
+  top: var(--s-4);
 }
 
-.book-hero__body {
+.book-hero .book-cover--lg {
+  width: 260px;
+  border: none;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.15),
+    0 12px 40px rgba(0,0,0,0.25),
+    0 30px 80px rgba(0,0,0,0.30);
+  border-radius: var(--radius-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-hero .book-cover--lg:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.15),
+    0 20px 50px rgba(0,0,0,0.28),
+    0 40px 100px rgba(0,0,0,0.35);
+}
+
+/* CTA buttons below cover */
+.book-hero__cta {
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+  margin-top: var(--s-3);
+  width: 100%;
+}
+
+.book-hero__cta-btn {
+  width: 100%;
+  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Body column */
+.book-hero__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   justify-content: flex-start;
   padding: var(--s-1) 0;
+  min-width: 0;
+}
+
+.book-hero__primary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+/* Month/year date label */
+.book-hero__date {
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--s-1);
 }
 
 .book-hero__title {
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
 }
 
+.book-hero__author {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: var(--t-lg);
+  color: inherit;
+  margin: 2px 0 0;
+}
+
+/* Grade row */
+.book-hero__grade {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: var(--s-3) 0 var(--s-1);
+}
+
+/* Hero footer: metadata + action pills */
+.book-hero__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}
+
+/* Inline metadata row (pages · year · isbn) */
+.book-meta-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  color: inherit;
+}
+
+.book-meta-inline__item {
+  white-space: nowrap;
+}
+
+.book-meta-inline__item + .book-meta-inline__item::before {
+  content: '\00b7';
+  padding: 0 8px;
+  color: var(--border);
+  font-weight: 700;
+}
+
+/* Action link row */
+.book-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+  align-items: center;
+}
+
+/* Text-style action links */
+.book-links__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.book-links__pill svg {
+  flex-shrink: 0;
+}
+
+.book-links__pill:hover {
+  text-decoration: underline;
+}
+
+/* Home hero compatibility — keep existing patterns working */
 .book-hero__meta {
   display: flex;
   align-items: center;
@@ -153,17 +312,10 @@
   flex-wrap: wrap;
 }
 
-/* Stacked variant: status above month/year (Home hero) */
 .book-hero__meta--stacked {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--s-2);
-}
-
-.book-hero__actions {
-  display: flex;
-  gap: var(--s-3);
-  margin-top: var(--s-3);
 }
 
 /* Meeting info — time & location */
@@ -186,40 +338,86 @@
   flex-shrink: 0;
 }
 
-/* Grade row — more breathing room */
-.book-hero__grade {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  margin: var(--s-2) 0;
-}
-
-/* Dark mode: subtler wash */
+/* ---- Dark mode hero adjustments ---- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .book-hero-wrap::before {
-    opacity: 0.06;
-    filter: blur(50px) saturate(0.8);
+    opacity: 0.10;
+    filter: blur(60px) saturate(1.0);
+  }
+  :root:not([data-theme="light"]) .book-hero-wrap::after {
+    height: 50%;
   }
 }
 [data-theme="dark"] .book-hero-wrap::before {
-  opacity: 0.06;
-  filter: blur(50px) saturate(0.8);
+  opacity: 0.10;
+  filter: blur(60px) saturate(1.0);
+}
+[data-theme="dark"] .book-hero-wrap::after {
+  height: 50%;
 }
 
+/* ---- Mobile hero layout ---- */
 @media (max-width: 640px) {
-  .book-hero {
-    grid-template-columns: 1fr;
-    gap: var(--s-3);
-    padding: var(--s-4) 0 var(--s-5);
+  .book-hero-wrap {
+    padding-bottom: var(--s-1);
   }
 
-  .book-hero > .book-cover {
-    width: 200px;
+  .book-hero {
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+    padding: var(--s-5) 0 var(--s-4);
+  }
+
+  .book-hero__cover-col {
     position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .book-hero__cta {
+    width: 260px;
+  }
+
+  .book-hero .book-cover--lg {
+    width: 260px;
+    box-shadow:
+      0 2px 8px rgba(0,0,0,0.15),
+      0 12px 40px rgba(0,0,0,0.25),
+      0 30px 80px rgba(0,0,0,0.30);
   }
 
   .book-hero__body {
     padding: 0;
+    text-align: center;
+  }
+
+  .book-hero__primary {
+    align-items: center;
+  }
+
+  .book-hero__tags {
+    justify-content: center;
+  }
+
+  .book-hero__grade {
+    justify-content: center;
+  }
+
+  .book-hero__footer {
+    align-items: center;
+  }
+
+  .book-meta-inline {
+    justify-content: center;
+  }
+
+  .book-hero__actions {
+    justify-content: center;
+  }
+
+  .book-description {
+    text-align: left;
   }
 }
 
@@ -359,32 +557,6 @@
   text-decoration: none;
 }
 
-/* ---- Share Button ---- */
-.share-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--s-1) var(--s-3);
-  margin-top: var(--s-2);
-  font-family: var(--font-ui);
-  font-size: var(--t-xs);
-  font-weight: 500;
-  color: var(--text2);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  align-self: flex-start;
-}
-.share-btn:hover {
-  color: var(--text);
-  border-color: var(--text3);
-}
-.share-btn__icon {
-  flex-shrink: 0;
-}
-
 /* ---- Login Prompt Link ---- */
 .login-prompt-link {
   font-family: var(--font-ui);
@@ -397,61 +569,7 @@
   text-decoration: underline;
 }
 
-/* ---- Book Metadata (label/value pairs) ---- */
-.book-metadata {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-3) var(--s-5);
-}
-
-.book-metadata__item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.book-metadata__label {
-  font-family: var(--font-ui);
-  font-weight: 500;
-  font-size: var(--t-xs);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text3);
-}
-
-.book-metadata__value {
-  font-family: var(--font-body);
-  font-size: var(--t-sm);
-  color: var(--text);
-}
-
-/* ---- Book External Links ---- */
-.book-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2);
-}
-
-.book-links__pill {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--s-1) var(--s-3);
-  font-family: var(--font-ui);
-  font-size: var(--t-xs);
-  font-weight: 500;
-  color: var(--text2);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  text-decoration: none;
-  transition: border-color 0.15s, color 0.15s;
-  white-space: nowrap;
-}
-
-.book-links__pill:hover {
-  color: var(--text);
-  border-color: var(--text3);
-}
+/* (Book metadata + links styles moved into Book Hero section above) */
 
 /* ---- Status Pill ---- */
 .status-pill {
