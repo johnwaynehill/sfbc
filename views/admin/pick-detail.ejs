@@ -370,7 +370,6 @@
             <div class="admin-nominee-edit" data-book-id="<%= nom.book_id %>" hidden>
               <input type="text" class="form-input form-input--sm" name="title" value="<%= nom.title %>" placeholder="Title">
               <input type="text" class="form-input form-input--sm" name="author" value="<%= nom.author %>" placeholder="Author">
-              <textarea class="form-input form-input--sm" name="reason" rows="2" placeholder="Why this book? (optional)"><%= nom.reason || '' %></textarea>
               <div style="display: flex; gap: var(--s-2);">
                 <button type="button" class="btn btn--primary btn--xs js-save-nominee"
                         data-meeting-id="<%= meeting.id %>"

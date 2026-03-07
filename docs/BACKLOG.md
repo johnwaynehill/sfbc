@@ -14,9 +14,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P0 | S | Improve metadata section visual design/layout | Metadata shoudl include: Pages, Publish Data, Published By, ISBN, Language. UX polish — current `<dl>` list is functional but plain |
-| P0 | S | Seprate Metadata from second CTAs | Goodreads, Storygraph, Bookshop.org should be in a different section/row |
-| P0 | M | Book cover as hero | Larger cover, subtle background color, immersive feel |
+| P1 | S | Add publisher & language to metadata | DB migration + API enrichment; backfill existing books. Hero already shows pages, year, ISBN. |
 | P1 | M | Admin can replace book covers | Fetch by ISBN or upload image; replace local stored version |
 | P2 | M | Tag-based filtering on History | Tap a tag → filter the grid; link to StoryGraph for that tag. ~30 books — search covers this until archive grows past 60. |
 | P2 | M | Author page | `/books/:authorSlug/` showing all books by that author. Not enough repeat authors yet to justify the route. |
@@ -56,8 +54,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P0 | S | Login prompt in Reviews section | Cheapest growth lever for the 875+. Every unauthenticated book page visit is a missed conversion. Ship with book page hero sprint. |
-| P0 | S | Share a book externally | If the book page is the destination, people need a way to send it. Directly serves "archive as product" thesis. |
 | P1 | M | Invite someone to the club | Shareable invite link |
 | P2 | L | Reading status per member | Reading, Read, DNF, Did Not Read — per-member tracking |
 | P2 | M | User-submitted discussion questions | Members contribute questions for the current book |
@@ -68,8 +64,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P0 | S | Edit a nomination | Fix spelling errors, update details after submission |
-| P0 | S | Show "why this book" rationale in admin pick detail | Currently collected but not displayed |
 | P1 | S | Hide/obscure full emails on /admin/users | Privacy improvement |
 | P1 | M | Admin pagination | Paginate reviews, picks, and users lists |
 | P1 | S | Unique nominations per cycle | Limit to one nomination per user per cycle |
@@ -101,6 +95,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | P1 | S | Show markdown helper in Reply form | Same hints as review textarea |
 | P2 | M | @ mentions | Mention another user in replies |
 | P2 | S | Coming Up section — enlarge covers | Larger book covers and more vertical space |
+| P2 | M | Add haptics on key interactions for mobile users | https://haptics.lochie.me/ |
 
 ## Bugs
 
@@ -109,7 +104,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
 | P1 | S | Samsung browser: Light Mode on Android | Light mode did not work on Samsung Android phones |
-| P0 | S | Nomination search bar | Start with search to find books (prevents typos, ensures covers) |
 
 ---
 
@@ -122,3 +116,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 3 | Route migration | Public routes + admin UI on picks |
 | 4 | Lifecycle reorder | Scheduled status, event tracking |
 | 5 | Quick wins + bugs | Metadata cleanup, book nav, my-reviews filter, toggle, --amber fix |
+| 6 | Book page as destination | Immersive hero, CTA buttons, inline metadata, external links, share, login prompts, nomination search + edit, rationale display |

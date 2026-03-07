@@ -4367,6 +4367,9 @@ textarea.form-input {
   flex: 1;
   min-width: 0;
 }
+.admin-nominee-edit[hidden] {
+  display: none;
+}
 .admin-nominee-edit .form-input--sm {
   font-size: var(--t-sm);
   padding: var(--s-1) var(--s-2);

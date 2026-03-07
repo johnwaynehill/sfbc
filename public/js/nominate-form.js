@@ -274,8 +274,12 @@
       })
       .then(function (result) {
         if (result.ok && result.data.success) {
-          // Show confirmation card and hide the form
+          // Show confirmation card and hide the form + search
           form.hidden = true;
+          var searchSection = document.getElementById('nom-search');
+          var dividerEl = document.getElementById('nom-divider');
+          if (searchSection) searchSection.hidden = true;
+          if (dividerEl) dividerEl.hidden = true;
           messageEl.hidden = false;
           messageEl.className = '';
 

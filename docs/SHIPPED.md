@@ -27,9 +27,12 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Placeholder covers** — Deterministic color-hash covers when no image available
 - **Grade distribution visualization** — Color gradient strip with tier axis on book detail
 - **Book-to-book navigation** — Prev/next month links at bottom of book detail pages *(Sprint 5)*
-- **Metadata section** — Goodreads, StoryGraph, and Bookshop.org links as secondary buttons *(Sprint 5)*
 - **Subjects/tags display** — Up to 6 genre tags shown on book hero section
 - **Book description** — Expandable "Read more" for long descriptions
+- **Immersive book hero** — Full-bleed blurred cover wash background, dramatic triple-layer shadow on cover, centered mobile layout at 260px *(Sprint 6)*
+- **Hero CTA buttons** — Review + Share buttons stacked below cover; context-aware (Write a Review / Sign in to Review) *(Sprint 6)*
+- **Inline metadata** — Pages, year, ISBN as compact dot-separated row in hero footer *(Sprint 6)*
+- **Text-style external links** — Goodreads, StoryGraph, Bookshop with icons; accent-colored accessible links *(Sprint 6)*
 
 ## Reviews & Engagement
 
@@ -50,6 +53,8 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Activity feed** — Home page shows reviews, replies, reactions, and nominations in real-time via SSE
 - **Announcements** — Admin-published updates on Home page with live SSE delivery
 - **Nominations page** — Public page showing nominations as they come in, live via SSE
+- **Share a book** — Web Share API with clipboard fallback; Share CTA in hero section *(Sprint 6)*
+- **Login prompts** — Review section header + empty state CTA for unauthenticated visitors *(Sprint 6)*
 
 ## Admin & Operations
 
@@ -65,6 +70,9 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Live admin SSE** — Nominations appear in real-time on admin pick detail
 - **Admin mobile responsive** — Hamburger nav, stacked cards, vertical stepper, full-width QR
 - **Admin form field dark mode** — Icons visible in dark mode
+- **Nomination rationale display** — "Why this book" reason shown on admin pick detail *(Sprint 6)*
+- **Inline nominee editing** — Edit title, author, reason in-place with PUT API *(Sprint 6)*
+- **Nomination search bar** — Google Books multi-result dropdown on nominate form; prevents typos, ensures covers *(Sprint 6)*
 
 ## Profiles & Identity
 
