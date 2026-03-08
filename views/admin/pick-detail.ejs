@@ -67,6 +67,7 @@
       var _nomineesReady = _nomineeCount >= 2;
       var _voteCount = typeof voteCount !== 'undefined' ? voteCount : 0;
       var _votesReady = _voteCount >= 1;
+      var _hasVoteData = results && results.rankings && results.rankings.length > 0;
       var _nParts = meeting.month_year.split('-');
       var _nY = parseInt(_nParts[0], 10);
       var _nM = parseInt(_nParts[1], 10) + 1;
@@ -115,9 +116,11 @@
                   data-new-status="reading">
             Start Reading →
           </button>
-          <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
-            📊 View results <span class="pipeline-link__arrow">↗</span>
-          </a>
+          <% if (_hasVoteData) { %>
+            <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
+              📊 View results <span class="pipeline-link__arrow">↗</span>
+            </a>
+          <% } %>
         </div>
 
       <% } else if (meeting.status === 'nominations') { %>
@@ -175,9 +178,11 @@
           <a href="/vote/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
             🗳️ Voting page <span class="pipeline-link__arrow">↗</span>
           </a>
-          <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
-            📊 Live results <span class="pipeline-link__arrow">↗</span>
-          </a>
+          <% if (_hasVoteData) { %>
+            <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
+              📊 Live results <span class="pipeline-link__arrow">↗</span>
+            </a>
+          <% } %>
         </div>
         <div class="pipeline-panel__actions">
           <button class="btn btn--primary pipeline-cta js-advance-status"
@@ -204,9 +209,11 @@
                   data-new-status="results">
             Mark as Finished →
           </button>
-          <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
-            📊 View results <span class="pipeline-link__arrow">↗</span>
-          </a>
+          <% if (_hasVoteData) { %>
+            <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
+              📊 View results <span class="pipeline-link__arrow">↗</span>
+            </a>
+          <% } %>
         </div>
 
       <% } else if (meeting.status === 'results') { %>
@@ -227,9 +234,11 @@
           <a href="/admin/picks/new?month=<%= encodeURIComponent(_nextMonth) %>" class="btn btn--primary pipeline-cta">
             Create Next Pick →
           </a>
-          <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
-            📊 View public results <span class="pipeline-link__arrow">↗</span>
-          </a>
+          <% if (_hasVoteData) { %>
+            <a href="/results/<%= _slug %>" class="pipeline-link" target="_blank" rel="noopener">
+              📊 View public results <span class="pipeline-link__arrow">↗</span>
+            </a>
+          <% } %>
         </div>
       <% } %>
 

@@ -265,7 +265,8 @@ router.get('/members/:slug', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   let book = db.prepare(`
-    SELECT b.*, mp.month_year, mp.status AS meeting_status
+    SELECT b.*, mp.month_year, mp.status AS meeting_status,
+           (mp.vote_results_json IS NOT NULL) AS has_vote_data
     FROM books b
     LEFT JOIN monthly_picks mp ON mp.book_id = b.id
     WHERE b.author_slug = ? AND b.title_slug = ?
@@ -302,7 +303,8 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
       if (enriched) {
         // Re-fetch with pick join to keep all fields
         book = db.prepare(`
-          SELECT b.*, mp.month_year, mp.status AS meeting_status
+          SELECT b.*, mp.month_year, mp.status AS meeting_status,
+                 (mp.vote_results_json IS NOT NULL) AS has_vote_data
           FROM books b
           LEFT JOIN monthly_picks mp ON mp.book_id = b.id
           WHERE b.id = ?
