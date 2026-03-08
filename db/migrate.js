@@ -30,10 +30,22 @@ function migrate() {
     const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8');
     console.log(`  [migrate] Applying ${file}...`);
 
+    // Disable foreign keys during migrations to prevent CASCADE deletes
+    // when migrations drop and recreate parent tables (e.g. meetings).
+    // SQLite requires this OUTSIDE a transaction.
+    db.pragma('foreign_keys = OFF');
+
     db.transaction(() => {
       db.exec(sql);
       db.prepare('INSERT INTO _migrations (filename) VALUES (?)').run(file);
     })();
+
+    // Re-enable and verify referential integrity
+    db.pragma('foreign_keys = ON');
+    const fkErrors = db.pragma('foreign_key_check');
+    if (fkErrors.length > 0) {
+      console.warn(`  [migrate] ⚠ FK violations after ${file}:`, fkErrors);
+    }
   }
 
   // ---------------------------------------------------------------------------
