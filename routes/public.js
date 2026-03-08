@@ -295,8 +295,8 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     }
   }
 
-  // Lazy-enrich metadata if description is missing
-  if (book.description == null) {
+  // Lazy-enrich metadata if key fields are missing
+  if (book.description == null || book.publisher == null || book.page_count == null) {
     try {
       const enriched = await enrichBookMetadata(book.id);
       if (enriched) {
@@ -338,7 +338,8 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
 
   // Reviews with display names
   const reviews = db.prepare(`
-    SELECT r.id, r.grade, r.body_markdown, r.has_spoilers, r.created_at, r.updated_at,
+    SELECT r.id, r.grade, r.body_markdown, r.has_spoilers, r.did_finish,
+           r.created_at, r.updated_at,
            r.user_id, u.display_name, u.avatar_style, u.user_slug, u.email,
            gw.weight
     FROM reviews r

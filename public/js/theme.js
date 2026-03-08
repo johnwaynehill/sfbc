@@ -23,6 +23,7 @@
   /** Apply theme to DOM without animation on first load. */
   function apply(theme) {
     document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
 
     // Update <meta name="theme-color">
     var meta = document.querySelector('meta[name="theme-color"]');

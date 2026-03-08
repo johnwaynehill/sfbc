@@ -9,6 +9,7 @@
 
 html {
   font-size: 16px;
+  color-scheme: light dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-size-adjust: 100%;

@@ -21,6 +21,7 @@
   var previewPane = document.getElementById('review-preview');
   var previewBtn  = document.getElementById('toolbar-preview');
   var spoilerCb   = document.getElementById('has-spoilers');
+  var didFinishCb = document.getElementById('did-finish');
   var submitBtn   = document.getElementById('review-submit');
   var messageEl   = document.getElementById('review-message');
   var methodField = form.querySelector('[name="_method"]');
@@ -304,6 +305,7 @@
         grade: gradeInput.value,
         body: textarea.value,
         spoilers: spoilerCb.checked,
+        didFinish: didFinishCb.checked,
         ts: Date.now(),
       }));
     } catch (e) { /* quota exceeded — ignore */ }
@@ -337,6 +339,11 @@
       if (draft.spoilers) {
         spoilerCb.checked = true;
       }
+
+      // Restore did-finish checkbox
+      if (draft.didFinish !== undefined) {
+        didFinishCb.checked = draft.didFinish;
+      }
     } catch (e) { /* corrupt data — ignore */ }
   }
 
@@ -344,8 +351,9 @@
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
   }
 
-  // Save on spoiler checkbox change
+  // Save on checkbox change
   spoilerCb.addEventListener('change', saveDraft);
+  didFinishCb.addEventListener('change', saveDraft);
 
   // ===========================================================================
   // Initialize
@@ -395,7 +403,7 @@
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ grade: grade, body: body, has_spoilers: hasSpoilers }),
+        body: JSON.stringify({ grade: grade, body: body, has_spoilers: hasSpoilers, did_finish: didFinishCb.checked }),
       });
 
       var data = await res.json();

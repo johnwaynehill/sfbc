@@ -43,7 +43,8 @@
       "Bash(xargs:*)",
       "Bash(npm run dev:*)",
       "Bash(gh pr:*)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(pkill -f \"node server\")"
     ]
   }
 }

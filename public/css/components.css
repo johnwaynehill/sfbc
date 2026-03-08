@@ -278,6 +278,7 @@
   flex-wrap: wrap;
   gap: var(--s-2) var(--s-3);
   align-items: center;
+  margin-top: var(--s-3);
 }
 
 /* Text-style action links */
@@ -727,6 +728,31 @@
 .grade-dist__axis span.active {
   color: var(--text2);
   opacity: 1;
+  position: relative;
+  cursor: default;
+}
+.grade-dist__axis span.active[data-count]::after {
+  content: attr(data-count);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  background: var(--text1);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.grade-dist__axis span.active[data-count]:hover::after,
+.grade-dist__axis span.active[data-count].is-tapped::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
 }
 
 /* Develop animation — Polaroid desaturate → saturate */
@@ -887,7 +913,30 @@
   color: #fbbf24;
 }
 
-/* ---- Spoiler Filter Toggle ---- */
+.dnf-badge {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #b91c1c;
+  background: rgba(185, 28, 28, 0.08);
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .dnf-badge {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* ---- Spoiler Filter ---- */
+.spoiler-filter {
+  display: flex;
+  align-items: center;
+  padding: var(--s-2) 0;
+  margin-bottom: var(--s-1);
+}
 .spoiler-toggle {
   display: inline-flex;
   align-items: center;
@@ -900,12 +949,15 @@
   font-size: var(--t-xs);
   color: var(--text3);
   cursor: pointer;
-  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 120ms ease;
   white-space: nowrap;
 }
 .spoiler-toggle:hover {
   background: var(--surface);
   color: var(--text2);
+}
+.spoiler-toggle:active {
+  transform: scale(0.97);
 }
 .spoiler-toggle[aria-pressed="true"] {
   background: var(--surface);
@@ -913,7 +965,30 @@
   border-color: var(--text3);
 }
 .spoiler-toggle__icon { flex-shrink: 0; }
-.spoiler-toggle__label { font-weight: 500; }
+.spoiler-toggle__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+.spoiler-toggle__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-lg);
+  background: var(--surface2);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text2);
+  transition: background 200ms ease, color 200ms ease;
+}
+.spoiler-toggle[aria-pressed="true"] .spoiler-toggle__count {
+  background: var(--accent);
+  color: #fff;
+}
 
 :is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-toggle {
   border-color: var(--border);
@@ -926,9 +1001,21 @@
   border-color: var(--text3);
 }
 
-/* Hide spoiler reviews by default */
+/* Animated spoiler card reveal/hide */
+.review-card[data-spoiler="true"] {
+  transition: opacity 250ms ease, max-height 300ms ease, margin 250ms ease;
+  overflow: hidden;
+}
 .review-list:not(.show-spoilers) .review-card[data-spoiler="true"] {
-  display: none;
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.review-list.show-spoilers .review-card[data-spoiler="true"] {
+  opacity: 1;
+  max-height: 2000px;
 }
 
 /* ---- Spoiler Toggle (review form) ---- */
@@ -1009,6 +1096,28 @@
 .spoiler-checkbox input:focus-visible + .spoiler-checkbox__label::before {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* ---- "Did you finish?" checkbox (review form) ---- */
+.finish-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: var(--s-3);
+  user-select: none;
+}
+.finish-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.finish-checkbox__label {
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  color: var(--text2);
 }
 
 /* ---- Reviews Header ---- */
@@ -2996,6 +3105,23 @@ textarea.form-input {
 :is([data-theme="dark"], :root:not([data-theme="light"])) .md-toolbar__btn:hover {
   background: var(--surface);
 }
+
+/* Compact toolbar (reply forms) */
+.md-toolbar--compact {
+  gap: 1px;
+  padding: 3px;
+}
+.md-toolbar--compact .md-toolbar__btn {
+  min-width: 28px;
+  height: 26px;
+  padding: 0 4px;
+  font-size: var(--t-xs);
+}
+.reply-form__textarea--toolbar {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 /* ---- Admin: Stats Row ---- */
 .admin-stats {
   display: flex;

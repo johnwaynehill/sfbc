@@ -93,6 +93,9 @@ const reviewChain = [
     .optional({ values: 'falsy' })
     .trim()
     .isLength({ max: 10000 }).withMessage('Review body is too long (max 10,000 characters).'),
+  body('did_finish')
+    .optional()
+    .toBoolean(),
 ];
 
 const nominationChain = [

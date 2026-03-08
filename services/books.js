@@ -64,6 +64,8 @@ async function searchGoogleBooks(title, author) {
       pageCount: info.pageCount || null,
       description,
       categories: info.categories || [],
+      publisher: info.publisher || null,
+      language: info.language || null,
     };
   } catch {
     return null;
@@ -207,6 +209,11 @@ function updateMetadataStmt() {
         description = COALESCE(?, description),
         subjects = COALESCE(?, subjects),
         google_books_id = COALESCE(?, google_books_id),
+        publisher = COALESCE(?, publisher),
+        language = COALESCE(?, language),
+        page_count = COALESCE(?, page_count),
+        publication_year = COALESCE(?, publication_year),
+        isbn = COALESCE(?, isbn),
         updated_at = datetime('now')
       WHERE id = ?
     `);
@@ -226,6 +233,11 @@ async function enrichBookMetadata(bookId) {
   let description = null;
   let subjects = [];
   let googleBooksId = book.google_books_id;
+  let publisher = null;
+  let language = null;
+  let pageCount = null;
+  let publicationYear = null;
+  let isbn = null;
 
   // Try Google Books first
   if (API_KEY) {
@@ -247,12 +259,29 @@ async function enrichBookMetadata(bookId) {
           description = result.description;
           subjects = result.categories || [];
           googleBooksId = result.googleBooksId;
+          publisher = result.publisher;
+          language = result.language;
+          pageCount = result.pageCount;
+          publicationYear = result.publicationYear;
+          isbn = result.isbn;
         }
       } else {
         if (info.description) {
           description = info.description.replace(/<[^>]+>/g, '').trim();
         }
         subjects = info.categories || [];
+        publisher = info.publisher || null;
+        language = info.language || null;
+        pageCount = info.pageCount || null;
+        if (info.publishedDate) {
+          const yearMatch = info.publishedDate.match(/^(\d{4})/);
+          if (yearMatch) publicationYear = parseInt(yearMatch[1], 10);
+        }
+        if (info.industryIdentifiers) {
+          const isbn13 = info.industryIdentifiers.find(i => i.type === 'ISBN_13');
+          const isbn10 = info.industryIdentifiers.find(i => i.type === 'ISBN_10');
+          isbn = (isbn13 || isbn10)?.identifier || null;
+        }
       }
     } catch {
       // Non-fatal
@@ -299,11 +328,16 @@ async function enrichBookMetadata(bookId) {
   }
 
   // Store whatever we found
-  if (description || subjects.length > 0) {
+  if (description || subjects.length > 0 || publisher || language || pageCount || publicationYear || isbn) {
     updateMetadataStmt().run(
       description || null,
       subjects.length > 0 ? JSON.stringify(subjects) : null,
       googleBooksId || null,
+      publisher || null,
+      language || null,
+      pageCount || null,
+      publicationYear || null,
+      isbn || null,
       bookId
     );
     return getBookByIdStmt().get(bookId);

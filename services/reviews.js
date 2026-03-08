@@ -9,7 +9,7 @@ const db = require('../db');
 const stmts = {
   getByBookAndUser: db.prepare(`
     SELECT r.id, r.book_id, r.user_id, r.grade, r.body_markdown,
-           r.created_at, r.updated_at, gw.weight
+           r.has_spoilers, r.did_finish, r.created_at, r.updated_at, gw.weight
     FROM reviews r
     JOIN grade_weights gw ON gw.grade = r.grade
     WHERE r.book_id = ? AND r.user_id = ?
@@ -27,12 +27,12 @@ const stmts = {
   `),
 
   create: db.prepare(`
-    INSERT INTO reviews (book_id, user_id, grade, body_markdown, has_spoilers, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    INSERT INTO reviews (book_id, user_id, grade, body_markdown, has_spoilers, did_finish, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
   `),
 
   update: db.prepare(`
-    UPDATE reviews SET grade = ?, body_markdown = ?, has_spoilers = ?, updated_at = datetime('now')
+    UPDATE reviews SET grade = ?, body_markdown = ?, has_spoilers = ?, did_finish = ?, updated_at = datetime('now')
     WHERE book_id = ? AND user_id = ?
   `),
 
@@ -72,13 +72,13 @@ function getByUser(userId) {
 }
 
 /** Create a new review. Returns the insert info. */
-function create(bookId, userId, grade, body, hasSpoilers) {
-  return stmts.create.run(bookId, userId, grade, body || null, hasSpoilers ? 1 : 0);
+function create(bookId, userId, grade, body, hasSpoilers, didFinish) {
+  return stmts.create.run(bookId, userId, grade, body || null, hasSpoilers ? 1 : 0, didFinish ? 1 : 0);
 }
 
 /** Update an existing review. Returns the update info. */
-function update(bookId, userId, grade, body, hasSpoilers) {
-  return stmts.update.run(grade, body || null, hasSpoilers ? 1 : 0, bookId, userId);
+function update(bookId, userId, grade, body, hasSpoilers, didFinish) {
+  return stmts.update.run(grade, body || null, hasSpoilers ? 1 : 0, didFinish ? 1 : 0, bookId, userId);
 }
 
 /** Delete a user's review for a specific book. Returns the change info. */

@@ -38,6 +38,61 @@
   }
 
   // ===========================================================================
+  // Compact markdown toolbar for reply forms
+  // ===========================================================================
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.md-toolbar--compact [data-action]');
+    if (!btn) return;
+
+    var formWrap = btn.closest('.reply-form-wrap');
+    if (!formWrap) return;
+
+    var ta = formWrap.querySelector('.reply-form__textarea');
+    if (!ta) return;
+
+    var action = btn.dataset.action;
+    var start = ta.selectionStart;
+    var end = ta.selectionEnd;
+    var text = ta.value;
+    var selected = text.slice(start, end);
+    var before = text.slice(0, start);
+    var after = text.slice(end);
+    var replacement, cursorOffset;
+
+    switch (action) {
+      case 'bold':
+        replacement = '**' + (selected || 'bold text') + '**';
+        cursorOffset = selected ? replacement.length : 2;
+        break;
+      case 'italic':
+        replacement = '*' + (selected || 'italic text') + '*';
+        cursorOffset = selected ? replacement.length : 1;
+        break;
+      case 'spoiler':
+        replacement = '||' + (selected || 'spoiler text') + '||';
+        cursorOffset = selected ? replacement.length : 2;
+        break;
+      case 'link':
+        if (selected) {
+          replacement = '[' + selected + '](url)';
+          cursorOffset = replacement.length - 1;
+        } else {
+          replacement = '[link text](url)';
+          cursorOffset = 1;
+        }
+        break;
+      default:
+        return;
+    }
+
+    ta.value = before + replacement + after;
+    var newPos = start + cursorOffset;
+    ta.setSelectionRange(newPos, newPos);
+    ta.focus();
+    updateCharCount(formWrap);
+  });
+
+  // ===========================================================================
   // Reply trigger — toggle form visibility
   // ===========================================================================
   document.addEventListener('click', function (e) {

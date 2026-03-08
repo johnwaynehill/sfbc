@@ -114,6 +114,12 @@
       <span class="spoiler-checkbox__label">This review contains spoilers</span>
     </label>
 
+    <label class="finish-checkbox">
+      <input type="checkbox" name="did_finish" id="did-finish" value="1"
+             <%= (!review || review.did_finish) ? 'checked' : '' %>>
+      <span class="finish-checkbox__label">I finished this book</span>
+    </label>
+
     <div id="review-message" hidden></div>
 
     <div class="review-form__actions">

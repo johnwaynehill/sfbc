@@ -669,7 +669,8 @@ router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValid
   }
 
   const hasSpoilers = !!req.body.has_spoilers;
-  reviewsService.create(bookId, req.user.id, grade, body, hasSpoilers);
+  const didFinish = req.body.did_finish !== undefined ? !!req.body.did_finish : true;
+  reviewsService.create(bookId, req.user.id, grade, body, hasSpoilers, didFinish);
   broadcastHomeActivity();
   res.status(201).json({ success: true });
 });
@@ -694,7 +695,8 @@ router.put('/books/:bookId/reviews', requireMember, ...reviewChain, handleValida
   if (!validGrade) return res.status(400).json({ error: 'Invalid grade.' });
 
   const hasSpoilers = !!req.body.has_spoilers;
-  reviewsService.update(bookId, req.user.id, grade, body, hasSpoilers);
+  const didFinish = req.body.did_finish !== undefined ? !!req.body.did_finish : true;
+  reviewsService.update(bookId, req.user.id, grade, body, hasSpoilers, didFinish);
   res.json({ success: true });
 });
 

@@ -9219,6 +9219,4228 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "vhOXW",
+      "x": 0,
+      "y": 5187,
+      "name": "Hero V1 — Editorial Overlay",
+      "clip": true,
+      "width": 800,
+      "height": 520,
+      "fill": "#111111",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "sdKh2",
+          "x": 0,
+          "y": 0,
+          "name": "Cover BG",
+          "opacity": 0.35,
+          "metadata": {
+            "type": "unsplash",
+            "username": "sschusterphotoart",
+            "link": "https://unsplash.com/@sschusterphotoart",
+            "author": "Sebastian Schuster"
+          },
+          "width": 800,
+          "height": 520,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1766269766133-db7c74f16a66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE2Mzl8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "fill"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "Gby4n",
+          "x": 0,
+          "y": 0,
+          "name": "Gradient Overlay",
+          "width": 800,
+          "height": 520,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#00000000",
+                "position": 0
+              },
+              {
+                "color": "#000000CC",
+                "position": 0.5
+              },
+              {
+                "color": "#000000F0",
+                "position": 1
+              }
+            ]
+          }
+        },
+        {
+          "type": "frame",
+          "id": "k8TYS",
+          "x": 0,
+          "y": 0,
+          "name": "Content",
+          "width": 800,
+          "height": 520,
+          "gap": 40,
+          "padding": 48,
+          "alignItems": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "QyLxA",
+              "name": "Cover",
+              "metadata": {
+                "type": "unsplash",
+                "username": "worldsbetweenlines",
+                "link": "https://unsplash.com/@worldsbetweenlines",
+                "author": "Patrick Hendry"
+              },
+              "width": 160,
+              "height": 240,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1589910580858-4972e2c3d28e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE2NDB8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              },
+              "cornerRadius": 4,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000088",
+                "offset": {
+                  "x": 0,
+                  "y": 12
+                },
+                "blur": 40
+              }
+            },
+            {
+              "type": "frame",
+              "id": "qCPpT",
+              "name": "Text Column",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Odf24",
+                  "name": "dateLbl",
+                  "fill": "#D4A054",
+                  "content": "FEBRUARY 2026",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "D8TU5",
+                  "name": "titleTxt",
+                  "fill": "#FFFFFF",
+                  "content": "Ubik",
+                  "fontFamily": "Playfair Display",
+                  "fontSize": 56,
+                  "fontWeight": "700",
+                  "letterSpacing": -2,
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "text",
+                  "id": "3XJXy",
+                  "name": "authorTxt",
+                  "fill": "#FFFFFF99",
+                  "content": "Philip K. Dick",
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 20,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "srX2K",
+                  "name": "tagRow",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "iUXEv",
+                      "name": "tag1",
+                      "fill": "#FFFFFF18",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF30"
+                      },
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "unt6C",
+                          "name": "tag1t",
+                          "fill": "#FFFFFFCC",
+                          "content": "Fiction",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4be7e",
+                      "name": "tag2",
+                      "fill": "#FFFFFF18",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF30"
+                      },
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "IycKI",
+                          "name": "tag2t",
+                          "fill": "#FFFFFFCC",
+                          "content": "Death",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rcBbj",
+                      "name": "tag3",
+                      "fill": "#FFFFFF18",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF30"
+                      },
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "M9KRe",
+                          "name": "tag3t",
+                          "fill": "#FFFFFFCC",
+                          "content": "Businessmen",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "65djU",
+                  "name": "metaRow",
+                  "fill": "#FFFFFF55",
+                  "content": "224 pages · 1969 · ISBN 9780547572291",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "Jho7h",
+                  "name": "gradeFrame",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "d74W1",
+                      "name": "gradeBadge",
+                      "fill": "#D4A054",
+                      "cornerRadius": 6,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "EnyIL",
+                          "name": "gradeText",
+                          "fill": "#000000",
+                          "content": "B+",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "4kaFI",
+                      "name": "reviewCount",
+                      "fill": "#FFFFFF77",
+                      "content": "5 reviews",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "yuyBn",
+      "x": 900,
+      "y": 5187,
+      "name": "Hero V2 — Split Composition",
+      "clip": true,
+      "width": 800,
+      "height": 520,
+      "fill": "#0f1724",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "mwi46",
+          "x": 0,
+          "y": 0,
+          "name": "Left Panel",
+          "width": 420,
+          "height": 520,
+          "fill": "#0f1724",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 48,
+          "justifyContent": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "EtuZE",
+              "name": "dateLbl2",
+              "fill": "#6B8AFF",
+              "content": "FEBRUARY 2026",
+              "fontFamily": "IBM Plex Mono",
+              "fontSize": 11,
+              "fontWeight": "500",
+              "letterSpacing": 2
+            },
+            {
+              "type": "text",
+              "id": "ur84q",
+              "name": "titleTxt2",
+              "fill": "#FFFFFF",
+              "content": "Ubik",
+              "fontFamily": "Fraunces",
+              "fontSize": 64,
+              "fontWeight": "700",
+              "letterSpacing": -2
+            },
+            {
+              "type": "text",
+              "id": "z10LI",
+              "name": "authorTxt2",
+              "fill": "#FFFFFF80",
+              "content": "Philip K. Dick",
+              "fontFamily": "Source Serif 4",
+              "fontSize": 18,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "frame",
+              "id": "mq42o",
+              "name": "divider2",
+              "width": 48,
+              "height": 3,
+              "fill": "#6B8AFF",
+              "cornerRadius": 2
+            },
+            {
+              "type": "frame",
+              "id": "K19gs",
+              "name": "tagRow2",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "FSrc5",
+                  "name": "t2a",
+                  "fill": "#FFFFFF66",
+                  "content": "Fiction",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "rJinX",
+                  "name": "t2dot",
+                  "fill": "#FFFFFF33",
+                  "content": "·",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "24CJc",
+                  "name": "t2b",
+                  "fill": "#FFFFFF66",
+                  "content": "Death",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "YTnb1",
+                  "name": "t2dot2",
+                  "fill": "#FFFFFF33",
+                  "content": "·",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "qZyfQ",
+                  "name": "t2c",
+                  "fill": "#FFFFFF66",
+                  "content": "Businessmen",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FgcMX",
+              "name": "gradeRow2",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ST1kg",
+                  "name": "gb2",
+                  "fill": "#6B8AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    5,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "BcSf8",
+                      "name": "gt2",
+                      "fill": "#FFFFFF",
+                      "content": "B+",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "xM3vt",
+                  "name": "rc2",
+                  "fill": "#FFFFFF55",
+                  "content": "5 reviews",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "LlFgj",
+              "name": "metaRow2",
+              "fill": "#FFFFFF44",
+              "content": "224 pages · 1969",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "mA4Zr",
+          "x": 420,
+          "y": 0,
+          "name": "Right Cover",
+          "metadata": {
+            "type": "unsplash",
+            "username": "bsteczdesigns_",
+            "link": "https://unsplash.com/@bsteczdesigns_",
+            "author": "Brandon Stecz"
+          },
+          "clip": true,
+          "width": 380,
+          "height": 520,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1640280882428-547d0afe0c8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE2Njl8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "fill"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "jyVV6",
+          "x": 420,
+          "y": 0,
+          "name": "Right Overlay",
+          "width": 380,
+          "height": 520,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#0f172480",
+                "position": 0
+              },
+              {
+                "color": "#0f172400",
+                "position": 0.4
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "QOGqQ",
+      "x": 1800,
+      "y": 5187,
+      "name": "Hero V3 — Floating Card",
+      "clip": true,
+      "width": 800,
+      "height": 520,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 180,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#fdf6ee",
+            "position": 0
+          },
+          {
+            "color": "#f5e6d3",
+            "position": 1
+          }
+        ]
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "vzD8z",
+          "x": 0,
+          "y": 0,
+          "name": "Content",
+          "width": 800,
+          "height": 520,
+          "gap": 48,
+          "padding": [
+            48,
+            56
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "1avtx",
+              "name": "Cover Card",
+              "metadata": {
+                "type": "unsplash",
+                "username": "bostonpubliclibrary",
+                "link": "https://unsplash.com/@bostonpubliclibrary",
+                "author": "Boston Public Library"
+              },
+              "width": 220,
+              "height": 330,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1709888246748-c61435a6a13d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE3MDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              },
+              "cornerRadius": 8,
+              "effect": [
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000012",
+                  "offset": {
+                    "x": 0,
+                    "y": 4
+                  },
+                  "blur": 12
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000020",
+                  "offset": {
+                    "x": 0,
+                    "y": 20
+                  },
+                  "blur": 60
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "oug1d",
+              "name": "Body",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "nvYH9",
+                  "name": "v3date",
+                  "fill": "#b45309",
+                  "content": "FEBRUARY 2026",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "slrXq",
+                  "name": "v3title",
+                  "fill": "#1a1a1a",
+                  "content": "Ubik",
+                  "fontFamily": "Fraunces",
+                  "fontSize": 52,
+                  "fontWeight": "700",
+                  "letterSpacing": -1
+                },
+                {
+                  "type": "text",
+                  "id": "G3jHo",
+                  "name": "v3author",
+                  "fill": "#666666",
+                  "content": "Philip K. Dick",
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 18,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "xhQws",
+                  "name": "v3sep",
+                  "width": 40,
+                  "height": 2,
+                  "fill": "#b4530944",
+                  "cornerRadius": 1
+                },
+                {
+                  "type": "text",
+                  "id": "KW1dZ",
+                  "name": "v3desc",
+                  "fill": "#555555",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "1992: Humanity now enjoys a range of psychic abilities. Glen Runciter runs his own organization employing inertials...",
+                  "lineHeight": 1.6,
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "P6XyL",
+                  "name": "v3tags",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "hAwMQ",
+                      "name": "v3t1",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "2pFQF",
+                          "name": "v3t1t",
+                          "fill": "#b45309",
+                          "content": "Fiction",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SMHEv",
+                      "name": "v3t2",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "7bvGm",
+                          "name": "v3t2t",
+                          "fill": "#b45309",
+                          "content": "Death",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "id3nn",
+                      "name": "v3t3",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "DY40X",
+                          "name": "v3t3t",
+                          "fill": "#b45309",
+                          "content": "Businessmen",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vTq94",
+                  "name": "v3footer",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "R4MLK",
+                      "name": "v3gb",
+                      "fill": "#b45309",
+                      "cornerRadius": 6,
+                      "padding": [
+                        5,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "9iIbN",
+                          "name": "v3gt",
+                          "fill": "#FFFFFF",
+                          "content": "B+",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "2emqN",
+                      "name": "v3rc",
+                      "fill": "#999999",
+                      "content": "5 reviews",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "nV4mL",
+                      "name": "v3meta",
+                      "fill": "#BBBBBB",
+                      "content": "· 224 pages · 1969",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Rm2dM",
+      "x": 0,
+      "y": 5807,
+      "name": "Hero V4 — Cinematic Tint",
+      "clip": true,
+      "width": 800,
+      "height": 520,
+      "fill": "#1a1410",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "GTb2P",
+          "x": 0,
+          "y": 0,
+          "name": "BG Image",
+          "opacity": 0.25,
+          "metadata": {
+            "type": "unsplash",
+            "username": "philcat",
+            "link": "https://unsplash.com/@philcat",
+            "author": "Sam Tsonis"
+          },
+          "width": 800,
+          "height": 520,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1759864731065-b0626a2a4e82?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE3MzR8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "fill"
+          }
+        },
+        {
+          "type": "frame",
+          "id": "KPqLO",
+          "x": 0,
+          "y": 0,
+          "name": "Sepia Tint",
+          "width": 800,
+          "height": 520,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "radial",
+            "enabled": true,
+            "rotation": 0,
+            "size": {
+              "width": 1,
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#2a180a88",
+                "position": 0
+              },
+              {
+                "color": "#1a1410EE",
+                "position": 1
+              }
+            ]
+          }
+        },
+        {
+          "type": "frame",
+          "id": "PNrOY",
+          "x": 0,
+          "y": 0,
+          "name": "Content",
+          "width": 800,
+          "height": 520,
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            40,
+            60
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "VEwgC",
+              "name": "v4date",
+              "fill": "#C8956B",
+              "content": "FEBRUARY 2026",
+              "fontFamily": "IBM Plex Mono",
+              "fontSize": 12,
+              "letterSpacing": 4
+            },
+            {
+              "type": "text",
+              "id": "dlHYr",
+              "name": "v4title",
+              "fill": "#F5E6D3",
+              "content": "Ubik",
+              "fontFamily": "Playfair Display",
+              "fontSize": 96,
+              "fontWeight": "700",
+              "letterSpacing": -4,
+              "fontStyle": "italic"
+            },
+            {
+              "type": "text",
+              "id": "WboUy",
+              "name": "v4author",
+              "fill": "#C8956B",
+              "content": "by Philip K. Dick",
+              "fontFamily": "Source Serif 4",
+              "fontSize": 20,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            },
+            {
+              "type": "frame",
+              "id": "knk4H",
+              "name": "v4line",
+              "width": 120,
+              "height": 1,
+              "fill": "#C8956B44"
+            },
+            {
+              "type": "frame",
+              "id": "BHzc8",
+              "name": "v4metaRow",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "a3VhN",
+                  "name": "v4m1",
+                  "fill": "#C8956B88",
+                  "content": "224 pages",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "yfCGD",
+                  "name": "v4mdot",
+                  "fill": "#C8956B44",
+                  "content": "·",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "kit2W",
+                  "name": "v4m2",
+                  "fill": "#C8956B88",
+                  "content": "1969",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "7WvyI",
+                  "name": "v4mdot2",
+                  "fill": "#C8956B44",
+                  "content": "·",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Xj6Si",
+                  "name": "v4m3",
+                  "fill": "#C8956B88",
+                  "content": "Fiction",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "iy4Kt",
+              "name": "v4gradeRow",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "pOqx6",
+                  "name": "v4gb",
+                  "cornerRadius": 100,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#C8956B66"
+                  },
+                  "padding": [
+                    6,
+                    14
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "A1KfZ",
+                      "name": "v4gt",
+                      "fill": "#F5E6D3",
+                      "content": "B+",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "ADQXQ",
+                  "name": "v4rc",
+                  "fill": "#C8956B77",
+                  "content": "5 reviews",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "CJK8N",
+              "name": "Cover Thumb",
+              "opacity": 0.85,
+              "metadata": {
+                "type": "unsplash",
+                "username": "susan0175",
+                "link": "https://unsplash.com/@susan0175",
+                "author": "Trung Manh cong"
+              },
+              "width": 100,
+              "height": 150,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1714146999438-45e2c6cd4f7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE3MzV8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              },
+              "cornerRadius": 4,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000066",
+                "offset": {
+                  "x": 0,
+                  "y": 8
+                },
+                "blur": 30
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "X1NRv",
+      "x": 900,
+      "y": 5807,
+      "name": "Hero V5 — Minimal Print",
+      "clip": true,
+      "width": 800,
+      "height": 520,
+      "fill": "#FAFAF7",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "NQQWs",
+          "x": 0,
+          "y": 0,
+          "name": "v5topBorder",
+          "width": 800,
+          "height": 3,
+          "fill": "#1a1a1a"
+        },
+        {
+          "type": "frame",
+          "id": "eW7GS",
+          "x": 0,
+          "y": 3,
+          "name": "Content",
+          "width": 800,
+          "height": 517,
+          "gap": 48,
+          "padding": [
+            48,
+            64
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "1qr6S",
+              "name": "Left Col",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "AJrQV",
+                  "name": "Cover",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "arthurbizkit",
+                    "link": "https://unsplash.com/@arthurbizkit",
+                    "author": "Arthur Mazi"
+                  },
+                  "width": 140,
+                  "height": 210,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "https://images.unsplash.com/photo-1663789669038-ba180c8c155a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzE3NzB8&ixlib=rb-4.1.0&q=80&w=1080",
+                    "mode": "fill"
+                  },
+                  "cornerRadius": 2,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E0E0E0"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000010",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 8
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "QVbsB",
+                  "name": "v5gradeWrap",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "eWZ9o",
+                      "name": "v5gb",
+                      "cornerRadius": 4,
+                      "stroke": {
+                        "thickness": 1.5,
+                        "fill": "#1a1a1a"
+                      },
+                      "padding": [
+                        3,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "lhd5O",
+                          "name": "v5gt",
+                          "fill": "#1a1a1a",
+                          "content": "B+",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "3anR8",
+                      "name": "v5rc",
+                      "fill": "#999999",
+                      "content": "5 reviews",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "EPPbU",
+              "name": "Right Col",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "RbsdG",
+                  "name": "v5date",
+                  "fill": "#999999",
+                  "content": "FEBRUARY 2026",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 10,
+                  "fontWeight": "500",
+                  "letterSpacing": 3
+                },
+                {
+                  "type": "text",
+                  "id": "2Fkrw",
+                  "name": "v5title",
+                  "fill": "#1a1a1a",
+                  "content": "Ubik",
+                  "fontFamily": "Fraunces",
+                  "fontSize": 48,
+                  "fontWeight": "800",
+                  "letterSpacing": -1
+                },
+                {
+                  "type": "text",
+                  "id": "2s9Ak",
+                  "name": "v5author",
+                  "fill": "#666666",
+                  "content": "Philip K. Dick",
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 18,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "YUTBY",
+                  "name": "v5divider",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "#E0E0E0"
+                },
+                {
+                  "type": "text",
+                  "id": "5XiCu",
+                  "name": "v5desc",
+                  "fill": "#555555",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "1992: Humanity now enjoys a range of psychic abilities. Glen Runciter runs his own organization employing inertials — those capable of blocking telepathic and precognitive abilities...",
+                  "lineHeight": 1.7,
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "NOgVw",
+                  "name": "v5metaGrid",
+                  "gap": 32,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "aQ0md",
+                      "name": "v5mg1",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "x6Lnt",
+                          "name": "v5ml1",
+                          "fill": "#BBBBBB",
+                          "content": "PAGES",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 9,
+                          "fontWeight": "500",
+                          "letterSpacing": 2
+                        },
+                        {
+                          "type": "text",
+                          "id": "zOVIg",
+                          "name": "v5mv1",
+                          "fill": "#1a1a1a",
+                          "content": "224",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "eSn8o",
+                      "name": "v5mg2",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Cr3bV",
+                          "name": "v5ml2",
+                          "fill": "#BBBBBB",
+                          "content": "YEAR",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 9,
+                          "fontWeight": "500",
+                          "letterSpacing": 2
+                        },
+                        {
+                          "type": "text",
+                          "id": "iSE71",
+                          "name": "v5mv2",
+                          "fill": "#1a1a1a",
+                          "content": "1969",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "qPPwO",
+                      "name": "v5mg3",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "XJYd0",
+                          "name": "v5ml3",
+                          "fill": "#BBBBBB",
+                          "content": "GENRE",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 9,
+                          "fontWeight": "500",
+                          "letterSpacing": 2
+                        },
+                        {
+                          "type": "text",
+                          "id": "SQ53E",
+                          "name": "v5mv3",
+                          "fill": "#1a1a1a",
+                          "content": "Fiction",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "jgE9Z",
+      "x": 2720,
+      "y": 5187,
+      "name": "Book Detail — Full Page (V3)",
+      "clip": true,
+      "width": 800,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "YnPJD",
+          "name": "Nav Bar",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": {
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E8E8E8"
+          },
+          "padding": [
+            16,
+            32
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "O0QHd",
+              "name": "navLogo",
+              "fill": "#1a1a1a",
+              "content": "SF Fantasy & Sci-Fi Book Club",
+              "fontFamily": "Fraunces",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "5XDzq",
+              "name": "navLinks",
+              "gap": 24,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "8EDjH",
+                  "name": "nl1",
+                  "fill": "#666666",
+                  "content": "Home",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "eElPU",
+                  "name": "nl2",
+                  "fill": "#666666",
+                  "content": "History",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "jXqx1",
+                  "name": "nl3",
+                  "fill": "#666666",
+                  "content": "About",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "7jMsn",
+                  "name": "nl4",
+                  "fill": "#b45309",
+                  "content": "Sign in",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "swLRZ",
+          "name": "Hero Section",
+          "width": "fill_container",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#fdf6ee",
+                "position": 0
+              },
+              {
+                "color": "#f5e6d3",
+                "position": 1
+              }
+            ]
+          },
+          "stroke": {
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E8E0D4"
+          },
+          "gap": 48,
+          "padding": [
+            48,
+            56
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "DDWq0",
+              "name": "Cover",
+              "metadata": {
+                "type": "unsplash",
+                "username": "nuarharuha",
+                "link": "https://unsplash.com/@nuarharuha",
+                "author": "NHN"
+              },
+              "width": 220,
+              "height": 330,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1757349984662-0e7fb92cae91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzIxMTF8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              },
+              "cornerRadius": 6,
+              "effect": [
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000012",
+                  "offset": {
+                    "x": 0,
+                    "y": 4
+                  },
+                  "blur": 12
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000020",
+                  "offset": {
+                    "x": 0,
+                    "y": 20
+                  },
+                  "blur": 60
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VBwnL",
+              "name": "Body",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "luynS",
+                  "name": "hDate",
+                  "fill": "#b45309",
+                  "content": "FEBRUARY 2026",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "O84fA",
+                  "name": "hTitle",
+                  "fill": "#1a1a1a",
+                  "content": "Ubik",
+                  "fontFamily": "Fraunces",
+                  "fontSize": 52,
+                  "fontWeight": "700",
+                  "letterSpacing": -1
+                },
+                {
+                  "type": "text",
+                  "id": "LUQar",
+                  "name": "hAuthor",
+                  "fill": "#666666",
+                  "content": "Philip K. Dick",
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 18,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "NJP8w",
+                  "name": "hTags",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "IIJQz",
+                      "name": "ht1",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bVXzH",
+                          "name": "ht1t",
+                          "fill": "#b45309",
+                          "content": "Businessmen",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "L7xBJ",
+                      "name": "ht2",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "piy2u",
+                          "name": "ht2t",
+                          "fill": "#b45309",
+                          "content": "Fiction",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CqNKj",
+                      "name": "ht3",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Th952",
+                          "name": "ht3t",
+                          "fill": "#b45309",
+                          "content": "Death",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZjaRQ",
+                  "name": "hGrade",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ab3q2",
+                      "name": "hgb",
+                      "fill": "#b45309",
+                      "cornerRadius": 6,
+                      "padding": [
+                        5,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Ailtt",
+                          "name": "hgt",
+                          "fill": "#FFFFFF",
+                          "content": "B+",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "ohPBo",
+                      "name": "hrc",
+                      "fill": "#999999",
+                      "content": "5 reviews",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "GnclA",
+                  "name": "hSep",
+                  "width": 40,
+                  "height": 2,
+                  "fill": "#b4530933",
+                  "cornerRadius": 1
+                },
+                {
+                  "type": "text",
+                  "id": "QUmZB",
+                  "name": "hDesc",
+                  "fill": "#555555",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "1992: Humanity now enjoys a range of psychic abilities. Glen Runciter runs his own organization employing inertials — those capable of blocking telepathic and precognitive abilities...",
+                  "lineHeight": 1.6,
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "YS4oC",
+                  "name": "hReadMore",
+                  "fill": "#b45309",
+                  "content": "Read more",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "dKsfN",
+                  "name": "Hero Footer",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "top": 1
+                    },
+                    "fill": "#b4530922"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": [
+                    12,
+                    0,
+                    0,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fjYEv",
+                      "name": "hMeta",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "RYODf",
+                          "name": "hm1",
+                          "fill": "#999999",
+                          "content": "224 pages",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "3vKvQ",
+                          "name": "hmdot",
+                          "fill": "#CCCCCC",
+                          "content": "·",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "98E3H",
+                          "name": "hm2",
+                          "fill": "#999999",
+                          "content": "1969",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "fgNIe",
+                          "name": "hmdot2",
+                          "fill": "#CCCCCC",
+                          "content": "·",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "OKmK7",
+                          "name": "hm3",
+                          "fill": "#999999",
+                          "content": "ISBN 9780547572291",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "PuCqv",
+                      "name": "hActions",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "lAhAS",
+                          "name": "ha1",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "H9MPv",
+                              "name": "ha1t",
+                              "fill": "#555555",
+                              "content": "Goodreads",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "3i4GO",
+                          "name": "ha2",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Eao1a",
+                              "name": "ha2t",
+                              "fill": "#555555",
+                              "content": "StoryGraph",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "3mcxZ",
+                          "name": "ha3",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "OPIum",
+                              "name": "ha3t",
+                              "fill": "#555555",
+                              "content": "Bookshop",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "NLoVy",
+                          "name": "ha4",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "s8xe4",
+                              "name": "ha4t",
+                              "fill": "#555555",
+                              "content": "Results",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jRMTm",
+                          "name": "ha5",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tidsM",
+                              "name": "ha5t",
+                              "fill": "#555555",
+                              "content": "Share",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "eekqH",
+          "name": "Grade Distribution",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            32,
+            56
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "SEiYJ",
+              "name": "gdCard",
+              "width": "fill_container",
+              "fill": "#FAFAF8",
+              "cornerRadius": 12,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E8E8E8"
+              },
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ywJf3",
+                  "name": "gdHeader",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "0Bsq4",
+                      "name": "gdTitle",
+                      "fill": "#1a1a1a",
+                      "content": "Grade Distribution",
+                      "fontFamily": "Fraunces",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dzr0K",
+                      "name": "gdRight",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "299BP",
+                          "name": "gdBadge",
+                          "fill": "#3B82F6",
+                          "cornerRadius": 6,
+                          "padding": [
+                            3,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ry3j3",
+                              "name": "gdBadgeT",
+                              "fill": "#FFFFFF",
+                              "content": "B+",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "zHuiE",
+                          "name": "gdCount",
+                          "fill": "#999999",
+                          "content": "5 reviews",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kYH2e",
+                  "name": "Strip",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 48,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 90,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#E8E0D4",
+                        "position": 0
+                      },
+                      {
+                        "color": "#D4B896",
+                        "position": 0.3
+                      },
+                      {
+                        "color": "#3B82F6",
+                        "position": 0.55
+                      },
+                      {
+                        "color": "#6FB86F",
+                        "position": 0.75
+                      },
+                      {
+                        "color": "#E8E0D4",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "KkhW9",
+                      "x": 370,
+                      "y": 0,
+                      "name": "gdTick",
+                      "width": 2,
+                      "height": 48,
+                      "fill": "#FFFFFF",
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#00000033",
+                        "blur": 4
+                      }
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "UT254",
+                      "x": 365,
+                      "y": 44,
+                      "name": "gdTickDot",
+                      "fill": "#FFFFFF",
+                      "width": 12,
+                      "height": 12,
+                      "stroke": {
+                        "thickness": 2,
+                        "fill": "#3B82F6"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "OD1j4",
+                  "name": "gdAxis",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FTZ0a",
+                      "name": "axF",
+                      "fill": "#CCCCCC",
+                      "content": "F",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "fRPAe",
+                      "name": "axD",
+                      "fill": "#CCCCCC",
+                      "content": "D",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wnUeR",
+                      "name": "axC",
+                      "fill": "#CCCCCC",
+                      "content": "C",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "94XQw",
+                      "name": "axB",
+                      "fill": "#1a1a1a",
+                      "content": "B",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "pl7W4",
+                      "name": "axA",
+                      "fill": "#1a1a1a",
+                      "content": "A",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "fAiVO",
+                      "name": "axS",
+                      "fill": "#CCCCCC",
+                      "content": "S",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "5zr1a",
+          "name": "Reviews Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            0,
+            56,
+            32,
+            56
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "vVpLf",
+              "name": "revHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "HxMDR",
+                  "name": "revTitle",
+                  "fill": "#1a1a1a",
+                  "content": "Reviews",
+                  "fontFamily": "Fraunces",
+                  "fontSize": 24,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "GW5CO",
+                  "name": "revActions",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aghAY",
+                      "name": "revLogin",
+                      "fill": "#b45309",
+                      "content": "Sign in to review",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "3tUcg",
+              "name": "Review List",
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ARQWq",
+                  "name": "Review 1",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "#F0F0F0"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    20,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Qc4e8",
+                      "name": "rev1grade",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ma3Fv",
+                          "name": "rev1badge",
+                          "fill": "#6FB86F",
+                          "cornerRadius": 6,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "sMimt",
+                              "name": "rev1bt",
+                              "fill": "#FFFFFF",
+                              "content": "A-",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "IvTgl",
+                      "name": "rev1body",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "DA5Hc",
+                          "name": "rev1meta",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "6shN0",
+                              "name": "rev1avatar",
+                              "fill": "#D4B896",
+                              "width": 24,
+                              "height": 24
+                            },
+                            {
+                              "type": "text",
+                              "id": "Pm1mE",
+                              "name": "rev1name",
+                              "fill": "#1a1a1a",
+                              "content": "Diana Okafor",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "YIUTS",
+                              "name": "rev1date",
+                              "fill": "#AAAAAA",
+                              "content": "Feb 28, 2026",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "o9U0R",
+                          "name": "rev1text",
+                          "fill": "#444444",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Absolutely blown away by this one. Dick's exploration of reality and entropy is masterful. The way each chapter opens with an ad for Ubik — and only later do you understand why — is genius-level structuring.",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Source Serif 4",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "sbm2U",
+                          "name": "rev1reactions",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "r2I3O",
+                              "name": "rev1r1",
+                              "fill": "#F5F5F5",
+                              "cornerRadius": 100,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#E8E8E8"
+                              },
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "5A9kG",
+                                  "name": "rev1r1e",
+                                  "fill": "#666666",
+                                  "content": "👍 2",
+                                  "fontFamily": "IBM Plex Sans",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ONTJM",
+                              "name": "rev1r2",
+                              "fill": "#F5F5F5",
+                              "cornerRadius": 100,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#E8E8E8"
+                              },
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "lwlhx",
+                                  "name": "rev1r2e",
+                                  "fill": "#666666",
+                                  "content": "💯 1",
+                                  "fontFamily": "IBM Plex Sans",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "9cNPi",
+                  "name": "Review 2",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "#F0F0F0"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    20,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "tC0yS",
+                      "name": "rev2grade",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "qnOUk",
+                          "name": "rev2badge",
+                          "fill": "#3B82F6",
+                          "cornerRadius": 6,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "6Yr6V",
+                              "name": "rev2bt",
+                              "fill": "#FFFFFF",
+                              "content": "B+",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "o1cKz",
+                      "name": "rev2body",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "3lGQK",
+                          "name": "rev2meta",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "354tg",
+                              "name": "rev2avatar",
+                              "fill": "#A8C4B8",
+                              "width": 24,
+                              "height": 24
+                            },
+                            {
+                              "type": "text",
+                              "id": "kJlm9",
+                              "name": "rev2name",
+                              "fill": "#1a1a1a",
+                              "content": "Jake Rivera",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "07KSV",
+                              "name": "rev2date",
+                              "fill": "#AAAAAA",
+                              "content": "Feb 25, 2026",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "3tVrm",
+                          "name": "rev2text",
+                          "fill": "#444444",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Really enjoyed the paranoid, disorienting atmosphere. The world-building is wild — half-life moratoriums, telepaths, precogs — and it all clicks together by the end. Not my absolute favorite Dick novel but solidly great.",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Source Serif 4",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "STSEX",
+                          "name": "rev2reactions",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "twlLc",
+                              "name": "rev2r1",
+                              "fill": "#F5F5F5",
+                              "cornerRadius": 100,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#E8E8E8"
+                              },
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "I4yfT",
+                                  "name": "rev2r1e",
+                                  "fill": "#666666",
+                                  "content": "🙈 1",
+                                  "fontFamily": "IBM Plex Sans",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "q66Fd",
+                          "name": "rev2reply",
+                          "fill": "#999999",
+                          "content": "Reply",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Iyzeo",
+          "name": "Book Navigation",
+          "width": "fill_container",
+          "stroke": {
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#F0F0F0"
+          },
+          "padding": [
+            24,
+            56
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "8Gpo8",
+              "name": "prevLink",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "jafIi",
+                  "name": "prevArrow",
+                  "fill": "#999999",
+                  "content": "←",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "uRQcL",
+                  "name": "prevText",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "iRgXA",
+                      "name": "prevLabel",
+                      "fill": "#BBBBBB",
+                      "content": "PREVIOUS",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 10,
+                      "fontWeight": "500",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "cmSvW",
+                      "name": "prevTitle",
+                      "fill": "#555555",
+                      "content": "The Long Way to a Small, Angry Planet",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zJ3tr",
+              "name": "nextLink",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "dcAZl",
+                  "name": "nextText",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RWIxU",
+                      "name": "nextLabel",
+                      "fill": "#BBBBBB",
+                      "content": "NEXT",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 10,
+                      "fontWeight": "500",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "Zf6eE",
+                      "name": "nextTitle",
+                      "fill": "#555555",
+                      "content": "Water Moon",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "KkQaU",
+                  "name": "nextArrow",
+                  "fill": "#999999",
+                  "content": "→",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "tol0l",
+          "name": "Footer",
+          "width": "fill_container",
+          "fill": "#FAFAF8",
+          "stroke": {
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#E8E8E8"
+          },
+          "padding": [
+            24,
+            56
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "KsnVW",
+              "name": "footLogo",
+              "fill": "#AAAAAA",
+              "content": "© 2026 SF Fantasy & Sci-Fi Book Club",
+              "fontFamily": "IBM Plex Sans",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "2m1X7",
+              "name": "footLinks",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Q3j9z",
+                  "name": "fl1",
+                  "fill": "#999999",
+                  "content": "What's New",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "TZPZN",
+                  "name": "fl2",
+                  "fill": "#999999",
+                  "content": "Feedback",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "t2KoT",
+      "x": 3560,
+      "y": 5187,
+      "name": "Book Detail — Full Page (V3)",
+      "clip": true,
+      "width": 800,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "2VKqC",
+          "name": "Nav Bar",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": {
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E8E8E8"
+          },
+          "padding": [
+            16,
+            32
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "44sUg",
+              "name": "navLogo",
+              "fill": "#1a1a1a",
+              "content": "SF Fantasy & Sci-Fi Book Club",
+              "fontFamily": "Fraunces",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "XFAya",
+              "name": "navLinks",
+              "gap": 24,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "JWVas",
+                  "name": "nl1",
+                  "fill": "#666666",
+                  "content": "Home",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "LvgOd",
+                  "name": "nl2",
+                  "fill": "#666666",
+                  "content": "History",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "gJAO8",
+                  "name": "nl3",
+                  "fill": "#666666",
+                  "content": "About",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "GCFxI",
+                  "name": "nl4",
+                  "fill": "#b45309",
+                  "content": "Sign in",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "i0Zub",
+          "name": "Hero Section",
+          "width": "fill_container",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#fdf6ee",
+                "position": 0
+              },
+              {
+                "color": "#f5e6d3",
+                "position": 1
+              }
+            ]
+          },
+          "stroke": {
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E8E0D4"
+          },
+          "gap": 48,
+          "padding": [
+            48,
+            56
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "C73pb",
+              "name": "Cover",
+              "metadata": {
+                "type": "unsplash",
+                "username": "nuarharuha",
+                "link": "https://unsplash.com/@nuarharuha",
+                "author": "NHN"
+              },
+              "width": 220,
+              "height": 330,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1757349984662-0e7fb92cae91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI4MzIxMTF8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "fill"
+              },
+              "cornerRadius": 6,
+              "effect": [
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000012",
+                  "offset": {
+                    "x": 0,
+                    "y": 4
+                  },
+                  "blur": 12
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000020",
+                  "offset": {
+                    "x": 0,
+                    "y": 20
+                  },
+                  "blur": 60
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Uk92y",
+              "name": "Body",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "kzlbs",
+                  "name": "hDate",
+                  "fill": "#b45309",
+                  "content": "FEBRUARY 2026",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 2
+                },
+                {
+                  "type": "text",
+                  "id": "QN4zl",
+                  "name": "hTitle",
+                  "fill": "#1a1a1a",
+                  "content": "Ubik",
+                  "fontFamily": "Fraunces",
+                  "fontSize": 52,
+                  "fontWeight": "700",
+                  "letterSpacing": -1
+                },
+                {
+                  "type": "text",
+                  "id": "R8Vwg",
+                  "name": "hAuthor",
+                  "fill": "#666666",
+                  "content": "Philip K. Dick",
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 18,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "73aj7",
+                  "name": "hTags",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "WZ4zV",
+                      "name": "ht1",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "L8fcF",
+                          "name": "ht1t",
+                          "fill": "#b45309",
+                          "content": "Businessmen",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MK6FR",
+                      "name": "ht2",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "X22lq",
+                          "name": "ht2t",
+                          "fill": "#b45309",
+                          "content": "Fiction",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "nqGIL",
+                      "name": "ht3",
+                      "fill": "#b4530912",
+                      "cornerRadius": 100,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#b4530933"
+                      },
+                      "padding": [
+                        5,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "lHfsR",
+                          "name": "ht3t",
+                          "fill": "#b45309",
+                          "content": "Death",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RdQbx",
+                  "name": "hGrade",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "OQqDA",
+                      "name": "hgb",
+                      "fill": "#b45309",
+                      "cornerRadius": 6,
+                      "padding": [
+                        5,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "SwVGi",
+                          "name": "hgt",
+                          "fill": "#FFFFFF",
+                          "content": "B+",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "l5BLq",
+                      "name": "hrc",
+                      "fill": "#999999",
+                      "content": "5 reviews",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Dsu9Y",
+                  "name": "hSep",
+                  "width": 40,
+                  "height": 2,
+                  "fill": "#b4530933",
+                  "cornerRadius": 1
+                },
+                {
+                  "type": "text",
+                  "id": "95wiM",
+                  "name": "hDesc",
+                  "fill": "#555555",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "1992: Humanity now enjoys a range of psychic abilities. Glen Runciter runs his own organization employing inertials — those capable of blocking telepathic and precognitive abilities...",
+                  "lineHeight": 1.6,
+                  "fontFamily": "Source Serif 4",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "ZgpVR",
+                  "name": "hReadMore",
+                  "fill": "#b45309",
+                  "content": "Read more",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "4l4Pd",
+                  "name": "Hero Footer",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "top": 1
+                    },
+                    "fill": "#b4530922"
+                  },
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": [
+                    12,
+                    0,
+                    0,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "9UvWx",
+                      "name": "hMeta",
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "XOJBo",
+                          "name": "hm1",
+                          "fill": "#999999",
+                          "content": "224 pages",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "NZqUC",
+                          "name": "hmdot",
+                          "fill": "#CCCCCC",
+                          "content": "·",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "j3uH4",
+                          "name": "hm2",
+                          "fill": "#999999",
+                          "content": "1969",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "hbSv6",
+                          "name": "hmdot2",
+                          "fill": "#CCCCCC",
+                          "content": "·",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "SWG0r",
+                          "name": "hm3",
+                          "fill": "#999999",
+                          "content": "ISBN 9780547572291",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cxclw",
+                      "name": "hActions",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "9BkNI",
+                          "name": "ha1",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "5V7IF",
+                              "name": "ha1t",
+                              "fill": "#555555",
+                              "content": "Goodreads",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "LIaG2",
+                          "name": "ha2",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "hXbgF",
+                              "name": "ha2t",
+                              "fill": "#555555",
+                              "content": "StoryGraph",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Ofh9V",
+                          "name": "ha3",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "QHaTX",
+                              "name": "ha3t",
+                              "fill": "#555555",
+                              "content": "Bookshop",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "f4SiJ",
+                          "name": "ha4",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "yZbxN",
+                              "name": "ha4t",
+                              "fill": "#555555",
+                              "content": "Results",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "wdWGT",
+                          "name": "ha5",
+                          "cornerRadius": 100,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#DDDDDD"
+                          },
+                          "gap": 5,
+                          "padding": [
+                            6,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DCg4a",
+                              "name": "ha5t",
+                              "fill": "#555555",
+                              "content": "Share",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kg73y",
+          "name": "Grade Distribution",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            32,
+            56
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "5iuiU",
+              "name": "gdCard",
+              "width": "fill_container",
+              "fill": "#FAFAF8",
+              "cornerRadius": 12,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E8E8E8"
+              },
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "DQ0Xe",
+                  "name": "gdHeader",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kOuv2",
+                      "name": "gdTitle",
+                      "fill": "#1a1a1a",
+                      "content": "Grade Distribution",
+                      "fontFamily": "Fraunces",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "9JWz5",
+                      "name": "gdRight",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "nz7u3",
+                          "name": "gdBadge",
+                          "fill": "#3B82F6",
+                          "cornerRadius": 6,
+                          "padding": [
+                            3,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "suwW0",
+                              "name": "gdBadgeT",
+                              "fill": "#FFFFFF",
+                              "content": "B+",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "o3s4R",
+                          "name": "gdCount",
+                          "fill": "#999999",
+                          "content": "5 reviews",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wKuuy",
+                  "name": "Strip",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 48,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 90,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#E8E0D4",
+                        "position": 0
+                      },
+                      {
+                        "color": "#D4B896",
+                        "position": 0.3
+                      },
+                      {
+                        "color": "#3B82F6",
+                        "position": 0.55
+                      },
+                      {
+                        "color": "#6FB86F",
+                        "position": 0.75
+                      },
+                      {
+                        "color": "#E8E0D4",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "mk2N4",
+                      "x": 370,
+                      "y": 0,
+                      "name": "gdTick",
+                      "width": 2,
+                      "height": 48,
+                      "fill": "#FFFFFF",
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#00000033",
+                        "blur": 4
+                      }
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "OMXFd",
+                      "x": 365,
+                      "y": 44,
+                      "name": "gdTickDot",
+                      "fill": "#FFFFFF",
+                      "width": 12,
+                      "height": 12,
+                      "stroke": {
+                        "thickness": 2,
+                        "fill": "#3B82F6"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "AlpMl",
+                  "name": "gdAxis",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "PKi48",
+                      "name": "axF",
+                      "fill": "#CCCCCC",
+                      "content": "F",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "MQ24I",
+                      "name": "axD",
+                      "fill": "#CCCCCC",
+                      "content": "D",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rEYMt",
+                      "name": "axC",
+                      "fill": "#CCCCCC",
+                      "content": "C",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wfB1B",
+                      "name": "axB",
+                      "fill": "#1a1a1a",
+                      "content": "B",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "0UrRM",
+                      "name": "axA",
+                      "fill": "#1a1a1a",
+                      "content": "A",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tMJlz",
+                      "name": "axS",
+                      "fill": "#CCCCCC",
+                      "content": "S",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "5JiJf",
+          "name": "Reviews Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            0,
+            56,
+            32,
+            56
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "K024s",
+              "name": "revHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "b75pU",
+                  "name": "revTitle",
+                  "fill": "#1a1a1a",
+                  "content": "Reviews",
+                  "fontFamily": "Fraunces",
+                  "fontSize": 24,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "gw6MM",
+                  "name": "revActions",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "As7H9",
+                      "name": "revLogin",
+                      "fill": "#b45309",
+                      "content": "Sign in to review",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sYuIY",
+              "name": "Review List",
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "oW7AY",
+                  "name": "Review 1",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "#F0F0F0"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    20,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "boL9E",
+                      "name": "rev1grade",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "7qagy",
+                          "name": "rev1badge",
+                          "fill": "#6FB86F",
+                          "cornerRadius": 6,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "04P2c",
+                              "name": "rev1bt",
+                              "fill": "#FFFFFF",
+                              "content": "A-",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YfFc4",
+                      "name": "rev1body",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ccCS9",
+                          "name": "rev1meta",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "UMtib",
+                              "name": "rev1avatar",
+                              "fill": "#D4B896",
+                              "width": 24,
+                              "height": 24
+                            },
+                            {
+                              "type": "text",
+                              "id": "5l59I",
+                              "name": "rev1name",
+                              "fill": "#1a1a1a",
+                              "content": "Diana Okafor",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "l7v6t",
+                              "name": "rev1date",
+                              "fill": "#AAAAAA",
+                              "content": "Feb 28, 2026",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "6uiCi",
+                          "name": "rev1text",
+                          "fill": "#444444",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Absolutely blown away by this one. Dick's exploration of reality and entropy is masterful. The way each chapter opens with an ad for Ubik — and only later do you understand why — is genius-level structuring.",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Source Serif 4",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "lJ2s9",
+                          "name": "rev1reactions",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "eoawk",
+                              "name": "rev1r1",
+                              "fill": "#F5F5F5",
+                              "cornerRadius": 100,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#E8E8E8"
+                              },
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "K8YKQ",
+                                  "name": "rev1r1e",
+                                  "fill": "#666666",
+                                  "content": "👍 2",
+                                  "fontFamily": "IBM Plex Sans",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "GduAC",
+                              "name": "rev1r2",
+                              "fill": "#F5F5F5",
+                              "cornerRadius": 100,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#E8E8E8"
+                              },
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "YJr6g",
+                                  "name": "rev1r2e",
+                                  "fill": "#666666",
+                                  "content": "💯 1",
+                                  "fontFamily": "IBM Plex Sans",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UCtRc",
+                  "name": "Review 2",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "#F0F0F0"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    20,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "hsuj0",
+                      "name": "rev2grade",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Z30pA",
+                          "name": "rev2badge",
+                          "fill": "#3B82F6",
+                          "cornerRadius": 6,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "0MEwd",
+                              "name": "rev2bt",
+                              "fill": "#FFFFFF",
+                              "content": "B+",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wyvkn",
+                      "name": "rev2body",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "BK3mP",
+                          "name": "rev2meta",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "NBCUB",
+                              "name": "rev2avatar",
+                              "fill": "#A8C4B8",
+                              "width": 24,
+                              "height": 24
+                            },
+                            {
+                              "type": "text",
+                              "id": "zh9ZT",
+                              "name": "rev2name",
+                              "fill": "#1a1a1a",
+                              "content": "Jake Rivera",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "0WEtJ",
+                              "name": "rev2date",
+                              "fill": "#AAAAAA",
+                              "content": "Feb 25, 2026",
+                              "fontFamily": "IBM Plex Sans",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Z7yNs",
+                          "name": "rev2text",
+                          "fill": "#444444",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Really enjoyed the paranoid, disorienting atmosphere. The world-building is wild — half-life moratoriums, telepaths, precogs — and it all clicks together by the end. Not my absolute favorite Dick novel but solidly great.",
+                          "lineHeight": 1.6,
+                          "fontFamily": "Source Serif 4",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "M6kqH",
+                          "name": "rev2reactions",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "ALex2",
+                              "name": "rev2r1",
+                              "fill": "#F5F5F5",
+                              "cornerRadius": 100,
+                              "stroke": {
+                                "thickness": 1,
+                                "fill": "#E8E8E8"
+                              },
+                              "gap": 4,
+                              "padding": [
+                                3,
+                                8
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "R3mP1",
+                                  "name": "rev2r1e",
+                                  "fill": "#666666",
+                                  "content": "🙈 1",
+                                  "fontFamily": "IBM Plex Sans",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "pNDhM",
+                          "name": "rev2reply",
+                          "fill": "#999999",
+                          "content": "Reply",
+                          "fontFamily": "IBM Plex Sans",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "PbNRo",
+          "name": "Book Navigation",
+          "width": "fill_container",
+          "stroke": {
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#F0F0F0"
+          },
+          "padding": [
+            24,
+            56
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "IGLx7",
+              "name": "prevLink",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "NsiTP",
+                  "name": "prevArrow",
+                  "fill": "#999999",
+                  "content": "←",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "0sQiu",
+                  "name": "prevText",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qrxIw",
+                      "name": "prevLabel",
+                      "fill": "#BBBBBB",
+                      "content": "PREVIOUS",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 10,
+                      "fontWeight": "500",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "c6k06",
+                      "name": "prevTitle",
+                      "fill": "#555555",
+                      "content": "The Long Way to a Small, Angry Planet",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nQpT5",
+              "name": "nextLink",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ANMUV",
+                  "name": "nextText",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mMtfr",
+                      "name": "nextLabel",
+                      "fill": "#BBBBBB",
+                      "content": "NEXT",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 10,
+                      "fontWeight": "500",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "OASv3",
+                      "name": "nextTitle",
+                      "fill": "#555555",
+                      "content": "Water Moon",
+                      "fontFamily": "IBM Plex Sans",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "quHsJ",
+                  "name": "nextArrow",
+                  "fill": "#999999",
+                  "content": "→",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RopQn",
+          "name": "Footer",
+          "width": "fill_container",
+          "fill": "#FAFAF8",
+          "stroke": {
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#E8E8E8"
+          },
+          "padding": [
+            24,
+            56
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "jxe40",
+              "name": "footLogo",
+              "fill": "#AAAAAA",
+              "content": "© 2026 SF Fantasy & Sci-Fi Book Club",
+              "fontFamily": "IBM Plex Sans",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "Mxuqb",
+              "name": "footLinks",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ytUX5",
+                  "name": "fl1",
+                  "fill": "#999999",
+                  "content": "What's New",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "mpIcw",
+                  "name": "fl2",
+                  "fill": "#999999",
+                  "content": "Feedback",
+                  "fontFamily": "IBM Plex Sans",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

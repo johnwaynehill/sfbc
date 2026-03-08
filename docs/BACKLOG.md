@@ -55,6 +55,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
 | P1 | M | Invite someone to the club | Shareable invite link |
+| P1 | S | Add # Members, and Reviews to About section on Home | Quick view of the community at large | 
 | P2 | L | Reading status per member | Reading, Read, DNF, Did Not Read — per-member tracking |
 | P2 | M | User-submitted discussion questions | Members contribute questions for the current book |
 

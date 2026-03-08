@@ -1,6 +1,6 @@
 <!-- ===== Book Hero ===== -->
 <% const coverUrl = getCoverUrl(book); %>
-<% const hasMetadata = book.publication_year || book.page_count || book.isbn; %>
+<% const hasMetadata = book.publication_year || book.page_count || book.isbn || book.publisher || book.language; %>
 <section class="book-hero-wrap"<% if (coverUrl) { %> style="--cover-url: url('<%= coverUrl %>')"<% } %>>
 <div class="book-hero">
   <div class="book-hero__cover-col">
@@ -76,6 +76,12 @@
           <% if (book.isbn) { %>
             <span class="book-meta-inline__item">ISBN&nbsp;<%= book.isbn %></span>
           <% } %>
+          <% if (book.publisher) { %>
+            <span class="book-meta-inline__item"><%= book.publisher %></span>
+          <% } %>
+          <% if (book.language && book.language !== 'en') { %>
+            <span class="book-meta-inline__item"><%= book.language.toUpperCase() %></span>
+          <% } %>
         </div>
       <% } %>
 
@@ -104,9 +110,14 @@
 <!-- ===== Grade Distribution ===== -->
 <% if (gradeDistribution.length > 0) { %>
 <%
-  // Collect which tier letters have at least one review
+  // Collect which tier letters have at least one review + per-tier counts
   const activeTiers = new Set(gradeDistribution.map(r => r.grade.charAt(0).toUpperCase()));
   const totalReviews = gradeDistribution.reduce((s, r) => s + r.count, 0);
+  const tierCounts = {};
+  for (const r of gradeDistribution) {
+    const t = r.grade.charAt(0).toUpperCase();
+    tierCounts[t] = (tierCounts[t] || 0) + r.count;
+  }
 %>
 <section class="section">
   <div class="grade-dist">
@@ -126,12 +137,9 @@
       <% } %>
     </div>
     <div class="grade-dist__axis">
-      <span<%= activeTiers.has('F') ? ' class="active"' : '' %>>F</span>
-      <span<%= activeTiers.has('D') ? ' class="active"' : '' %>>D</span>
-      <span<%= activeTiers.has('C') ? ' class="active"' : '' %>>C</span>
-      <span<%= activeTiers.has('B') ? ' class="active"' : '' %>>B</span>
-      <span<%= activeTiers.has('A') ? ' class="active"' : '' %>>A</span>
-      <span<%= activeTiers.has('S') ? ' class="active"' : '' %>>S</span>
+      <% for (const tier of ['F','D','C','B','A','S']) { %>
+        <span<%- activeTiers.has(tier) ? ` class="active" data-count="${tierCounts[tier]}"` : '' %>><%= tier %></span>
+      <% } %>
     </div>
   </div>
 </section>
@@ -143,18 +151,6 @@
   <div class="reviews-header">
     <h2 class="t-section">Reviews</h2>
     <div class="reviews-header__actions">
-      <% if (spoilerCount > 0) { %>
-        <button type="button" class="spoiler-toggle" id="spoilerToggle"
-                aria-pressed="false"
-                aria-label="Show spoiler reviews">
-          <svg class="spoiler-toggle__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-            <line x1="1" y1="1" x2="23" y2="23"/>
-          </svg>
-          <span class="spoiler-toggle__label" id="spoilerToggleLabel">Show <%= spoilerCount %> spoiler<%= spoilerCount !== 1 ? 's' : '' %></span>
-        </button>
-      <% } %>
       <% if (reviews.length > 1) { %>
         <div class="sort-dropdown" id="reviewSortDropdown">
           <button type="button" class="history-btn" id="reviewSortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
@@ -178,6 +174,24 @@
     </div>
   </div>
 
+  <% if (spoilerCount > 0) { %>
+    <div class="spoiler-filter">
+      <button type="button" class="spoiler-toggle" id="spoilerToggle"
+              aria-pressed="false"
+              aria-label="Show spoiler reviews">
+        <svg class="spoiler-toggle__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        <span class="spoiler-toggle__label" id="spoilerToggleLabel">
+          <span class="spoiler-toggle__text">Show spoilers</span>
+          <span class="spoiler-toggle__count"><%= spoilerCount %></span>
+        </span>
+      </button>
+    </div>
+  <% } %>
+
   <% if (reviews.length > 0) { %>
   <div class="review-list" id="reviewList" data-spoiler-count="<%= spoilerCount %>">
     <% for (const review of reviews) { %>
@@ -186,6 +200,9 @@
           <span class="grade-badge grade-badge--sm <%= gradeTier(review.grade) %>"><%= review.grade %></span>
           <% if (review.has_spoilers) { %>
             <span class="spoiler-badge">Spoiler</span>
+          <% } %>
+          <% if (!review.did_finish) { %>
+            <span class="dnf-badge">DNF</span>
           <% } %>
         </div>
         <div class="review-card__body">
@@ -276,7 +293,24 @@
                 Reply<% if (reviewReplies.length > 0) { %> (<%= reviewReplies.length %>)<% } %>
               </button>
               <div class="reply-form-wrap" data-review-id="<%= review.id %>" hidden>
-                <textarea class="reply-form__textarea" placeholder="Write a reply…" maxlength="2000" rows="3"></textarea>
+                <div class="md-toolbar md-toolbar--compact">
+                  <button type="button" class="md-toolbar__btn" data-action="bold" title="Bold"><strong>B</strong></button>
+                  <button type="button" class="md-toolbar__btn" data-action="italic" title="Italic"><em>I</em></button>
+                  <button type="button" class="md-toolbar__btn" data-action="spoiler" title="Spoiler">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  </button>
+                  <button type="button" class="md-toolbar__btn" data-action="link" title="Link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                  </button>
+                </div>
+                <textarea class="reply-form__textarea reply-form__textarea--toolbar" placeholder="Write a reply…" maxlength="2000" rows="3"></textarea>
                 <div class="reply-form__footer">
                   <span class="reply-form__char-count">0 / 2,000</span>
                   <div class="reply-form__btns">
