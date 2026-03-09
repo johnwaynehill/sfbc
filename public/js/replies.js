@@ -205,10 +205,10 @@
             delete formWrap.dataset.editingReplyId;
             formWrap.hidden = true;
           } else {
-            alert(result.data.error || 'Could not update reply.');
+            showAlert(result.data.error || 'Could not update reply.');
           }
         })
-        .catch(function () { alert('Network error. Please try again.'); })
+        .catch(function () { showAlert('Network error. Please try again.'); })
         .finally(function () {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Reply';
@@ -233,10 +233,10 @@
             // Update reply count on trigger button
             updateTriggerCount(formWrap.closest('.reply-section'));
           } else {
-            alert(result.data.error || 'Could not post reply.');
+            showAlert(result.data.error || 'Could not post reply.');
           }
         })
-        .catch(function () { alert('Network error. Please try again.'); })
+        .catch(function () { showAlert('Network error. Please try again.'); })
         .finally(function () {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Reply';
@@ -339,11 +339,11 @@
   // ===========================================================================
   // Delete reply
   // ===========================================================================
-  document.addEventListener('click', function (e) {
+  document.addEventListener('click', async function (e) {
     var btn = e.target.closest('.reply__delete-btn');
     if (!btn) return;
 
-    if (!confirm('Delete this reply?')) return;
+    if (!await showConfirm('Delete this reply?', { danger: true })) return;
 
     var replyId = btn.dataset.replyId;
     var replyEl = btn.closest('.reply');
@@ -351,32 +351,31 @@
 
     btn.disabled = true;
 
-    fetch('/api/replies/' + replyId, {
-      method: 'DELETE',
-      headers: { 'Accept': 'application/json' },
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (data.success) {
-          replyEl.style.opacity = '0';
-          replyEl.style.transform = 'translateY(-8px)';
-          replyEl.style.transition = 'opacity 0.25s, transform 0.25s';
-          setTimeout(function () {
-            replyEl.remove();
-            // Remove empty reply-list container
-            var list = section.querySelector('.reply-list');
-            if (list && list.children.length === 0) list.remove();
-            updateTriggerCount(section);
-          }, 260);
-        } else {
-          alert(data.error || 'Could not delete reply.');
-          btn.disabled = false;
-        }
-      })
-      .catch(function () {
-        alert('Network error. Please try again.');
-        btn.disabled = false;
+    try {
+      var res = await fetch('/api/replies/' + replyId, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' },
       });
+      var data = await res.json();
+      if (data.success) {
+        replyEl.style.opacity = '0';
+        replyEl.style.transform = 'translateY(-8px)';
+        replyEl.style.transition = 'opacity 0.25s, transform 0.25s';
+        setTimeout(function () {
+          replyEl.remove();
+          // Remove empty reply-list container
+          var list = section.querySelector('.reply-list');
+          if (list && list.children.length === 0) list.remove();
+          updateTriggerCount(section);
+        }, 260);
+      } else {
+        showAlert(data.error || 'Could not delete reply.');
+        btn.disabled = false;
+      }
+    } catch (_) {
+      showAlert('Network error. Please try again.');
+      btn.disabled = false;
+    }
   });
 
   // ===========================================================================

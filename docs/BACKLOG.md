@@ -14,7 +14,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | S | Add publisher & language to metadata | DB migration + API enrichment; backfill existing books. Hero already shows pages, year, ISBN. |
 | P1 | M | Admin can replace book covers | Fetch by ISBN or upload image; replace local stored version |
 | P2 | M | Tag-based filtering on History | Tap a tag → filter the grid; link to StoryGraph for that tag. ~30 books — search covers this until archive grows past 60. |
 | P2 | M | Author page | `/books/:authorSlug/` showing all books by that author. Not enough repeat authors yet to justify the route. |
@@ -26,11 +25,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | S | Enhance spoiler filter UX | Polish toggle placement, animation, count badge styling |
-| P1 | S | Enhance grade pill strip | Polish interaction, explore haptic feedback, mobile scroll UX |
 | P1 | M | Extended markdown support | Additional formatting options beyond current set |
-| P1 | S | Add "Did you finish?" to Review with simple checkbox | Sets the tone for the Review, Stored in Database with review |
-| P1 | S | If a Review was marked "Did not finish" show DNF badge in/above Review | Sets the tone for the Review and any Replies |
 | P2 | S | Emoji flurry for A+ books | Celebratory animation on high-scoring book pages |
 
 ## Profiles & Identity
@@ -65,9 +60,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | S | Hide/obscure full emails on /admin/users | Privacy improvement |
 | P1 | M | Admin pagination | Paginate reviews, picks, and users lists |
-| P1 | S | Unique nominations per cycle | Limit to one nomination per user per cycle |
 | P1 | M | Remove Meeting information from Pick | Allows Picks to have multiple meetings per cycle |
 | P2 | M | Allow for creation of meeting for a Pick | Multiple meetings per Pick allow for more people to meet in-person | 
 
@@ -93,7 +86,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | P1 | M | Client-side dialogs | Replace browser alerts/confirms with styled modals |
 | P1 | S | Reaction and reply button design | Placement, size, hover effects update |
 | P1 | M | Home page hero section redesign | Larger, subtle background color, better info hierarchy |
-| P1 | S | Show markdown helper in Reply form | Same hints as review textarea |
 | P2 | M | @ mentions | Mention another user in replies |
 | P2 | S | Coming Up section — enlarge covers | Larger book covers and more vertical space |
 | P2 | M | Add haptics on key interactions for mobile users | https://haptics.lochie.me/ |
@@ -104,7 +96,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | S | Samsung browser: Light Mode on Android | Light mode did not work on Samsung Android phones |
+| — | — | *No open P1 bugs* | — |
 
 ---
 
@@ -118,3 +110,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 4 | Lifecycle reorder | Scheduled status, event tracking |
 | 5 | Quick wins + bugs | Metadata cleanup, book nav, my-reviews filter, toggle, --amber fix |
 | 6 | Book page as destination | Immersive hero, CTA buttons, inline metadata, external links, share, login prompts, nomination search + edit, rationale display |
+| 7 | Reviews polish + metadata | DNF checkbox + badge, spoiler filter polish, grade axis tooltips, reply markdown helper, publisher/language metadata, Samsung light mode fix, migration FK safeguard |

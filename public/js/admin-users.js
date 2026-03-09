@@ -194,7 +194,7 @@
     var userId = btn.dataset.userId;
     var name = btn.dataset.name;
 
-    if (!confirm('Promote \u201c' + name + '\u201d to admin?')) return;
+    if (!await showConfirm('Promote \u201c' + name + '\u201d to admin?')) return;
 
     btn.disabled = true;
     btn.textContent = 'Promoting\u2026';
@@ -239,9 +239,9 @@
         return;
       }
 
-      alert(data.error || 'Failed to promote user.');
+      showAlert(data.error || 'Failed to promote user.');
     } catch (err) {
-      alert('Network error. Please try again.');
+      showAlert('Network error. Please try again.');
     }
 
     btn.disabled = false;
@@ -258,7 +258,7 @@
     var userId = btn.dataset.userId;
     var name = btn.dataset.name;
 
-    if (!confirm('Demote \u201c' + name + '\u201d from admin to member?')) return;
+    if (!await showConfirm('Demote \u201c' + name + '\u201d from admin to member?')) return;
 
     btn.disabled = true;
     btn.textContent = 'Demoting\u2026';
@@ -306,9 +306,9 @@
         return;
       }
 
-      alert(data.error || 'Failed to demote user.');
+      showAlert(data.error || 'Failed to demote user.');
     } catch (err) {
-      alert('Network error. Please try again.');
+      showAlert('Network error. Please try again.');
     }
 
     btn.disabled = false;
@@ -325,7 +325,7 @@
     var userId = btn.dataset.userId;
     var name = btn.dataset.name;
 
-    if (!confirm('Delete user \u201c' + name + '\u201d? This will also remove their reviews. This cannot be undone.')) return;
+    if (!await showConfirm('Delete user \u201c' + name + '\u201d? This will also remove their reviews. This cannot be undone.', { danger: true })) return;
 
     btn.disabled = true;
     btn.textContent = 'Deleting\u2026';
@@ -351,9 +351,9 @@
         return;
       }
 
-      alert(data.error || 'Failed to delete user.');
+      showAlert(data.error || 'Failed to delete user.');
     } catch (err) {
-      alert('Network error. Please try again.');
+      showAlert('Network error. Please try again.');
     }
 
     btn.disabled = false;
@@ -390,9 +390,9 @@
         return;
       }
 
-      alert(data.error || 'Failed to send link.');
+      showAlert(data.error || 'Failed to send link.');
     } catch (err) {
-      alert('Network error. Please try again.');
+      showAlert('Network error. Please try again.');
     }
 
     btn.disabled = false;

@@ -422,6 +422,166 @@
   }
 }
 
+/* ---- Home Hero ---- */
+.home-hero {
+  position: relative;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding: var(--s-6) calc(50vw - 50%) var(--s-5);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, hsla(var(--hero-hue), 55%, 65%, 0.12), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 30%, hsla(var(--hero-hue), 45%, 70%, 0.08), transparent);
+}
+
+.home-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.home-hero__layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-5);
+  align-items: start;
+  max-width: var(--content-width, 960px);
+  margin: 0 auto;
+}
+
+.home-hero__cover {
+  width: 220px;
+  border: none;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.12),
+    0 12px 36px rgba(0,0,0,0.20),
+    0 28px 70px rgba(0,0,0,0.25);
+  border-radius: var(--radius-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-hero__cover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.12),
+    0 18px 44px rgba(0,0,0,0.24),
+    0 36px 90px rgba(0,0,0,0.30);
+}
+
+.home-hero__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding-top: var(--s-2);
+}
+
+.home-hero__label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.home-hero__title {
+  margin-top: var(--s-1);
+}
+
+.home-hero__author {
+  margin-bottom: var(--s-1);
+}
+
+.home-hero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  margin-bottom: var(--s-1);
+}
+
+.home-hero__description {
+  max-width: 520px;
+  margin-bottom: var(--s-1);
+}
+
+.home-hero__actions {
+  display: flex;
+  gap: var(--s-2);
+  margin-top: var(--s-1);
+}
+
+.home-hero__meeting {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+  margin-top: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: fit-content;
+}
+
+/* Home hero dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .home-hero {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, hsla(var(--hero-hue), 40%, 45%, 0.10), transparent),
+      radial-gradient(ellipse 60% 50% at 80% 30%, hsla(var(--hero-hue), 35%, 50%, 0.06), transparent);
+  }
+}
+[data-theme="dark"] .home-hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, hsla(var(--hero-hue), 40%, 45%, 0.10), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 30%, hsla(var(--hero-hue), 35%, 50%, 0.06), transparent);
+}
+
+/* Home hero mobile */
+@media (max-width: 640px) {
+  .home-hero {
+    padding: var(--s-5) calc(50vw - 50%) var(--s-4);
+  }
+
+  .home-hero__layout {
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+    justify-items: center;
+  }
+
+  .home-hero__cover {
+    width: 200px;
+  }
+
+  .home-hero__body {
+    text-align: center;
+    align-items: center;
+    padding-top: 0;
+  }
+
+  .home-hero__label {
+    justify-content: center;
+  }
+
+  .home-hero__tags {
+    justify-content: center;
+  }
+
+  .home-hero__description {
+    text-align: left;
+  }
+
+  .home-hero__actions {
+    justify-content: center;
+  }
+
+  .home-hero__meeting {
+    width: auto;
+    justify-content: center;
+  }
+}
+
 /* ---- Book Card ---- */
 .book-card {
   display: flex;
@@ -1595,11 +1755,16 @@ a.activity-item__target:hover {
   max-width: 520px;
 }
 
+.about-section__stats {
+  display: flex;
+  gap: var(--s-5);
+  margin-top: var(--s-3);
+}
+
 .about-section__stat {
   display: flex;
-  align-items: baseline;
-  gap: var(--s-1);
-  margin-top: var(--s-3);
+  flex-direction: column;
+  gap: 2px;
 }
 
 /* ---- Placeholder Cover (deterministic color from title) ---- */
@@ -4841,8 +5006,16 @@ textarea.form-input {
   padding: var(--s-6) var(--s-3);
 }
 
-.profile-page__heading {
+.profile-page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
   margin-bottom: var(--s-5);
+}
+
+.profile-page__heading {
+  margin-bottom: 0;
 }
 
 .profile-section {
@@ -6341,5 +6514,168 @@ a.reply__author-link:hover .reply__author {
   :root:not([data-theme="light"]) .status-pill--nominations,
   :root:not([data-theme="light"]) .status-pill--voting { background: rgba(217, 119, 6, 0.15); }
   :root:not([data-theme="light"]) .status-pill--upcoming { background: rgba(255, 255, 255, 0.06); }
+}
+
+
+/* ================================================================
+   APP DIALOG — styled replacement for confirm() / alert()
+   ================================================================ */
+
+.app-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0;
+  max-width: 380px;
+  width: calc(100% - var(--s-6));
+  max-height: fit-content;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 24px 48px rgba(0, 0, 0, 0.08);
+  animation: dialog-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-dialog.is-closing {
+  animation: dialog-exit 0.12s ease-in forwards;
+}
+
+.app-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: backdrop-enter 0.2s ease-out;
+}
+
+.app-dialog.is-closing::backdrop {
+  animation: backdrop-exit 0.12s ease-in forwards;
+}
+
+@keyframes dialog-enter {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes dialog-exit {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(6px); }
+}
+@keyframes backdrop-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes backdrop-exit {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.app-dialog__content {
+  padding: var(--s-4) var(--s-4) var(--s-3);
+}
+
+.app-dialog__title {
+  margin: 0 0 var(--s-2);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--t-base);
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.app-dialog__title[hidden] { display: none; }
+
+.app-dialog__message {
+  margin: 0 0 var(--s-4);
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  color: var(--text2);
+  white-space: pre-line;
+}
+
+.app-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4) var(--s-4);
+}
+
+.app-dialog__btn {
+  padding: var(--s-2) var(--s-3);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+  line-height: 1.4;
+}
+
+.app-dialog__btn:active { transform: scale(0.97); }
+.app-dialog__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app-dialog__btn--cancel {
+  background: var(--surface2);
+  color: var(--text);
+}
+.app-dialog__btn--cancel:hover {
+  background: var(--border);
+}
+
+.app-dialog__btn--confirm {
+  background: var(--cta-bg);
+  color: var(--cta-text);
+}
+.app-dialog__btn--confirm:hover {
+  opacity: 0.88;
+}
+
+/* Danger variant */
+.app-dialog--danger .app-dialog__message {
+  color: var(--text);
+}
+
+.app-dialog__btn--danger {
+  background: var(--danger);
+  color: #fff;
+}
+.app-dialog__btn--danger:hover {
+  opacity: 0.88;
+}
+
+/* ── Dialog dark mode ── */
+[data-theme="dark"] .app-dialog {
+  background: var(--surface);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .app-dialog__btn--cancel {
+  background: var(--surface2);
+}
+[data-theme="dark"] .app-dialog__btn--cancel:hover {
+  background: var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .app-dialog {
+    background: var(--surface);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 8px 24px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+  :root:not([data-theme="light"]) .app-dialog__btn--cancel {
+    background: var(--surface2);
+  }
+  :root:not([data-theme="light"]) .app-dialog__btn--cancel:hover {
+    background: var(--border);
+  }
 }
 

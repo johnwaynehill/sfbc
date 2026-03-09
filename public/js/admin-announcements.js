@@ -79,7 +79,7 @@
       var action = btn.dataset.action;
       var id = btn.dataset.id;
 
-      if (action === 'delete' && !confirm('Delete this announcement permanently?')) {
+      if (action === 'delete' && !await showConfirm('Delete this announcement permanently?', { danger: true })) {
         return;
       }
 

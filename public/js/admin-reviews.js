@@ -229,7 +229,7 @@
     var reviewId = btn.dataset.reviewId;
     var name = btn.dataset.name;
 
-    if (!confirm('Delete this review by ' + name + '? This cannot be undone.')) return;
+    if (!await showConfirm('Delete this review by ' + name + '? This cannot be undone.', { danger: true })) return;
 
     btn.disabled = true;
     btn.textContent = 'Deleting\u2026';
@@ -260,9 +260,9 @@
         return;
       }
 
-      alert(data.error || 'Failed to delete review.');
+      showAlert(data.error || 'Failed to delete review.');
     } catch (err) {
-      alert('Network error. Please try again.');
+      showAlert('Network error. Please try again.');
     }
 
     btn.disabled = false;

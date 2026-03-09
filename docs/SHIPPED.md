@@ -102,6 +102,23 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Rate limiting** — Brute-force protection on auth and API endpoints
 - **Trust proxy** — Secure cookies behind Fly.io HTTPS termination
 
+## Reviews Polish (Sprint 7)
+
+- **"Did you finish?" checkbox** — Review form checkbox (checked by default); stores `did_finish` in database
+- **DNF badge** — Red "DNF" badge on review cards when reviewer didn't finish the book
+- **Spoiler filter UX polish** — Relocated toggle to standalone strip, count badge, smooth reveal/hide animation, `aria-pressed` state
+- **Grade distribution tooltips** — Hover/tap tooltips showing per-tier review counts on axis labels
+- **Reply markdown helper** — Compact Bold/Italic/Spoiler/Link toolbar above reply textareas
+- **Publisher & language metadata** — Auto-fetched from Google Books API; language only shown for non-English books
+- **Metadata backfill** — Enrichment now backfills `page_count`, `publication_year`, `isbn` from Google Books API on page visit
+- **Samsung browser light mode fix** — `color-scheme: light dark` + explicit `data-theme` in FOUC prevention script
+- **View Details button spacing** — Added top margin to `.book-hero__actions` in home hero section
+
+## Infrastructure (Sprint 7)
+
+- **Migration FK safeguard** — `PRAGMA foreign_keys = OFF` around migration execution prevents cascade deletes when tables are dropped/recreated; `foreign_key_check` runs after each migration
+- **Conditional results links** — Results links hidden on pick detail and book detail pages when no voting data exists
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background

@@ -5,45 +5,43 @@
   if (!reviewList) return;
 
   // ── Delete review ─────────────────────────────────────────
-  reviewList.addEventListener('click', function (e) {
+  reviewList.addEventListener('click', async function (e) {
     var btn = e.target.closest('.review-card__delete');
     if (!btn) return;
 
-    if (!confirm('Delete your review? This cannot be undone.')) return;
+    if (!await showConfirm('Delete your review? This cannot be undone.', { danger: true })) return;
 
     var bookId = btn.getAttribute('data-book-id');
 
-    fetch('/api/books/' + bookId + '/reviews', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-    })
-      .then(function (res) {
-        if (res.ok) {
-          // Remove the review card from the DOM
-          var card = btn.closest('.review-card');
-          if (card) card.remove();
-
-          // If no reviews remain, show empty state
-          var remaining = reviewList.querySelectorAll('.review-card');
-          if (remaining.length === 0) {
-            reviewList.innerHTML = '<div class="empty-state"><p class="empty-state__message">No reviews yet.</p></div>';
-          }
-
-          // Update "Edit My Review" button to "Write a Review"
-          var editBtn = document.querySelector('.reviews-header__actions .btn--ghost');
-          if (editBtn) {
-            editBtn.className = editBtn.className.replace('btn--ghost', 'btn--primary');
-            editBtn.textContent = 'Write a Review';
-          }
-        } else {
-          res.json().then(function (data) {
-            alert(data.error || 'Failed to delete review.');
-          });
-        }
-      })
-      .catch(function () {
-        alert('Network error. Please try again.');
+    try {
+      var res = await fetch('/api/books/' + bookId + '/reviews', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
       });
+      if (res.ok) {
+        // Remove the review card from the DOM
+        var card = btn.closest('.review-card');
+        if (card) card.remove();
+
+        // If no reviews remain, show empty state
+        var remaining = reviewList.querySelectorAll('.review-card');
+        if (remaining.length === 0) {
+          reviewList.innerHTML = '<div class="empty-state"><p class="empty-state__message">No reviews yet.</p></div>';
+        }
+
+        // Update "Edit My Review" button to "Write a Review"
+        var editBtn = document.querySelector('.reviews-header__actions .btn--ghost');
+        if (editBtn) {
+          editBtn.className = editBtn.className.replace('btn--ghost', 'btn--primary');
+          editBtn.textContent = 'Write a Review';
+        }
+      } else {
+        var data = await res.json();
+        showAlert(data.error || 'Failed to delete review.');
+      }
+    } catch (_) {
+      showAlert('Network error. Please try again.');
+    }
   });
 
   // ── Sort reviews ──────────────────────────────────────────

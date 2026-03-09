@@ -99,7 +99,7 @@
         scheduled: 'open nominations',
       };
 
-      if (!confirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
+      if (!await showConfirm('Are you sure you want to ' + (labels[newStatus] || newStatus) + '?')) return;
 
       var originalText = btn.textContent;
       btn.disabled = true;
@@ -119,9 +119,9 @@
           return;
         }
 
-        alert(data.error || 'Something went wrong.');
+        showAlert(data.error || 'Something went wrong.');
       } catch (err) {
-        alert('Network error.');
+        showAlert('Network error.');
       }
 
       btn.disabled = false;
@@ -157,7 +157,7 @@
 
       if (!newStatus || newStatus === currentStatus) return;
 
-      if (!confirm('Override status from "' + (statusLabels[currentStatus] || currentStatus) + '" to "' + (statusLabels[newStatus] || newStatus) + '"?')) {
+      if (!await showConfirm('Override status from \u201c' + (statusLabels[currentStatus] || currentStatus) + '\u201d to \u201c' + (statusLabels[newStatus] || newStatus) + '\u201d?')) {
         return;
       }
 
@@ -179,9 +179,9 @@
           return;
         }
 
-        alert(data.error || 'Something went wrong.');
+        showAlert(data.error || 'Something went wrong.');
       } catch (err) {
-        alert('Network error.');
+        showAlert('Network error.');
       }
 
       statusSelect.disabled = false;
@@ -200,7 +200,7 @@
       var bookId = btn.dataset.bookId;
       var title = btn.dataset.title;
 
-      if (!confirm('Remove "' + title + '" from nominees?')) return;
+      if (!await showConfirm('Remove \u201c' + title + '\u201d from nominees?')) return;
 
       btn.disabled = true;
       btn.textContent = 'Removing\u2026';
@@ -220,9 +220,9 @@
           return;
         }
 
-        alert(data.error || 'Something went wrong.');
+        showAlert(data.error || 'Something went wrong.');
       } catch (err) {
-        alert('Network error.');
+        showAlert('Network error.');
       }
 
       btn.disabled = false;
@@ -277,7 +277,7 @@
       var author = form.querySelector('[name="author"]').value.trim();
       var reason = form.querySelector('[name="reason"]').value.trim();
 
-      if (!title || !author) { alert('Title and author are required.'); return; }
+      if (!title || !author) { showAlert('Title and author are required.'); return; }
 
       saveBtn.disabled = true;
       saveBtn.textContent = 'Saving\u2026';
@@ -315,10 +315,10 @@
           var editBtn3 = row.querySelector('.js-edit-nominee[data-book-id="' + bookId + '"]');
           if (editBtn3) editBtn3.hidden = false;
         } else {
-          alert(result.data.error || 'Something went wrong.');
+          showAlert(result.data.error || 'Something went wrong.');
         }
       })
-      .catch(function () { alert('Network error.'); })
+      .catch(function () { showAlert('Network error.'); })
       .finally(function () {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Save';
@@ -459,12 +459,7 @@
       var meetingId = deleteBtn.dataset.meetingId;
       var label = deleteBtn.dataset.meetingLabel || 'this pick';
 
-      if (!confirm('Are you sure you want to permanently delete "' + label + '"?\n\nThis will remove all nominations, votes, and results. This cannot be undone.')) {
-        return;
-      }
-
-      // Double-confirm
-      if (!confirm('This action is irreversible. Delete "' + label + '"?')) {
+      if (!await showConfirm('Permanently delete \u201c' + label + '\u201d? This will remove all nominations, votes, and results. This cannot be undone.', { danger: true, confirmText: 'Delete' })) {
         return;
       }
 
@@ -484,9 +479,9 @@
           return;
         }
 
-        alert(data.error || 'Something went wrong.');
+        showAlert(data.error || 'Something went wrong.');
       } catch (err) {
-        alert('Network error.');
+        showAlert('Network error.');
       }
 
       deleteBtn.disabled = false;
@@ -590,7 +585,7 @@
           var bId = btn.dataset.bookId;
           var t = btn.dataset.title;
 
-          if (!confirm('Remove "' + t + '" from nominees?')) return;
+          if (!await showConfirm('Remove \u201c' + t + '\u201d from nominees?')) return;
 
           btn.disabled = true;
           btn.textContent = 'Removing\u2026';
@@ -606,9 +601,9 @@
               if (row) row.remove();
               return;
             }
-            alert(d.error || 'Something went wrong.');
+            showAlert(d.error || 'Something went wrong.');
           } catch (err) {
-            alert('Network error.');
+            showAlert('Network error.');
           }
           btn.disabled = false;
           btn.textContent = 'Remove';

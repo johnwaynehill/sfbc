@@ -69,6 +69,8 @@ router.get('/', (req, res) => {
   const recentBooks = picksService.getRecentPicks(6, currentMeeting ? currentMeeting.id : null);
 
   const totalBooks = picksService.countCompleted();
+  const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+  const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
 
   // Active participation meeting (nominations or voting) — may or may not have a book
   const activeMeeting = db.prepare(`
@@ -108,6 +110,8 @@ router.get('/', (req, res) => {
     recentBooks,
     upcomingMeetings,
     totalBooks,
+    totalMembers,
+    totalReviews,
     heroSubjects,
     announcements,
     activity,
@@ -181,7 +185,7 @@ router.get('/changelog', (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/profile', requireMember, (req, res) => {
   const profileUser = db.prepare(
-    'SELECT id, email, display_name, avatar_style, goodreads_url, storygraph_url, instagram_handle, threads_handle, password_hash FROM users WHERE id = ?'
+    'SELECT id, email, display_name, avatar_style, user_slug, goodreads_url, storygraph_url, instagram_handle, threads_handle, password_hash FROM users WHERE id = ?'
   ).get(req.user.id);
 
   res.render('profile', {

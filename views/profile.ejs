@@ -1,5 +1,10 @@
 <section class="profile-page">
-  <h1 class="t-section profile-page__heading">Your Profile</h1>
+  <div class="profile-page__header">
+    <h1 class="t-section profile-page__heading">Your Profile</h1>
+    <% if (profileUser.user_slug) { %>
+      <a href="/members/<%= profileUser.user_slug %>" class="btn-quiet" target="_blank" rel="noopener">View public profile &rarr;</a>
+    <% } %>
+  </div>
 
   <!-- ---- Avatar Picker ---- -->
   <div class="profile-section">

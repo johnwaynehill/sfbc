@@ -227,6 +227,11 @@ router.get('/users', (req, res) => {
     pageTitle: 'Users',
     pageScript: '/js/admin-users.js',
     users,
+    maskEmail(email) {
+      const [local, domain] = email.split('@');
+      if (local.length <= 2) return local[0] + '***@' + domain;
+      return local[0] + '***' + local[local.length - 1] + '@' + domain;
+    },
   });
 });
 
