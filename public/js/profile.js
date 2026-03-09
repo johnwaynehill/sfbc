@@ -123,6 +123,34 @@
     });
   }
 
+  // ---- Slug Preview ----
+  var nameInput = document.querySelector('[name="display_name"]');
+  var slugPreview = document.getElementById('slug-preview');
+  var slugTimer = null;
+
+  function updateSlugPreview() {
+    if (!nameInput || !slugPreview) return;
+    var val = nameInput.value.trim();
+    if (!val) {
+      slugPreview.innerHTML = 'Your profile URL will appear after you set a name.';
+      return;
+    }
+    var slug = val.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 80);
+    slugPreview.innerHTML = 'Your profile: <code>/members/' + (slug || 'member') + '</code>';
+  }
+
+  if (nameInput && slugPreview) {
+    nameInput.addEventListener('input', function () {
+      clearTimeout(slugTimer);
+      slugTimer = setTimeout(updateSlugPreview, 150);
+    });
+  }
+
   // ---- 3. Social Links ----
   var socialForm = document.getElementById('social-form');
   var socialMsg = document.getElementById('social-message');

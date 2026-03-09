@@ -200,6 +200,26 @@ router.get('/profile', requireMember, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /members — Member directory
+// ---------------------------------------------------------------------------
+router.get('/members', requireMember, (req, res) => {
+  const members = db.prepare(`
+    SELECT u.id, u.display_name, u.avatar_style, u.user_slug, u.email, u.created_at,
+           COUNT(r.id) AS review_count
+    FROM users u
+    LEFT JOIN reviews r ON r.user_id = u.id
+    WHERE u.display_name IS NOT NULL AND u.user_slug IS NOT NULL
+    GROUP BY u.id
+    ORDER BY u.display_name COLLATE NOCASE ASC
+  `).all();
+
+  res.render('members', {
+    pageTitle: 'Members',
+    members,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /members/:slug — Public member profile
 // ---------------------------------------------------------------------------
 router.get('/members/:slug', requireMember, (req, res) => {

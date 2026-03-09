@@ -141,7 +141,9 @@
       if (match) visible++;
     });
 
-    if (countEl) countEl.textContent = visible;
+    if (countEl) {
+      countEl.textContent = query ? visible : (countEl.getAttribute('data-total') || visible);
+    }
     if (noResults) noResults.hidden = visible > 0 || !query;
   }
 

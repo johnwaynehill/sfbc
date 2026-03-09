@@ -35,7 +35,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
 | P1 | M | Better profile settings UX | Improve layout and flow of settings page |
-| P1 | S | View own public profile | Let members see how their profile appears to others |
 | P1 | L | Public members page | Browsable member directory (logged-in users only) |
 | P1 | S | Display name collision detection | Alert + suggest alternatives on signup |
 | P1 | M | Usernames + display names | Profile URLs use usernames; admin views show both |
@@ -50,7 +49,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
 | P1 | M | Invite someone to the club | Shareable invite link |
-| P1 | S | Add # Members, and Reviews to About section on Home | Quick view of the community at large | 
 | P2 | L | Reading status per member | Reading, Read, DNF, Did Not Read — per-member tracking |
 | P2 | M | User-submitted discussion questions | Members contribute questions for the current book |
 
@@ -83,9 +81,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Client-side dialogs | Replace browser alerts/confirms with styled modals |
 | P1 | S | Reaction and reply button design | Placement, size, hover effects update |
-| P1 | M | Home page hero section redesign | Larger, subtle background color, better info hierarchy |
 | P2 | M | @ mentions | Mention another user in replies |
 | P2 | S | Coming Up section — enlarge covers | Larger book covers and more vertical space |
 | P2 | M | Add haptics on key interactions for mobile users | https://haptics.lochie.me/ |
@@ -111,3 +107,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 5 | Quick wins + bugs | Metadata cleanup, book nav, my-reviews filter, toggle, --amber fix |
 | 6 | Book page as destination | Immersive hero, CTA buttons, inline metadata, external links, share, login prompts, nomination search + edit, rationale display |
 | 7 | Reviews polish + metadata | DNF checkbox + badge, spoiler filter polish, grade axis tooltips, reply markdown helper, publisher/language metadata, Samsung light mode fix, migration FK safeguard |
+| 8 | Community & polish | Community stats on Home, view own profile link, masked admin emails, styled dialog modals, home hero redesign |

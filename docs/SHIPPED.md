@@ -119,6 +119,14 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Migration FK safeguard** — `PRAGMA foreign_keys = OFF` around migration execution prevents cascade deletes when tables are dropped/recreated; `foreign_key_check` runs after each migration
 - **Conditional results links** — Results links hidden on pick detail and book detail pages when no voting data exists
 
+## Community & Polish (Sprint 8)
+
+- **Community stats on Home** — Member count and review count displayed alongside book count in the About section
+- **View own public profile** — "View public profile →" link on settings page opens `/members/:slug` in new tab
+- **Masked admin emails** — Admin users page shows `j***n@gmail.com` format for privacy; search still uses full email
+- **Styled dialog modals** — Replaced all 45 `confirm()`/`alert()` calls across 6 JS files with accessible `<dialog>` modals (`showConfirm()`, `showAlert()`)
+- **Home hero redesign** — Tinted radial gradient background from book cover hue, 220px cover, status/month label, meeting info card, gradient fade to page, responsive mobile stack
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background

@@ -1,0 +1,56 @@
+<section class="members-page">
+  <div class="members-page__header">
+    <h1 class="t-section">Members</h1>
+    <span class="t-body text-secondary"><%= members.length %> member<%= members.length !== 1 ? 's' : '' %></span>
+  </div>
+
+  <% if (members.length > 5) { %>
+    <div class="members-search">
+      <svg class="members-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="memberSearchInput" class="members-search__input" placeholder="Search members…" autocomplete="off">
+    </div>
+  <% } %>
+
+  <div class="members-grid" id="membersGrid">
+    <% for (const m of members) { %>
+      <a href="/members/<%= m.user_slug %>" class="member-card" data-name="<%= (m.display_name || '').toLowerCase() %>">
+        <%- include('partials/avatar', { avatarUser: m, avatarSize: 'md', avatarClass: '' }) %>
+        <div class="member-card__info">
+          <span class="member-card__name t-body-bold"><%= m.display_name %></span>
+          <span class="member-card__meta t-caption text-secondary">
+            <%= m.review_count %> review<%= m.review_count !== 1 ? 's' : '' %>
+            &middot;
+            Joined <%= new Date(m.created_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) %>
+          </span>
+        </div>
+      </a>
+    <% } %>
+  </div>
+
+  <div id="noMembers" class="admin-empty" hidden>
+    <p class="t-body text-secondary">No members match your search.</p>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var input = document.getElementById('memberSearchInput');
+  var grid = document.getElementById('membersGrid');
+  var noResults = document.getElementById('noMembers');
+  if (!input || !grid) return;
+
+  input.addEventListener('input', function () {
+    var query = input.value.trim().toLowerCase();
+    var cards = grid.querySelectorAll('.member-card');
+    var visible = 0;
+    cards.forEach(function (card) {
+      var name = card.getAttribute('data-name') || '';
+      var match = !query || name.indexOf(query) !== -1;
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    if (noResults) noResults.hidden = visible > 0 || !query;
+  });
+})();
+</script>

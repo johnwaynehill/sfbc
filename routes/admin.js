@@ -11,6 +11,17 @@ const { calculateResults, getVoteCount } = require('../services/voting');
 const { formatMonthYear, parseMonthYearSlug, monthYearSlug } = require('../utils/format');
 
 /* ------------------------------------------------------------------ */
+/*  Pagination helper                                                  */
+/* ------------------------------------------------------------------ */
+
+function parsePagination(query, defaultPer = 25) {
+  const page = Math.max(1, parseInt(query.page, 10) || 1);
+  const per = Math.min(100, Math.max(10, parseInt(query.per, 10) || defaultPer));
+  const offset = (page - 1) * per;
+  return { page, per, offset };
+}
+
+/* ------------------------------------------------------------------ */
 /*  QR code helper                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -217,16 +228,25 @@ router.get('/picks/:slug', async (req, res) => {
 // Users list
 // ---------------------------------------------------------------------------
 router.get('/users', (req, res) => {
+  const { page, per, offset } = parsePagination(req.query);
+  const total = db.prepare('SELECT COUNT(*) AS total FROM users').get().total;
+  const totalPages = Math.ceil(total / per) || 1;
+
   const users = db.prepare(`
     SELECT id, email, display_name, role, avatar_style, user_slug, created_at
     FROM users
     ORDER BY created_at DESC
-  `).all();
+    LIMIT ? OFFSET ?
+  `).all(per, offset);
 
   res.render('admin/users', {
     pageTitle: 'Users',
     pageScript: '/js/admin-users.js',
     users,
+    total,
+    page,
+    per,
+    totalPages,
     maskEmail(email) {
       const [local, domain] = email.split('@');
       if (local.length <= 2) return local[0] + '***@' + domain;
@@ -239,6 +259,10 @@ router.get('/users', (req, res) => {
 // Reviews list
 // ---------------------------------------------------------------------------
 router.get('/reviews', (req, res) => {
+  const { page, per, offset } = parsePagination(req.query);
+  const total = db.prepare('SELECT COUNT(*) AS total FROM reviews').get().total;
+  const totalPages = Math.ceil(total / per) || 1;
+
   const reviews = db.prepare(`
     SELECT r.id, r.grade, r.body_markdown, r.created_at,
            u.display_name, u.email,
@@ -248,12 +272,17 @@ router.get('/reviews', (req, res) => {
     JOIN users u ON u.id = r.user_id
     JOIN books b ON b.id = r.book_id
     ORDER BY r.created_at DESC
-  `).all();
+    LIMIT ? OFFSET ?
+  `).all(per, offset);
 
   res.render('admin/reviews', {
     pageTitle: 'Reviews',
     pageScript: '/js/admin-reviews.js',
     reviews,
+    total,
+    page,
+    per,
+    totalPages,
   });
 });
 

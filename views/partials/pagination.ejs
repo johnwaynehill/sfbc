@@ -1,0 +1,32 @@
+<%
+/**
+ * Pagination partial — reusable page navigation controls
+ *
+ * Locals:
+ *   page      — Current page number (1-indexed)
+ *   totalPages — Total number of pages
+ *   per       — Items per page
+ *   baseUrl   — Base URL for page links (e.g., '/admin/users')
+ */
+%>
+<% if (totalPages > 1) { %>
+  <nav class="pagination" aria-label="Page navigation">
+    <% if (page > 1) { %>
+      <a href="<%= baseUrl %>?page=<%= page - 1 %>&per=<%= per %>"
+         class="pagination__btn" aria-label="Previous page">&larr; Prev</a>
+    <% } else { %>
+      <span class="pagination__btn is-disabled" aria-disabled="true">&larr; Prev</span>
+    <% } %>
+
+    <span class="pagination__info">
+      Page <strong><%= page %></strong> of <strong><%= totalPages %></strong>
+    </span>
+
+    <% if (page < totalPages) { %>
+      <a href="<%= baseUrl %>?page=<%= page + 1 %>&per=<%= per %>"
+         class="pagination__btn" aria-label="Next page">Next &rarr;</a>
+    <% } else { %>
+      <span class="pagination__btn is-disabled" aria-disabled="true">Next &rarr;</span>
+    <% } %>
+  </nav>
+<% } %>

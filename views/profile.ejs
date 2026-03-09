@@ -129,6 +129,13 @@
                  value="<%= profileUser.display_name || '' %>" maxlength="40"
                  placeholder="How you appear to others" required>
         </label>
+        <div class="slug-preview" id="slug-preview">
+          <% if (profileUser.user_slug) { %>
+            Your profile: <code>/members/<%= profileUser.user_slug %></code>
+          <% } else { %>
+            Your profile URL will appear after you set a name.
+          <% } %>
+        </div>
 
         <label class="form-label">
           Email
@@ -187,10 +194,8 @@
   <div class="profile-section">
     <h2 class="t-body-bold profile-section__title">
       <%= profileUser.hasPassword ? 'Change Password' : 'Set Password' %>
+      <span class="t-caption text-tertiary">&nbsp;&middot; Optional</span>
     </h2>
-    <p class="t-caption text-secondary" style="margin-bottom: var(--s-3);">
-      Optional. You can always use the magic link to sign in.
-    </p>
     <div class="profile-card">
       <form class="profile-form" id="password-form">
         <% if (profileUser.hasPassword) { %>
