@@ -443,9 +443,12 @@
   height: 40%;
   background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
   pointer-events: none;
+  z-index: 0;
 }
 
 .home-hero__layout {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--s-5);
