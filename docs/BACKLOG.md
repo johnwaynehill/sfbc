@@ -41,6 +41,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | P2 | L | More robust profiles | Richer member pages with stats, favorites, reading history |
 | P2 | M | Photo upload avatars | Alongside existing DiceBear options |
 | P2 | S | Pick any DiceBear avatar | All styles via DiceBear JS library (currently 24 of many) |
+| P2 | S | Show/Hide password in password fields (users and admins) | basic usability | 
 
 ## Social & Community
 
