@@ -1,5 +1,96 @@
 [
   {
+    "version": "0.9",
+    "date": "2026-03-08",
+    "title": "Members Directory & Admin Upgrades",
+    "intro": "A new members directory, better profile settings, and some much-needed admin quality of life improvements.",
+    "entries": [
+      {
+        "icon": "user",
+        "text": "Members directory — browse all club members at /members with avatars, review counts, and join dates. Search to find anyone quickly."
+      },
+      {
+        "icon": "book",
+        "text": "Redesigned home hero — the current book now has a tinted gradient background pulled from its cover, with meeting info and a cleaner layout."
+      },
+      {
+        "icon": "magic",
+        "text": "Better profile settings — your profile page now shows a live preview of your URL as you type your display name, with cleaner card sections and a more compact avatar picker."
+      },
+      {
+        "icon": "calendar",
+        "text": "Admin pagination — the users and reviews lists in admin now paginate properly instead of loading everything at once."
+      },
+      {
+        "icon": "moon",
+        "text": "Polish everywhere — reaction and reply buttons have better tap targets and hover states, dialogs use proper accessible modals instead of browser alerts, and community stats show on the home page."
+      }
+    ],
+    "outro": "Got ideas for what we should build next? Let us know!"
+  },
+  {
+    "version": "0.8",
+    "date": "2026-03-07",
+    "title": "Reviews Polish & Book Metadata",
+    "intro": "Reviews got a bunch of small but meaningful improvements, and book pages now show richer metadata automatically.",
+    "entries": [
+      {
+        "icon": "book",
+        "text": "\"Did you finish?\" — reviews now track whether you finished the book. If you didn't, a DNF badge shows on your review so others know the context."
+      },
+      {
+        "icon": "magic",
+        "text": "Reply formatting toolbar — replies now have a compact Bold/Italic/Spoiler/Link toolbar, just like the main review editor."
+      },
+      {
+        "icon": "calendar",
+        "text": "Grade distribution tooltips — hover or tap the grade axis on any book page to see exactly how many reviews each tier got."
+      },
+      {
+        "icon": "user",
+        "text": "Publisher and language metadata — book pages now automatically show publisher info and language (for non-English books) pulled from Google Books."
+      },
+      {
+        "icon": "moon",
+        "text": "Spoiler filter polish — the toggle moved to its own strip with a count badge, smooth animations, and better accessibility."
+      }
+    ],
+    "outro": "Up next: a redesigned home page hero and a public members directory."
+  },
+  {
+    "version": "0.7",
+    "date": "2026-03-06",
+    "title": "Immersive Book Pages",
+    "intro": "Book pages got a complete visual overhaul — they feel like real destination pages now, not just data displays.",
+    "entries": [
+      {
+        "icon": "book",
+        "text": "Immersive book hero — a full-bleed blurred cover wash fills the background, with a dramatic shadow on the cover and genre tags at a glance."
+      },
+      {
+        "icon": "magic",
+        "text": "Review and Share buttons — big clear CTAs right on the book page. Not logged in? You'll see a friendly sign-in prompt instead."
+      },
+      {
+        "icon": "qr",
+        "text": "Nomination search — when nominating a book, you now get a Google Books powered search with cover previews. No more typos or missing covers."
+      },
+      {
+        "icon": "user",
+        "text": "External book links — quick links to Goodreads, StoryGraph, and Bookshop.org right from any book page."
+      },
+      {
+        "icon": "calendar",
+        "text": "Richer book metadata — page count, publication year, and ISBN shown in a compact row. Inline admin editing for nominations."
+      },
+      {
+        "icon": "moon",
+        "text": "Share any book — tap the Share button to send a link via your phone's share sheet, or copy it to your clipboard on desktop."
+      }
+    ],
+    "outro": "Up next: review improvements and better book metadata."
+  },
+  {
     "version": "0.6",
     "date": "2026-03-01",
     "title": "Live Activity Feed & Review Upgrades",
