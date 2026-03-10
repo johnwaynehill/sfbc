@@ -127,6 +127,14 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Styled dialog modals** — Replaced all 45 `confirm()`/`alert()` calls across 6 JS files with accessible `<dialog>` modals (`showConfirm()`, `showAlert()`)
 - **Home hero redesign** — Tinted radial gradient background from book cover hue, 220px cover, status/month label, meeting info card, gradient fade to page, responsive mobile stack
 
+## Admin QoL & Members Directory (Sprint 9)
+
+- **Public members directory** — New `/members` page (auth-gated) listing all members with avatars, review counts, and join dates; inline client-side search; "Members" nav link for logged-in users
+- **Better profile settings UX** — Wider card layout with section elevation, display-font headings, live slug preview below display name input, compact avatar picker grid (60px cells)
+- **Admin pagination** — Server-side `LIMIT/OFFSET` for `/admin/users` and `/admin/reviews` (25/page); reusable `pagination.ejs` partial; client-side search scoped to current page via `data-total` attribute
+- **Reaction & reply button polish** — 32px min touch targets, hover micro-lift (`translateY(-1px)`), visible hover backgrounds on reply trigger, active pill box-shadow
+- **Password signup fix** — `POST /auth/password-login` now auto-registers new users when the email doesn't exist yet, mirroring the magic-link flow; added 8-char minimum validation
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background

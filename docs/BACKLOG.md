@@ -34,8 +34,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Better profile settings UX | Improve layout and flow of settings page |
-| P1 | L | Public members page | Browsable member directory (logged-in users only) |
 | P1 | S | Display name collision detection | Alert + suggest alternatives on signup |
 | P1 | M | Usernames + display names | Profile URLs use usernames; admin views show both |
 | P2 | L | More robust profiles | Richer member pages with stats, favorites, reading history |
@@ -59,7 +57,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Admin pagination | Paginate reviews, picks, and users lists |
 | P1 | M | Remove Meeting information from Pick | Allows Picks to have multiple meetings per cycle |
 | P2 | M | Allow for creation of meeting for a Pick | Multiple meetings per Pick allow for more people to meet in-person | 
 
@@ -82,7 +79,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | S | Reaction and reply button design | Placement, size, hover effects update |
 | P2 | M | @ mentions | Mention another user in replies |
 | P2 | S | Coming Up section — enlarge covers | Larger book covers and more vertical space |
 | P2 | M | Add haptics on key interactions for mobile users | https://haptics.lochie.me/ |
@@ -109,3 +105,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 6 | Book page as destination | Immersive hero, CTA buttons, inline metadata, external links, share, login prompts, nomination search + edit, rationale display |
 | 7 | Reviews polish + metadata | DNF checkbox + badge, spoiler filter polish, grade axis tooltips, reply markdown helper, publisher/language metadata, Samsung light mode fix, migration FK safeguard |
 | 8 | Community & polish | Community stats on Home, view own profile link, masked admin emails, styled dialog modals, home hero redesign |
+| 9 | Admin QoL, members directory, UX polish | Reaction/reply button polish, admin pagination, profile settings UX, public members directory, password signup fix |
