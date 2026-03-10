@@ -162,7 +162,7 @@ router.get('/auth/callback', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// POST /auth/password-login — email + password login
+// POST /auth/password-login — email + password sign-in or registration
 // ---------------------------------------------------------------------------
 router.post('/auth/password-login', authLimiter, ...emailChain, handleValidationErrors, (req, res) => {
   const email = req.body.email; // already trimmed + lowercased by chain
@@ -172,9 +172,19 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
     return res.status(400).json({ error: 'Password is required.' });
   }
 
-  const user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
 
-  if (!user || !user.password_hash || !bcrypt.compareSync(password, user.password_hash)) {
+  let user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+
+  if (!user) {
+    // New user — create account with hashed password (mirrors magic-link auto-registration)
+    const hash = bcrypt.hashSync(password, 12);
+    const displayName = email.split('@')[0];
+    db.prepare("INSERT INTO users (email, display_name, password_hash, role) VALUES (?, ?, ?, 'member')").run(email, displayName, hash);
+    user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+  } else if (!user.password_hash || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 
