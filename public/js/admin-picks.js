@@ -231,106 +231,229 @@
   });
 
   // -----------------------------------------------------------------------
-  // Edit nominee (inline)
+  // Edit nominee / Replace cover — unified modal
   // -----------------------------------------------------------------------
-
-  document.addEventListener('click', function (e) {
-    // Edit button
-    var editBtn = e.target.closest('.js-edit-nominee');
-    if (editBtn) {
-      var row = editBtn.closest('.admin-nominee');
-      if (!row) return;
-      var bookId = editBtn.dataset.bookId;
-      var display = row.querySelector('.js-nominee-display[data-book-id="' + bookId + '"]');
-      var form = row.querySelector('.admin-nominee-edit[data-book-id="' + bookId + '"]');
-      if (display) display.hidden = true;
-      if (form) form.hidden = false;
-      editBtn.hidden = true;
-      return;
-    }
-
-    // Cancel button
-    var cancelBtn = e.target.closest('.js-cancel-edit-nominee');
-    if (cancelBtn) {
-      var row = cancelBtn.closest('.admin-nominee');
-      if (!row) return;
-      var form = cancelBtn.closest('.admin-nominee-edit');
-      var bookId = form ? form.dataset.bookId : null;
-      if (form) form.hidden = true;
-      var display = row.querySelector('.js-nominee-display[data-book-id="' + bookId + '"]');
-      if (display) display.hidden = false;
-      var editBtn2 = row.querySelector('.js-edit-nominee[data-book-id="' + bookId + '"]');
-      if (editBtn2) editBtn2.hidden = false;
-      return;
-    }
-
-    // Save button
-    var saveBtn = e.target.closest('.js-save-nominee');
-    if (saveBtn) {
-      var meetingId = saveBtn.dataset.meetingId;
-      var bookId = saveBtn.dataset.bookId;
-      var row = saveBtn.closest('.admin-nominee');
-      var form = saveBtn.closest('.admin-nominee-edit');
-      if (!form) return;
-
-      var title = form.querySelector('[name="title"]').value.trim();
-      var author = form.querySelector('[name="author"]').value.trim();
-      var reason = form.querySelector('[name="reason"]').value.trim();
-
-      if (!title || !author) { showAlert('Title and author are required.'); return; }
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving\u2026';
-
-      fetch('/api/admin/meetings/' + meetingId + '/nominees/' + bookId, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ title: title, author: author, reason: reason }),
-      })
-      .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, data: d }; }); })
-      .then(function (result) {
-        if (result.ok && result.data.success) {
-          // Update display values
-          var display = row.querySelector('.js-nominee-display[data-book-id="' + bookId + '"]');
-          if (display) {
-            var titleEl = display.querySelector('.js-nominee-title');
-            var authorEl = display.querySelector('.js-nominee-author');
-            var reasonEl = display.querySelector('.js-nominee-reason');
-            if (titleEl) titleEl.textContent = result.data.book.title;
-            if (authorEl) authorEl.textContent = result.data.book.author;
-            if (reasonEl && result.data.book.reason) {
-              reasonEl.innerHTML = '&ldquo;' + esc(result.data.book.reason) + '&rdquo;';
-            } else if (reasonEl && !result.data.book.reason) {
-              reasonEl.remove();
-            } else if (!reasonEl && result.data.book.reason) {
-              var p = document.createElement('p');
-              p.className = 't-caption text-secondary js-nominee-reason';
-              p.style.cssText = 'margin-top: var(--s-1); font-style: italic;';
-              p.innerHTML = '&ldquo;' + esc(result.data.book.reason) + '&rdquo;';
-              display.appendChild(p);
-            }
-            display.hidden = false;
-          }
-          form.hidden = true;
-          var editBtn3 = row.querySelector('.js-edit-nominee[data-book-id="' + bookId + '"]');
-          if (editBtn3) editBtn3.hidden = false;
-        } else {
-          showAlert(result.data.error || 'Something went wrong.');
-        }
-      })
-      .catch(function () { showAlert('Network error.'); })
-      .finally(function () {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save';
-      });
-    }
-  });
 
   function esc(str) {
     var d = document.createElement('div');
     d.textContent = str || '';
     return d.innerHTML;
   }
+
+  var editDialog = null;
+
+  function getEditDialog() {
+    if (editDialog) return editDialog;
+    var dialog = document.createElement('dialog');
+    dialog.className = 'app-dialog edit-modal';
+    dialog.innerHTML =
+      '<div class="edit-modal__content">' +
+        '<h3 class="edit-modal__heading t-body-bold">Edit Book</h3>' +
+        '<div class="edit-modal__fields" id="edit-modal-fields">' +
+          '<div class="edit-modal__field">' +
+            '<label class="t-caption text-secondary" for="edit-modal-title">Title</label>' +
+            '<input type="text" class="form-input form-input--sm" id="edit-modal-title" placeholder="Title">' +
+          '</div>' +
+          '<div class="edit-modal__field">' +
+            '<label class="t-caption text-secondary" for="edit-modal-author">Author</label>' +
+            '<input type="text" class="form-input form-input--sm" id="edit-modal-author" placeholder="Author">' +
+          '</div>' +
+          '<button type="button" class="btn btn--primary btn--sm" id="edit-modal-save">Save</button>' +
+        '</div>' +
+        '<hr class="edit-modal__divider" id="edit-modal-divider">' +
+        '<div class="edit-modal__cover-section">' +
+          '<span class="t-caption-bold">Replace Cover</span>' +
+          '<div class="edit-modal__search-row">' +
+            '<input type="text" class="form-input form-input--sm" id="edit-modal-search" placeholder="Search for a cover\u2026">' +
+            '<button type="button" class="btn btn--secondary btn--sm" id="edit-modal-search-btn">Search</button>' +
+          '</div>' +
+          '<div class="edit-modal__covers" id="edit-modal-covers"></div>' +
+        '</div>' +
+        '<div class="edit-modal__actions">' +
+          '<button type="button" class="btn btn--ghost btn--sm" id="edit-modal-close">Close</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(dialog);
+
+    // Close handlers
+    dialog.querySelector('#edit-modal-close').addEventListener('click', function () {
+      dialog.close();
+    });
+    dialog.addEventListener('click', function (e) {
+      if (e.target === dialog) dialog.close();
+    });
+
+    editDialog = dialog;
+    return dialog;
+  }
+
+  function showEditModal(opts) {
+    var dialog = getEditDialog();
+    var titleInput = dialog.querySelector('#edit-modal-title');
+    var authorInput = dialog.querySelector('#edit-modal-author');
+    var fieldsSection = dialog.querySelector('#edit-modal-fields');
+    var divider = dialog.querySelector('#edit-modal-divider');
+    var saveBtn = dialog.querySelector('#edit-modal-save');
+    var searchInput = dialog.querySelector('#edit-modal-search');
+    var searchBtn = dialog.querySelector('#edit-modal-search-btn');
+    var coversEl = dialog.querySelector('#edit-modal-covers');
+
+    // Reset
+    titleInput.value = opts.title || '';
+    authorInput.value = opts.author || '';
+    searchInput.value = (opts.title || '') + ' ' + (opts.author || '');
+    coversEl.innerHTML = '';
+
+    // Show/hide edit fields based on mode
+    var isEditMode = !!opts.meetingId;
+    fieldsSection.hidden = !isEditMode;
+    divider.hidden = !isEditMode;
+    dialog.querySelector('.edit-modal__heading').textContent = isEditMode ? 'Edit Book' : 'Replace Cover';
+
+    // Store current context
+    dialog._bookId = opts.bookId;
+    dialog._meetingId = opts.meetingId || null;
+
+    // Save handler (re-bind each time)
+    var newSaveBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+    newSaveBtn.addEventListener('click', function () {
+      var title = titleInput.value.trim();
+      var author = authorInput.value.trim();
+      if (!title || !author) { showAlert('Title and author are required.'); return; }
+      newSaveBtn.disabled = true;
+      newSaveBtn.textContent = 'Saving\u2026';
+      fetch('/api/admin/meetings/' + dialog._meetingId + '/nominees/' + dialog._bookId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ title: title, author: author }),
+      })
+      .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, data: d }; }); })
+      .then(function (result) {
+        if (result.ok && result.data.success) {
+          // Update DOM
+          var row = document.querySelector('.admin-nominee[data-book-id="' + dialog._bookId + '"]');
+          if (row) {
+            var titleEl = row.querySelector('.js-nominee-title');
+            var authorEl = row.querySelector('.js-nominee-author');
+            if (titleEl) titleEl.textContent = result.data.book.title;
+            if (authorEl) authorEl.textContent = result.data.book.author;
+          }
+          // Update search field to match new values
+          searchInput.value = title + ' ' + author;
+          newSaveBtn.textContent = 'Saved!';
+          setTimeout(function () { newSaveBtn.textContent = 'Save'; }, 1500);
+        } else {
+          showAlert(result.data.error || 'Something went wrong.');
+        }
+      })
+      .catch(function () { showAlert('Network error.'); })
+      .finally(function () { newSaveBtn.disabled = false; });
+    });
+
+    // Search handler (re-bind each time)
+    var newSearchBtn = searchBtn.cloneNode(true);
+    searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+    newSearchBtn.addEventListener('click', function () {
+      var q = searchInput.value.trim();
+      if (q.length < 3) { showAlert('Enter at least 3 characters to search.'); return; }
+      doModalCoverSearch(coversEl, dialog._bookId, q);
+    });
+
+    // Enter key on search input
+    searchInput.onkeydown = function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); newSearchBtn.click(); }
+    };
+
+    dialog.showModal();
+
+    // Auto-search if we have a query
+    var autoQuery = searchInput.value.trim();
+    if (autoQuery.length >= 3) {
+      doModalCoverSearch(coversEl, dialog._bookId, autoQuery);
+    }
+  }
+
+  function doModalCoverSearch(container, bookId, query) {
+    container.innerHTML = '<span class="t-caption text-secondary">Searching\u2026</span>';
+    fetch('/api/books/search-multi?q=' + encodeURIComponent(query))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.results || data.results.length === 0) {
+          container.innerHTML = '<span class="t-caption text-secondary">No results found.</span>';
+          return;
+        }
+        var html = '';
+        for (var i = 0; i < data.results.length; i++) {
+          var r = data.results[i];
+          html += '<div class="edit-modal__cover-item" data-google-books-id="' + esc(r.googleBooksId) + '" data-book-id="' + bookId + '">'
+            + '<img src="' + esc(r.coverUrl) + '" alt="' + esc(r.title) + '" loading="lazy">'
+            + '<span class="t-caption">' + esc(r.title) + '</span>'
+            + '</div>';
+        }
+        container.innerHTML = html;
+      })
+      .catch(function () {
+        container.innerHTML = '<span class="t-caption text-secondary">Search failed.</span>';
+      });
+  }
+
+  // Click handler for edit/cover buttons and cover results
+  document.addEventListener('click', function (e) {
+    // Edit nominee button → full modal
+    var editBtn = e.target.closest('.js-edit-nominee');
+    if (editBtn) {
+      showEditModal({
+        bookId: editBtn.dataset.bookId,
+        title: editBtn.dataset.title,
+        author: editBtn.dataset.author,
+        meetingId: editBtn.dataset.meetingId,
+      });
+      return;
+    }
+
+    // Replace cover button (winner callout) → cover-only modal
+    var coverBtn = e.target.closest('.js-replace-cover');
+    if (coverBtn) {
+      showEditModal({
+        bookId: coverBtn.dataset.bookId,
+        title: coverBtn.dataset.title,
+        author: coverBtn.dataset.author,
+        meetingId: null,
+      });
+      return;
+    }
+
+    // Cover result click
+    var coverItem = e.target.closest('.edit-modal__cover-item');
+    if (coverItem) {
+      var gbid = coverItem.dataset.googleBooksId;
+      var bkId = coverItem.dataset.bookId;
+      showConfirm('Replace the cover with this image?').then(function (ok) {
+        if (!ok) return;
+        coverItem.style.opacity = '0.5';
+        fetch('/api/admin/books/' + bkId + '/cover', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ googleBooksId: gbid }),
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            window.location.reload();
+          } else {
+            showAlert(data.error || 'Failed to replace cover.');
+            coverItem.style.opacity = '1';
+          }
+        })
+        .catch(function () {
+          showAlert('Network error.');
+          coverItem.style.opacity = '1';
+        });
+      });
+      return;
+    }
+  });
 
   // -----------------------------------------------------------------------
   // Edit meeting details (toggle + form)
@@ -487,107 +610,6 @@
       deleteBtn.disabled = false;
       deleteBtn.textContent = 'Delete Pick';
     });
-  }
-
-  // -----------------------------------------------------------------------
-  // Replace cover (admin)
-  // -----------------------------------------------------------------------
-
-  var coverSearchTimer = null;
-
-  document.addEventListener('click', function (e) {
-    var coverBtn = e.target.closest('.js-replace-cover');
-    if (coverBtn) {
-      var bookId = coverBtn.dataset.bookId;
-      var row = coverBtn.closest('.admin-nominee');
-      var panel = row ? row.querySelector('.admin-cover-search[data-book-id="' + bookId + '"]') : null;
-      // Fallback: find panel anywhere on the page (e.g. winner callout)
-      if (!panel) panel = document.querySelector('.admin-cover-search[data-book-id="' + bookId + '"]');
-      if (!panel) return;
-
-      var isHidden = panel.hidden;
-      // Close all other panels first
-      document.querySelectorAll('.admin-cover-search').forEach(function (p) { p.hidden = true; });
-
-      if (isHidden) {
-        panel.hidden = false;
-        var input = panel.querySelector('.admin-cover-search__input');
-        if (input && input.value.trim()) {
-          doCoverSearch(panel, input.value.trim());
-        }
-        if (input) input.focus();
-      }
-      return;
-    }
-
-    // Cover result click
-    var coverItem = e.target.closest('.admin-cover-search__item');
-    if (coverItem) {
-      var gbid = coverItem.dataset.googleBooksId;
-      var bkId = coverItem.dataset.bookId;
-      showConfirm('Replace the cover with this image?').then(function (ok) {
-        if (!ok) return;
-        coverItem.style.opacity = '0.5';
-        fetch('/api/admin/books/' + bkId + '/cover', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ googleBooksId: gbid }),
-        })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (data.success) {
-            window.location.reload();
-          } else {
-            showAlert(data.error || 'Failed to replace cover.');
-            coverItem.style.opacity = '1';
-          }
-        })
-        .catch(function () {
-          showAlert('Network error.');
-          coverItem.style.opacity = '1';
-        });
-      });
-      return;
-    }
-  });
-
-  // Debounced cover search input
-  document.addEventListener('input', function (e) {
-    if (!e.target.matches('.admin-cover-search__input')) return;
-    var panel = e.target.closest('.admin-cover-search');
-    var query = e.target.value.trim();
-    clearTimeout(coverSearchTimer);
-    if (query.length < 3) return;
-    coverSearchTimer = setTimeout(function () {
-      doCoverSearch(panel, query);
-    }, 350);
-  });
-
-  function doCoverSearch(panel, query) {
-    var results = panel.querySelector('.admin-cover-search__results');
-    var bookId = panel.dataset.bookId;
-    results.innerHTML = '<span class="t-caption text-secondary">Searching\u2026</span>';
-
-    fetch('/api/books/search-multi?q=' + encodeURIComponent(query))
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data.results || data.results.length === 0) {
-          results.innerHTML = '<span class="t-caption text-secondary">No results found.</span>';
-          return;
-        }
-        var html = '';
-        for (var i = 0; i < data.results.length; i++) {
-          var r = data.results[i];
-          html += '<div class="admin-cover-search__item" data-google-books-id="' + esc(r.googleBooksId) + '" data-book-id="' + bookId + '">'
-            + '<img src="' + esc(r.coverUrl) + '" alt="' + esc(r.title) + '" loading="lazy">'
-            + '<span class="t-caption">' + esc(r.title) + '</span>'
-            + '</div>';
-        }
-        results.innerHTML = html;
-      })
-      .catch(function () {
-        results.innerHTML = '<span class="t-caption text-secondary">Search failed.</span>';
-      });
   }
 
   // -----------------------------------------------------------------------

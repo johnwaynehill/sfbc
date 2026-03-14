@@ -135,6 +135,13 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Reaction & reply button polish** — 32px min touch targets, hover micro-lift (`translateY(-1px)`), visible hover backgrounds on reply trigger, active pill box-shadow
 - **Password signup fix** — `POST /auth/password-login` now auto-registers new users when the email doesn't exist yet, mirroring the magic-link flow; added 8-char minimum validation
 
+## Bug Fixes & UX Polish (Sprint 11)
+
+- **Email `+` alias fix** — Accounts can now be created with `+` subaddress aliases (e.g. `user+club@gmail.com`); `normalizeEmail()` options updated to preserve subaddresses across Gmail, Outlook, and Yahoo
+- **Admin nav cleanup** — Removed "View Site" link from admin navigation to reduce clutter
+- **Enlarged Coming Up covers** — Homepage "Coming Up" section covers increased from 56px to 96px (72px on mobile) for better visual prominence
+- **Unified edit/cover modal** — Merged separate "Edit" and "Cover" nominee buttons into a single "Edit" button that opens a modal dialog; modal has Title/Author fields plus cover search with Google Books thumbnails; winner callout has a standalone "Replace Cover" button in cover-only mode
+
 ## Content & Admin (Sprint 10)
 
 - **Display name collision detection** — Real-time slug availability check on profile page; green ✓ for available, amber ⚠ with suggested alternative for taken names; `GET /api/auth/check-slug` endpoint with debounced client-side check
