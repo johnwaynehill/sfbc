@@ -1,5 +1,53 @@
 [
   {
+    "version": "0.11",
+    "date": "2026-03-13",
+    "title": "UX Polish & Admin Improvements",
+    "intro": "Quality-of-life improvements across the board \u2014 bigger covers, a smarter edit modal, and a handful of bug fixes.",
+    "entries": [
+      {
+        "icon": "book",
+        "text": "Bigger Coming Up covers \u2014 upcoming books on the home page now show larger cover images with the date label above for a cleaner layout."
+      },
+      {
+        "icon": "magic",
+        "text": "Unified edit modal \u2014 admins can now edit a nomination\u2019s title, author, and cover in a single dialog. Cover suggestions update automatically as you type."
+      },
+      {
+        "icon": "user",
+        "text": "Email alias support \u2014 you can now sign up with + aliases like user+bookclub@gmail.com without issues."
+      },
+      {
+        "icon": "moon",
+        "text": "Admin nav cleanup \u2014 removed the redundant \u201cView Site\u201d link to keep the admin navigation focused."
+      }
+    ]
+  },
+  {
+    "version": "0.10",
+    "date": "2026-03-10",
+    "title": "Invites, Events & Content Admin",
+    "intro": "Big admin update \u2014 invite friends to the club, manage meeting events, and keep display names unique.",
+    "entries": [
+      {
+        "icon": "magic",
+        "text": "Invite links \u2014 any member can generate a shareable link from the Members page to invite someone to the club. The new member sees who invited them."
+      },
+      {
+        "icon": "calendar",
+        "text": "Events on picks \u2014 admins can create, edit, and delete event sessions (date, location, Meetup link) for any pick. The home page hero pulls from events automatically."
+      },
+      {
+        "icon": "user",
+        "text": "Display name collision detection \u2014 your profile page now checks if your chosen name is taken in real time, with a suggested alternative if it is."
+      },
+      {
+        "icon": "book",
+        "text": "Admin cover replace \u2014 admins can search Google Books and swap out any book\u2019s cover image from the pick detail page."
+      }
+    ]
+  },
+  {
     "version": "0.9",
     "date": "2026-03-08",
     "title": "Members Directory & Admin Upgrades",
