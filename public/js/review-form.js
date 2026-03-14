@@ -196,10 +196,6 @@
         replacement = '~~' + (selected || 'strikethrough text') + '~~';
         cursorOffset = selected ? replacement.length : 2;
         break;
-      case 'heading':
-        replacement = '### ' + (selected || 'Heading');
-        cursorOffset = selected ? replacement.length : 4;
-        break;
       case 'ordered-list':
         if (selected) {
           replacement = selected.split('\n').map(function (l, i) { return (i + 1) + '. ' + l; }).join('\n');
@@ -286,15 +282,6 @@
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
-
-      // Headings: ### text
-      if (/^#{1,3}\s+/.test(line)) {
-        if (inList) { result.push('</ul>'); inList = false; }
-        if (inOl) { result.push('</ol>'); inOl = false; }
-        var level = line.match(/^(#{1,3})/)[1].length;
-        result.push('<h' + level + '>' + line.replace(/^#{1,3}\s+/, '') + '</h' + level + '>');
-        continue;
-      }
 
       // Unordered list
       if (/^[-*+]\s+/.test(line)) {
