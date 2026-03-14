@@ -123,31 +123,61 @@
     });
   }
 
-  // ---- Slug Preview ----
+  // ---- Slug Preview (with server-side collision check) ----
   var nameInput = document.querySelector('[name="display_name"]');
   var slugPreview = document.getElementById('slug-preview');
   var slugTimer = null;
+
+  function localSlug(val) {
+    return val.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 80);
+  }
 
   function updateSlugPreview() {
     if (!nameInput || !slugPreview) return;
     var val = nameInput.value.trim();
     if (!val) {
       slugPreview.innerHTML = 'Your profile URL will appear after you set a name.';
+      slugPreview.className = 'slug-preview';
       return;
     }
-    var slug = val.toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 80);
-    slugPreview.innerHTML = 'Your profile: <code>/members/' + (slug || 'member') + '</code>';
+
+    var slug = localSlug(val);
+
+    // Instant local feedback
+    slugPreview.innerHTML = 'Checking <code>/members/' + (slug || 'member') + '</code>\u2026';
+    slugPreview.className = 'slug-preview';
+
+    // Server-side availability check
+    fetch('/api/auth/check-slug?name=' + encodeURIComponent(val))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        // Only update if input hasn't changed
+        if (nameInput.value.trim() !== val) return;
+        if (data.available) {
+          slugPreview.innerHTML = '\u2713 Your profile: <code>/members/' + data.slug + '</code>';
+          slugPreview.className = 'slug-preview slug-preview--available';
+        } else {
+          slugPreview.innerHTML = '\u26a0 That name is taken \u2014 you\u2019d get <code>/members/' + data.suggestion + '</code>';
+          slugPreview.className = 'slug-preview slug-preview--taken';
+        }
+      })
+      .catch(function () {
+        // Graceful fallback — show local preview without status
+        if (nameInput.value.trim() !== val) return;
+        slugPreview.innerHTML = 'Your profile: <code>/members/' + (slug || 'member') + '</code>';
+        slugPreview.className = 'slug-preview';
+      });
   }
 
   if (nameInput && slugPreview) {
     nameInput.addEventListener('input', function () {
       clearTimeout(slugTimer);
-      slugTimer = setTimeout(updateSlugPreview, 150);
+      slugTimer = setTimeout(updateSlugPreview, 350);
     });
   }
 

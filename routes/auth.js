@@ -61,6 +61,7 @@ router.get('/login', (req, res) => {
     step: 'form',
     email: null,
     error: null,
+    invite: null,
   });
 });
 
@@ -83,6 +84,7 @@ router.post('/auth/send-link', authLimiter, ...emailChain, async (req, res) => {
       step: 'form',
       email: req.body.email || '',
       error: firstError,
+      invite: null,
     });
   }
 
@@ -118,6 +120,7 @@ router.post('/auth/send-link', authLimiter, ...emailChain, async (req, res) => {
     step: 'sent',
     email,
     error: null,
+    invite: null,
   });
 });
 
@@ -134,6 +137,7 @@ router.get('/auth/callback', (req, res) => {
       step: 'error',
       email: null,
       error: 'This login link is invalid.',
+      invite: null,
     });
   }
 
@@ -145,6 +149,7 @@ router.get('/auth/callback', (req, res) => {
       step: 'error',
       email: null,
       error: 'This login link has expired or has already been used. Please request a new one.',
+      invite: null,
     });
   }
 
@@ -153,6 +158,13 @@ router.get('/auth/callback', (req, res) => {
 
   // Set session
   req.session.userId = row.uid;
+
+  // Attribute invite if present
+  if (req.session.inviteCode) {
+    db.prepare('UPDATE invites SET use_count = use_count + 1 WHERE code = ?').run(req.session.inviteCode);
+    delete req.session.inviteCode;
+  }
+
   req.session.save((err) => {
     if (err) console.error('Session save error:', err);
     const returnTo = req.session.returnTo || '/';
@@ -189,6 +201,13 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
   }
 
   req.session.userId = user.id;
+
+  // Attribute invite if present
+  if (req.session.inviteCode) {
+    db.prepare('UPDATE invites SET use_count = use_count + 1 WHERE code = ?').run(req.session.inviteCode);
+    delete req.session.inviteCode;
+  }
+
   req.session.save((err) => {
     if (err) console.error('Session save error:', err);
     const returnTo = req.session.returnTo || '/';

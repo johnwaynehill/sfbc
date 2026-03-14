@@ -490,6 +490,229 @@
   }
 
   // -----------------------------------------------------------------------
+  // Replace cover (admin)
+  // -----------------------------------------------------------------------
+
+  var coverSearchTimer = null;
+
+  document.addEventListener('click', function (e) {
+    var coverBtn = e.target.closest('.js-replace-cover');
+    if (coverBtn) {
+      var bookId = coverBtn.dataset.bookId;
+      var row = coverBtn.closest('.admin-nominee');
+      var panel = row ? row.querySelector('.admin-cover-search[data-book-id="' + bookId + '"]') : null;
+      // Fallback: find panel anywhere on the page (e.g. winner callout)
+      if (!panel) panel = document.querySelector('.admin-cover-search[data-book-id="' + bookId + '"]');
+      if (!panel) return;
+
+      var isHidden = panel.hidden;
+      // Close all other panels first
+      document.querySelectorAll('.admin-cover-search').forEach(function (p) { p.hidden = true; });
+
+      if (isHidden) {
+        panel.hidden = false;
+        var input = panel.querySelector('.admin-cover-search__input');
+        if (input && input.value.trim()) {
+          doCoverSearch(panel, input.value.trim());
+        }
+        if (input) input.focus();
+      }
+      return;
+    }
+
+    // Cover result click
+    var coverItem = e.target.closest('.admin-cover-search__item');
+    if (coverItem) {
+      var gbid = coverItem.dataset.googleBooksId;
+      var bkId = coverItem.dataset.bookId;
+      showConfirm('Replace the cover with this image?').then(function (ok) {
+        if (!ok) return;
+        coverItem.style.opacity = '0.5';
+        fetch('/api/admin/books/' + bkId + '/cover', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ googleBooksId: gbid }),
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            window.location.reload();
+          } else {
+            showAlert(data.error || 'Failed to replace cover.');
+            coverItem.style.opacity = '1';
+          }
+        })
+        .catch(function () {
+          showAlert('Network error.');
+          coverItem.style.opacity = '1';
+        });
+      });
+      return;
+    }
+  });
+
+  // Debounced cover search input
+  document.addEventListener('input', function (e) {
+    if (!e.target.matches('.admin-cover-search__input')) return;
+    var panel = e.target.closest('.admin-cover-search');
+    var query = e.target.value.trim();
+    clearTimeout(coverSearchTimer);
+    if (query.length < 3) return;
+    coverSearchTimer = setTimeout(function () {
+      doCoverSearch(panel, query);
+    }, 350);
+  });
+
+  function doCoverSearch(panel, query) {
+    var results = panel.querySelector('.admin-cover-search__results');
+    var bookId = panel.dataset.bookId;
+    results.innerHTML = '<span class="t-caption text-secondary">Searching\u2026</span>';
+
+    fetch('/api/books/search-multi?q=' + encodeURIComponent(query))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.results || data.results.length === 0) {
+          results.innerHTML = '<span class="t-caption text-secondary">No results found.</span>';
+          return;
+        }
+        var html = '';
+        for (var i = 0; i < data.results.length; i++) {
+          var r = data.results[i];
+          html += '<div class="admin-cover-search__item" data-google-books-id="' + esc(r.googleBooksId) + '" data-book-id="' + bookId + '">'
+            + '<img src="' + esc(r.coverUrl) + '" alt="' + esc(r.title) + '" loading="lazy">'
+            + '<span class="t-caption">' + esc(r.title) + '</span>'
+            + '</div>';
+        }
+        results.innerHTML = html;
+      })
+      .catch(function () {
+        results.innerHTML = '<span class="t-caption text-secondary">Search failed.</span>';
+      });
+  }
+
+  // -----------------------------------------------------------------------
+  // Events CRUD
+  // -----------------------------------------------------------------------
+
+  // Add event form
+  var addEventForm = document.getElementById('add-event-form');
+  if (addEventForm) {
+    addEventForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var pickId = addEventForm.dataset.pickId;
+      var body = {
+        meeting_time: addEventForm.querySelector('[name="meeting_time"]').value,
+        location_text: addEventForm.querySelector('[name="location_text"]').value.trim(),
+        meetup_event_url: addEventForm.querySelector('[name="meetup_event_url"]').value.trim(),
+      };
+      try {
+        var res = await fetch('/api/admin/picks/' + pickId + '/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        var data = await res.json();
+        if (data.success) { window.location.reload(); return; }
+        showAlert(data.error || 'Failed to add event.');
+      } catch (err) {
+        showAlert('Network error.');
+      }
+    });
+  }
+
+  // Edit/Delete/Save/Cancel event buttons
+  document.addEventListener('click', function (e) {
+    // Edit event
+    var editEventBtn = e.target.closest('.js-edit-event');
+    if (editEventBtn) {
+      var evId = editEventBtn.dataset.eventId;
+      var evRow = editEventBtn.closest('.admin-event');
+      var evInfo = evRow ? evRow.querySelector('.admin-event__info') : null;
+      var evActions = evRow ? evRow.querySelector('.admin-event__actions') : null;
+      var evEdit = evRow ? evRow.querySelector('.admin-event-edit[data-event-id="' + evId + '"]') : null;
+      if (evInfo) evInfo.hidden = true;
+      if (evActions) evActions.hidden = true;
+      if (evEdit) evEdit.hidden = false;
+      return;
+    }
+
+    // Cancel edit event
+    var cancelEditEvent = e.target.closest('.js-cancel-edit-event');
+    if (cancelEditEvent) {
+      var evRow = cancelEditEvent.closest('.admin-event');
+      var evEdit = cancelEditEvent.closest('.admin-event-edit');
+      if (evEdit) evEdit.hidden = true;
+      var evInfo = evRow ? evRow.querySelector('.admin-event__info') : null;
+      var evActions = evRow ? evRow.querySelector('.admin-event__actions') : null;
+      if (evInfo) evInfo.hidden = false;
+      if (evActions) evActions.hidden = false;
+      return;
+    }
+
+    // Save event
+    var saveEventBtn = e.target.closest('.js-save-event');
+    if (saveEventBtn) {
+      var pickId = saveEventBtn.dataset.pickId;
+      var evId = saveEventBtn.dataset.eventId;
+      var evEdit = saveEventBtn.closest('.admin-event-edit');
+      var body = {
+        meeting_time: evEdit.querySelector('[name="meeting_time"]').value,
+        location_text: evEdit.querySelector('[name="location_text"]').value.trim(),
+        meetup_event_url: evEdit.querySelector('[name="meetup_event_url"]').value.trim(),
+      };
+      saveEventBtn.disabled = true;
+      saveEventBtn.textContent = 'Saving\u2026';
+      fetch('/api/admin/picks/' + pickId + '/events/' + evId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.success) { window.location.reload(); return; }
+        showAlert(data.error || 'Failed to save event.');
+      })
+      .catch(function () { showAlert('Network error.'); })
+      .finally(function () {
+        saveEventBtn.disabled = false;
+        saveEventBtn.textContent = 'Save';
+      });
+      return;
+    }
+
+    // Delete event
+    var deleteEventBtn = e.target.closest('.js-delete-event');
+    if (deleteEventBtn) {
+      var pickId = deleteEventBtn.dataset.pickId;
+      var evId = deleteEventBtn.dataset.eventId;
+      showConfirm('Delete this event?').then(function (ok) {
+        if (!ok) return;
+        deleteEventBtn.disabled = true;
+        deleteEventBtn.textContent = 'Deleting\u2026';
+        fetch('/api/admin/picks/' + pickId + '/events/' + evId, {
+          method: 'DELETE',
+          headers: { 'Accept': 'application/json' },
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            var row = deleteEventBtn.closest('.admin-event');
+            if (row) row.remove();
+            return;
+          }
+          showAlert(data.error || 'Failed to delete event.');
+        })
+        .catch(function () { showAlert('Network error.'); })
+        .finally(function () {
+          deleteEventBtn.disabled = false;
+          deleteEventBtn.textContent = 'Delete';
+        });
+      });
+      return;
+    }
+  });
+
+  // -----------------------------------------------------------------------
   // SSE: live nominee + vote count updates
   // -----------------------------------------------------------------------
 

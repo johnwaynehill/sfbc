@@ -1,9 +1,16 @@
 <section class="login-page">
   <% if (step === 'form') { %>
-    <h1 class="t-section login-page__heading">Sign In or Create an Account</h1>
-    <p class="t-body text-secondary login-page__subtitle" id="login-subtitle">
-      Enter your email and we&rsquo;ll send you a login link.
-    </p>
+    <% if (typeof invite !== 'undefined' && invite) { %>
+      <h1 class="t-section login-page__heading">You&rsquo;re Invited!</h1>
+      <p class="t-body text-secondary login-page__subtitle" id="login-subtitle">
+        <strong><%= invite.inviterName %></strong> invited you to join the book club. Sign in or create an account to get started.
+      </p>
+    <% } else { %>
+      <h1 class="t-section login-page__heading">Sign In or Create an Account</h1>
+      <p class="t-body text-secondary login-page__subtitle" id="login-subtitle">
+        Enter your email and we&rsquo;ll send you a login link.
+      </p>
+    <% } %>
 
     <% if (error) { %>
       <div class="nom-message nom-message--error" style="margin-bottom: var(--s-3);">

@@ -1,8 +1,12 @@
 'use strict';
 
+const path = require('path');
+const fsp = require('fs/promises');
 const db = require('../db');
 const config = require('../config');
 const { slugify } = require('../utils/slug');
+
+const COVERS_DIR = path.join(__dirname, '..', 'public', 'img', 'covers');
 
 const API_KEY = config.googleBooksApiKey;
 
@@ -346,4 +350,33 @@ async function enrichBookMetadata(bookId) {
   return null;
 }
 
-module.exports = { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook, enrichBookMetadata };
+/* ------------------------------------------------------------------ */
+/*  Download a cover image to local disk                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Download an image from a URL and save it to the covers directory.
+ * Rejects images smaller than 15KB (likely Google Books placeholders).
+ *
+ * @param {string} imageUrl - URL of the image to download
+ * @param {string} filename - Filename to save as (e.g. "author_title.jpg")
+ * @returns {Promise<string>} The local path (e.g. "/img/covers/author_title.jpg")
+ */
+async function downloadCover(imageUrl, filename) {
+  await fsp.mkdir(COVERS_DIR, { recursive: true });
+
+  const res = await fetch(imageUrl, { redirect: 'follow' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const buffer = Buffer.from(await res.arrayBuffer());
+
+  if (buffer.length < 15000) {
+    throw new Error(`Image too small (${buffer.length} bytes), likely a placeholder`);
+  }
+
+  const filePath = path.join(COVERS_DIR, filename);
+  await fsp.writeFile(filePath, buffer);
+  return `/img/covers/${filename}`;
+}
+
+module.exports = { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook, enrichBookMetadata, downloadCover };
