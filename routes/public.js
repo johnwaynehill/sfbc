@@ -65,6 +65,16 @@ router.get('/', (req, res) => {
   // fall back to the most recent completed one
   const currentMeeting = picksService.getHero();
 
+  // Enrich with first event data (meeting_time, location_text, meetup_event_url)
+  if (currentMeeting && currentMeeting.id) {
+    const event = picksService.getFirstEvent(currentMeeting.id);
+    if (event) {
+      if (!currentMeeting.meeting_time) currentMeeting.meeting_time = event.meeting_time;
+      if (!currentMeeting.location_text) currentMeeting.location_text = event.location_text;
+      if (!currentMeeting.meetup_event_url) currentMeeting.meetup_event_url = event.meetup_event_url;
+    }
+  }
+
   // Last 6 finished books (skip the current one)
   const recentBooks = picksService.getRecentPicks(6, currentMeeting ? currentMeeting.id : null);
 
@@ -445,6 +455,47 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     formatMonthYear,
     bookPath,
     renderMarkdown,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Invite join page
+// GET /join/:code
+// ---------------------------------------------------------------------------
+router.get('/join/:code', (req, res) => {
+  const { code } = req.params;
+  const invite = db.prepare(
+    `SELECT i.*, u.display_name AS inviter_name
+     FROM invites i JOIN users u ON u.id = i.invited_by
+     WHERE i.code = ?`
+  ).get(code);
+
+  if (!invite || invite.use_count >= invite.max_uses) {
+    res.locals.layout = 'layouts/app-shell';
+    return res.render('login', {
+      pageTitle: 'Invalid Invite',
+      step: 'error',
+      email: null,
+      error: 'This invite link is invalid or has already been used.',
+      invite: null,
+    });
+  }
+
+  // Already logged in — redirect home
+  if (req.session && req.session.userId) {
+    return res.redirect('/');
+  }
+
+  // Store invite code in session for attribution on registration
+  req.session.inviteCode = code;
+
+  res.locals.layout = 'layouts/app-shell';
+  res.render('login', {
+    pageTitle: "You're Invited!",
+    step: 'form',
+    email: null,
+    error: null,
+    invite: { inviterName: invite.inviter_name, code },
   });
 });
 

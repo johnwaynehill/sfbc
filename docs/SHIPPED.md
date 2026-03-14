@@ -135,6 +135,14 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Reaction & reply button polish** — 32px min touch targets, hover micro-lift (`translateY(-1px)`), visible hover backgrounds on reply trigger, active pill box-shadow
 - **Password signup fix** — `POST /auth/password-login` now auto-registers new users when the email doesn't exist yet, mirroring the magic-link flow; added 8-char minimum validation
 
+## Content & Admin (Sprint 10)
+
+- **Display name collision detection** — Real-time slug availability check on profile page; green ✓ for available, amber ⚠ with suggested alternative for taken names; `GET /api/auth/check-slug` endpoint with debounced client-side check
+- **Admin replace book covers** — Admins can search Google Books from the pick detail page and replace a nominee's cover image; `downloadCover()` service validates image size (rejects placeholders <15KB); search-only approach reuses existing `/api/books/search-multi` endpoint
+- **Invite someone to the club** — Any member can generate a shareable invite link from the Members page; `/join/:code` renders personalized welcome with inviter's name; invite attribution tracked on registration via both magic-link and password flows; `invites` table with use count tracking
+- **Events CRUD on picks** — Admin can create, edit, and delete event sessions on any pick; events section on pick detail page with inline editing; home page hero now enriched with first event data (meeting_time, location_text); begins decoupling event details from the meetings table
+- **Home hero event enrichment** — Home page hero section now pulls meeting_time, location_text, and meetup_event_url from the events table when meetings table data is empty
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background

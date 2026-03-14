@@ -14,7 +14,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Admin can replace book covers | Fetch by ISBN or upload image; replace local stored version |
 | P2 | M | Tag-based filtering on History | Tap a tag → filter the grid; link to StoryGraph for that tag. ~30 books — search covers this until archive grows past 60. |
 | P2 | M | Author page | `/books/:authorSlug/` showing all books by that author. Not enough repeat authors yet to justify the route. |
 | P2 | S | Easy library checkout link | Admin enters local library URL; shown in metadata |
@@ -34,7 +33,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | S | Display name collision detection | Alert + suggest alternatives on signup |
 | P1 | M | Usernames + display names | Profile URLs use usernames; admin views show both |
 | P2 | L | More robust profiles | Richer member pages with stats, favorites, reading history |
 | P2 | M | Photo upload avatars | Alongside existing DiceBear options |
@@ -47,7 +45,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Invite someone to the club | Shareable invite link |
 | P2 | L | Reading status per member | Reading, Read, DNF, Did Not Read — per-member tracking |
 | P2 | M | User-submitted discussion questions | Members contribute questions for the current book |
 
@@ -57,8 +54,10 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Remove Meeting information from Pick | Allows Picks to have multiple meetings per cycle |
-| P2 | M | Allow for creation of meeting for a Pick | Multiple meetings per Pick allow for more people to meet in-person | 
+| P2 | M | Full migration off meetings table | Complete the decoupling — admin edit details writes to events only | 
+| P2 | M | Admin should be able to see all past Nominations and allow for re-nominating quickly | faster nominations |
+| P1 | S | Admin navigation should remove the "View site" button | Admin navigation is over crowded |
+| P2 | S | Make Edit Cover button open a modal wiht seperate fields for Book Title and Author | Admins need a better way to replace a Pick's cover/image. | 
 
 ## Meetings & In-Person
 
@@ -106,3 +105,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 7 | Reviews polish + metadata | DNF checkbox + badge, spoiler filter polish, grade axis tooltips, reply markdown helper, publisher/language metadata, Samsung light mode fix, migration FK safeguard |
 | 8 | Community & polish | Community stats on Home, view own profile link, masked admin emails, styled dialog modals, home hero redesign |
 | 9 | Admin QoL, members directory, UX polish | Reaction/reply button polish, admin pagination, profile settings UX, public members directory, password signup fix |
+| 10 | Content & admin | Display name collision detection, admin cover replace, invite links, events CRUD on picks, home hero event enrichment |

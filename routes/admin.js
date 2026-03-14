@@ -8,7 +8,7 @@ const { requireAdmin } = require('../middleware/auth');
 const meetings = require('../services/meetings');
 const picksService = require('../services/monthly-picks');
 const { calculateResults, getVoteCount } = require('../services/voting');
-const { formatMonthYear, parseMonthYearSlug, monthYearSlug } = require('../utils/format');
+const { formatMonthYear, formatMeetingTime, parseMonthYearSlug, monthYearSlug } = require('../utils/format');
 
 /* ------------------------------------------------------------------ */
 /*  Pagination helper                                                  */
@@ -172,6 +172,8 @@ router.get('/picks/new', (req, res) => {
     voteCount: 0,
     results: null,
     qrCodes: [],
+    events: [],
+    formatMeetingTime,
   });
 });
 
@@ -211,6 +213,7 @@ router.get('/picks/:slug', async (req, res) => {
 
   // Also resolve the linked pick for future use
   const pick = picksService.getByMonthYear(meeting.month_year);
+  const events = pick ? picksService.getEvents(pick.id) : [];
 
   res.render('admin/pick-detail', {
     pageTitle: formatMonthYear(meeting.month_year),
@@ -221,6 +224,8 @@ router.get('/picks/:slug', async (req, res) => {
     voteCount,
     results,
     qrCodes,
+    events,
+    formatMeetingTime,
   });
 });
 

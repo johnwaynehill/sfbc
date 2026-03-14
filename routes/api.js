@@ -4,7 +4,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const config = require('../config');
 const { slugify } = require('../utils/slug');
-const { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook } = require('../services/books');
+const { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook, downloadCover } = require('../services/books');
 const { getFingerprint } = require('../services/fingerprint');
 const {
   getNomineesForBallot,
@@ -130,6 +130,30 @@ router.post('/auth/admin-logout', (req, res) => {
   req.session.destroy(() => {
     res.json({ success: true, redirect: '/admin/login' });
   });
+});
+
+// ---------------------------------------------------------------------------
+// Check slug availability
+// GET /api/auth/check-slug?name=...
+// ---------------------------------------------------------------------------
+router.get('/auth/check-slug', requireMember, (req, res) => {
+  const name = (req.query.name || '').trim();
+  if (!name) return res.json({ available: true, slug: '' });
+
+  const base = slugify(name) || 'member';
+  let slug = base;
+
+  const taken = db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(slug, req.user.id);
+  if (!taken) {
+    return res.json({ available: true, slug });
+  }
+
+  // Slug is taken — compute suggestion with -2, -3 suffix
+  let n = 2;
+  while (db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(base + '-' + n, req.user.id)) {
+    n++;
+  }
+  res.json({ available: false, slug, suggestion: base + '-' + n });
 });
 
 // ---------------------------------------------------------------------------
@@ -535,6 +559,75 @@ router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
   if (!review) return res.status(404).json({ error: 'Review not found.' });
 
   db.prepare('DELETE FROM reviews WHERE id = ?').run(id);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// Replace book cover (admin only)
+// PUT /api/admin/books/:id/cover
+// ---------------------------------------------------------------------------
+router.put('/admin/books/:id/cover', requireAdmin, async (req, res) => {
+  const bookId = parseInt(req.params.id, 10);
+  if (isNaN(bookId)) return res.status(400).json({ error: 'Invalid book ID.' });
+
+  const { googleBooksId } = req.body;
+  if (!googleBooksId) return res.status(400).json({ error: 'Google Books ID is required.' });
+
+  const book = db.prepare('SELECT * FROM books WHERE id = ?').get(bookId);
+  if (!book) return res.status(404).json({ error: 'Book not found.' });
+
+  try {
+    const imageUrl = `https://books.google.com/books/content?id=${googleBooksId}&printsec=frontcover&img=1&zoom=0&source=gbs_api`;
+    const filename = `${book.author_slug}_${book.title_slug}.jpg`;
+    const localPath = await downloadCover(imageUrl, filename);
+
+    db.prepare('UPDATE books SET cover_url = ?, google_books_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
+      .run(localPath, googleBooksId, bookId);
+
+    res.json({ success: true, cover_url: localPath });
+  } catch (err) {
+    console.error('Cover download error:', err.message);
+    res.status(500).json({ error: 'Failed to download cover: ' + err.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Events CRUD on picks (admin)
+// ---------------------------------------------------------------------------
+
+// POST /api/admin/picks/:pickId/events — create event
+router.post('/admin/picks/:pickId/events', requireAdmin, (req, res) => {
+  const pickId = parseInt(req.params.pickId, 10);
+  if (isNaN(pickId)) return res.status(400).json({ error: 'Invalid pick ID.' });
+
+  const pick = picksService.getById(pickId);
+  if (!pick) return res.status(404).json({ error: 'Pick not found.' });
+
+  const { meeting_time, location_text, meetup_event_url } = req.body;
+  const event = picksService.createEvent(pickId, { meeting_time, location_text, meetup_event_url });
+  res.json({ success: true, event });
+});
+
+// PUT /api/admin/picks/:pickId/events/:eventId — update event
+router.put('/admin/picks/:pickId/events/:eventId', requireAdmin, (req, res) => {
+  const pickId = parseInt(req.params.pickId, 10);
+  const eventId = parseInt(req.params.eventId, 10);
+  if (isNaN(pickId) || isNaN(eventId)) return res.status(400).json({ error: 'Invalid ID.' });
+
+  const { meeting_time, location_text, meetup_event_url } = req.body;
+  const event = picksService.updateEvent(pickId, eventId, { meeting_time, location_text, meetup_event_url });
+  if (!event) return res.status(404).json({ error: 'Event not found.' });
+  res.json({ success: true, event });
+});
+
+// DELETE /api/admin/picks/:pickId/events/:eventId — delete event
+router.delete('/admin/picks/:pickId/events/:eventId', requireAdmin, (req, res) => {
+  const pickId = parseInt(req.params.pickId, 10);
+  const eventId = parseInt(req.params.eventId, 10);
+  if (isNaN(pickId) || isNaN(eventId)) return res.status(400).json({ error: 'Invalid ID.' });
+
+  const deleted = picksService.deleteEvent(pickId, eventId);
+  if (!deleted) return res.status(404).json({ error: 'Event not found.' });
   res.json({ success: true });
 });
 
@@ -1357,6 +1450,26 @@ router.get('/meetings/:meetingId/nominations/stream', (req, res) => {
       }
     }
   });
+});
+
+// ---------------------------------------------------------------------------
+// Invites (any member)
+// ---------------------------------------------------------------------------
+
+// POST /api/invites — generate an invite link
+router.post('/invites', requireMember, (req, res) => {
+  const code = crypto.randomBytes(4).toString('hex'); // 8-char hex
+  db.prepare('INSERT INTO invites (code, invited_by) VALUES (?, ?)').run(code, req.user.id);
+  const url = `${req.protocol}://${req.get('host')}/join/${code}`;
+  res.json({ success: true, code, url });
+});
+
+// GET /api/invites/mine — list current user's invites
+router.get('/invites/mine', requireMember, (req, res) => {
+  const invites = db.prepare(
+    'SELECT code, use_count, max_uses, created_at FROM invites WHERE invited_by = ? ORDER BY created_at DESC'
+  ).all(req.user.id);
+  res.json({ invites });
 });
 
 module.exports = router;

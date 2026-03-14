@@ -7,6 +7,7 @@ Field-reported bugs. Enhancements and feature work are tracked in [BACKLOG.md](B
 ## Open
 
 - [ ] Samsung browser: Light Mode did not work on Android phones (P2)
+- [ ] Create account seems to not allow for symbols within email addresses such at "designbyjohnwayne+text@gmail.com" returns an error code
 
 ## Fixed
 

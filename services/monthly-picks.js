@@ -491,6 +491,47 @@ function getFirstEvent(pickId) {
 }
 
 /**
+ * Get all events for a pick, ordered by meeting_time.
+ */
+function getEvents(pickId) {
+  return db.prepare(
+    'SELECT * FROM events WHERE monthly_pick_id = ? ORDER BY meeting_time ASC'
+  ).all(pickId);
+}
+
+/**
+ * Create a new event for a pick.
+ */
+function createEvent(pickId, { meeting_time, location_text, meetup_event_url }) {
+  const result = db.prepare(
+    'INSERT INTO events (monthly_pick_id, meeting_time, location_text, meetup_event_url) VALUES (?, ?, ?, ?)'
+  ).run(pickId, meeting_time || null, location_text || null, meetup_event_url || null);
+  return db.prepare('SELECT * FROM events WHERE id = ?').get(result.lastInsertRowid);
+}
+
+/**
+ * Update an event (with pick ownership check).
+ */
+function updateEvent(pickId, eventId, { meeting_time, location_text, meetup_event_url }) {
+  const event = db.prepare('SELECT * FROM events WHERE id = ? AND monthly_pick_id = ?').get(eventId, pickId);
+  if (!event) return null;
+  db.prepare(
+    'UPDATE events SET meeting_time = ?, location_text = ?, meetup_event_url = ? WHERE id = ?'
+  ).run(meeting_time || null, location_text || null, meetup_event_url || null, eventId);
+  return db.prepare('SELECT * FROM events WHERE id = ?').get(eventId);
+}
+
+/**
+ * Delete an event (with pick ownership check).
+ */
+function deleteEvent(pickId, eventId) {
+  const event = db.prepare('SELECT * FROM events WHERE id = ? AND monthly_pick_id = ?').get(eventId, pickId);
+  if (!event) return false;
+  db.prepare('DELETE FROM events WHERE id = ?').run(eventId);
+  return true;
+}
+
+/**
  * Get adjacent picks (prev/next) by month_year for book-to-book navigation.
  * Returns { prev: {...} | null, next: {...} | null }
  */
@@ -535,5 +576,9 @@ module.exports = {
   getHistory,
   getPickForBook,
   getFirstEvent,
+  getEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
   getAdjacentPicks,
 };

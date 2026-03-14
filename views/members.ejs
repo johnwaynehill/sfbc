@@ -1,7 +1,10 @@
 <section class="members-page">
   <div class="members-page__header">
-    <h1 class="t-section">Members</h1>
-    <span class="t-body text-secondary"><%= members.length %> member<%= members.length !== 1 ? 's' : '' %></span>
+    <div>
+      <h1 class="t-section">Members</h1>
+      <span class="t-body text-secondary"><%= members.length %> member<%= members.length !== 1 ? 's' : '' %></span>
+    </div>
+    <button type="button" class="btn btn--secondary btn--sm" id="invite-btn">Invite a Friend</button>
   </div>
 
   <% if (members.length > 5) { %>
@@ -38,19 +41,55 @@
   var input = document.getElementById('memberSearchInput');
   var grid = document.getElementById('membersGrid');
   var noResults = document.getElementById('noMembers');
-  if (!input || !grid) return;
-
-  input.addEventListener('input', function () {
-    var query = input.value.trim().toLowerCase();
-    var cards = grid.querySelectorAll('.member-card');
-    var visible = 0;
-    cards.forEach(function (card) {
-      var name = card.getAttribute('data-name') || '';
-      var match = !query || name.indexOf(query) !== -1;
-      card.style.display = match ? '' : 'none';
-      if (match) visible++;
+  if (input && grid) {
+    input.addEventListener('input', function () {
+      var query = input.value.trim().toLowerCase();
+      var cards = grid.querySelectorAll('.member-card');
+      var visible = 0;
+      cards.forEach(function (card) {
+        var name = card.getAttribute('data-name') || '';
+        var match = !query || name.indexOf(query) !== -1;
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      if (noResults) noResults.hidden = visible > 0 || !query;
     });
-    if (noResults) noResults.hidden = visible > 0 || !query;
-  });
+  }
+
+  // Invite a Friend
+  var inviteBtn = document.getElementById('invite-btn');
+  if (inviteBtn) {
+    inviteBtn.addEventListener('click', async function () {
+      inviteBtn.disabled = true;
+      inviteBtn.textContent = 'Creating link\u2026';
+      try {
+        var res = await fetch('/api/invites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        });
+        var data = await res.json();
+        if (data.success && data.url) {
+          if (navigator.share) {
+            await navigator.share({
+              title: 'Join our Book Club!',
+              text: 'You\u2019re invited to join the SF Book Club.',
+              url: data.url,
+            });
+          } else {
+            await navigator.clipboard.writeText(data.url);
+            showAlert('Invite link copied to clipboard!');
+          }
+        } else {
+          showAlert(data.error || 'Could not create invite.');
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showAlert('Something went wrong.');
+        }
+      }
+      inviteBtn.disabled = false;
+      inviteBtn.textContent = 'Invite a Friend';
+    });
+  }
 })();
 </script>
