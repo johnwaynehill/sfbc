@@ -283,8 +283,7 @@
       var input = btn.parentElement.querySelector('input');
       var show = input.type === 'password';
       input.type = show ? 'text' : 'password';
-      btn.querySelector('.pw-icon-show').hidden = show;
-      btn.querySelector('.pw-icon-hide').hidden = !show;
+      btn.classList.toggle('is-visible', show);
       btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
     });
   });
