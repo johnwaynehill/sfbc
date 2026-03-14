@@ -34,7 +34,7 @@ const emailChain = [
     .toLowerCase()
     .notEmpty().withMessage('Email is required.')
     .isEmail().withMessage('Please enter a valid email address.')
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_subaddress: false, outlookdotcom_remove_subaddress: false, yahoo_remove_subaddress: false }),
 ];
 
 const passwordChain = [

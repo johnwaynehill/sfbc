@@ -290,15 +290,10 @@
           <div style="margin-top: var(--s-2);">
             <button type="button" class="btn btn--ghost btn--xs js-replace-cover"
                     data-book-id="<%= meeting.winning_book_id %>"
-                    data-search-query="<%= meeting.book_title %> <%= meeting.book_author %>">Replace Cover</button>
+                    data-title="<%= meeting.book_title %>"
+                    data-author="<%= meeting.book_author %>">Replace Cover</button>
           </div>
         </div>
-      </div>
-      <div class="admin-cover-search" data-book-id="<%= meeting.winning_book_id %>" hidden>
-        <input type="text" class="form-input form-input--sm admin-cover-search__input"
-               placeholder="Search for a cover&hellip;"
-               value="<%= meeting.book_title %> <%= meeting.book_author %>">
-        <div class="admin-cover-search__results"></div>
       </div>
     <% } %>
 
@@ -387,33 +382,18 @@
                 <p class="t-caption text-secondary js-nominee-reason" style="margin-top: var(--s-1); font-style: italic;">&ldquo;<%= nom.reason %>&rdquo;</p>
               <% } %>
             </div>
-            <div class="admin-nominee-edit" data-book-id="<%= nom.book_id %>" hidden>
-              <input type="text" class="form-input form-input--sm" name="title" value="<%= nom.title %>" placeholder="Title">
-              <input type="text" class="form-input form-input--sm" name="author" value="<%= nom.author %>" placeholder="Author">
-              <div style="display: flex; gap: var(--s-2);">
-                <button type="button" class="btn btn--primary btn--xs js-save-nominee"
-                        data-meeting-id="<%= meeting.id %>"
-                        data-book-id="<%= nom.book_id %>">Save</button>
-                <button type="button" class="btn btn--ghost btn--xs js-cancel-edit-nominee">Cancel</button>
-              </div>
-            </div>
             <div class="admin-nominee__actions">
-              <button type="button" class="btn btn--ghost btn--xs js-edit-nominee" data-book-id="<%= nom.book_id %>">Edit</button>
-              <button type="button" class="btn btn--ghost btn--xs js-replace-cover"
+              <button type="button" class="btn btn--ghost btn--xs js-edit-nominee"
                       data-book-id="<%= nom.book_id %>"
-                      data-search-query="<%= nom.title %> <%= nom.author %>">Cover</button>
+                      data-title="<%= nom.title %>"
+                      data-author="<%= nom.author %>"
+                      data-meeting-id="<%= meeting.id %>">Edit</button>
               <% if (meeting.status !== 'results' && meeting.status !== 'upcoming' && meeting.status !== 'reading' && meeting.status !== 'scheduled') { %>
                 <button class="btn btn--danger btn--sm js-remove-nominee"
                         data-meeting-id="<%= meeting.id %>"
                         data-book-id="<%= nom.book_id %>"
                         data-title="<%= nom.title %>">Remove</button>
               <% } %>
-            </div>
-            <div class="admin-cover-search" data-book-id="<%= nom.book_id %>" hidden>
-              <input type="text" class="form-input form-input--sm admin-cover-search__input"
-                     placeholder="Search for a cover\u2026"
-                     value="<%= nom.title %> <%= nom.author %>">
-              <div class="admin-cover-search__results"></div>
             </div>
           </div>
         <% }); %>

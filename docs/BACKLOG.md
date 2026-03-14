@@ -16,7 +16,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 |----------|------|------|-------|
 | P2 | M | Tag-based filtering on History | Tap a tag → filter the grid; link to StoryGraph for that tag. ~30 books — search covers this until archive grows past 60. |
 | P2 | M | Author page | `/books/:authorSlug/` showing all books by that author. Not enough repeat authors yet to justify the route. |
-| P2 | S | Easy library checkout link | Admin enters local library URL; shown in metadata |
+| P1 | S | Easy library checkout link | Admin enters local library URL; shown in metadata |
 
 ## Reviews
 
@@ -37,7 +37,7 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | P2 | L | More robust profiles | Richer member pages with stats, favorites, reading history |
 | P2 | M | Photo upload avatars | Alongside existing DiceBear options |
 | P2 | S | Pick any DiceBear avatar | All styles via DiceBear JS library (currently 24 of many) |
-| P2 | S | Show/Hide password in password fields (users and admins) | basic usability | 
+| P1 | S | Show/Hide password in password fields (users and admins) | basic usability | 
 
 ## Social & Community
 
@@ -56,8 +56,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 |----------|------|------|-------|
 | P2 | M | Full migration off meetings table | Complete the decoupling — admin edit details writes to events only | 
 | P2 | M | Admin should be able to see all past Nominations and allow for re-nominating quickly | faster nominations |
-| P1 | S | Admin navigation should remove the "View site" button | Admin navigation is over crowded |
-| P2 | S | Make Edit Cover button open a modal wiht seperate fields for Book Title and Author | Admins need a better way to replace a Pick's cover/image. | 
 
 ## Meetings & In-Person
 
@@ -79,7 +77,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
 | P2 | M | @ mentions | Mention another user in replies |
-| P2 | S | Coming Up section — enlarge covers | Larger book covers and more vertical space |
 | P2 | M | Add haptics on key interactions for mobile users | https://haptics.lochie.me/ |
 
 ## Bugs
@@ -106,3 +103,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 8 | Community & polish | Community stats on Home, view own profile link, masked admin emails, styled dialog modals, home hero redesign |
 | 9 | Admin QoL, members directory, UX polish | Reaction/reply button polish, admin pagination, profile settings UX, public members directory, password signup fix |
 | 10 | Content & admin | Display name collision detection, admin cover replace, invite links, events CRUD on picks, home hero event enrichment |
+| 11 | Bug fixes & UX polish | Email + alias fix, remove View Site nav link, enlarge Coming Up covers, unified edit/cover modal |
