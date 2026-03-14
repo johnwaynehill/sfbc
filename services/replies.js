@@ -11,7 +11,7 @@ const stmts = {
   getBatch: db.prepare(`
     SELECT rr.id, rr.review_id, rr.user_id, rr.body_markdown,
            rr.created_at, rr.updated_at,
-           u.display_name, u.avatar_style, u.user_slug, u.email
+           u.display_name, u.avatar_style, u.user_slug, u.username, u.email
     FROM review_replies rr
     JOIN users u ON u.id = rr.user_id
     WHERE rr.review_id IN (SELECT value FROM json_each(?))

@@ -16,7 +16,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 |----------|------|------|-------|
 | P2 | M | Tag-based filtering on History | Tap a tag → filter the grid; link to StoryGraph for that tag. ~30 books — search covers this until archive grows past 60. |
 | P2 | M | Author page | `/books/:authorSlug/` showing all books by that author. Not enough repeat authors yet to justify the route. |
-| P1 | S | Easy library checkout link | Admin enters local library URL; shown in metadata |
 
 ## Reviews
 
@@ -24,7 +23,6 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Extended markdown support | Additional formatting options beyond current set |
 | P2 | S | Emoji flurry for A+ books | Celebratory animation on high-scoring book pages |
 
 ## Profiles & Identity
@@ -33,11 +31,9 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P1 | M | Usernames + display names | Profile URLs use usernames; admin views show both |
 | P2 | L | More robust profiles | Richer member pages with stats, favorites, reading history |
 | P2 | M | Photo upload avatars | Alongside existing DiceBear options |
 | P2 | S | Pick any DiceBear avatar | All styles via DiceBear JS library (currently 24 of many) |
-| P1 | S | Show/Hide password in password fields (users and admins) | basic usability | 
 
 ## Social & Community
 
@@ -104,3 +100,4 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 | 9 | Admin QoL, members directory, UX polish | Reaction/reply button polish, admin pagination, profile settings UX, public members directory, password signup fix |
 | 10 | Content & admin | Display name collision detection, admin cover replace, invite links, events CRUD on picks, home hero event enrichment |
 | 11 | Bug fixes & UX polish | Email + alias fix, remove View Site nav link, enlarge Coming Up covers, unified edit/cover modal |
+| 12 | Features & usability | Password toggle, extended markdown, library checkout link, usernames |

@@ -1,8 +1,8 @@
 <section class="profile-page">
   <div class="profile-page__header">
     <h1 class="t-section profile-page__heading">Your Profile</h1>
-    <% if (profileUser.user_slug) { %>
-      <a href="/members/<%= profileUser.user_slug %>" class="btn-quiet" target="_blank" rel="noopener">View public profile &rarr;</a>
+    <% if (profileUser.username || profileUser.user_slug) { %>
+      <a href="/members/<%= profileUser.username || profileUser.user_slug %>" class="btn-quiet" target="_blank" rel="noopener">View public profile &rarr;</a>
     <% } %>
   </div>
 
@@ -129,11 +129,33 @@
                  value="<%= profileUser.display_name || '' %>" maxlength="40"
                  placeholder="How you appear to others" required>
         </label>
+
+        <div id="profile-message" hidden></div>
+
+        <button type="submit" class="btn btn--primary" id="profile-submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---- Username ---- -->
+  <div class="profile-section">
+    <h2 class="t-body-bold profile-section__title">Username</h2>
+    <div class="profile-card">
+      <form class="profile-form" id="username-form">
+        <label class="form-label">
+          Username
+          <input type="text" name="username" class="form-input" id="username-input"
+                 value="<%= profileUser.username || '' %>" maxlength="30"
+                 placeholder="your-username">
+          <span class="t-caption text-tertiary">Letters, numbers, hyphens. Used in your profile URL.</span>
+        </label>
         <div class="slug-preview" id="slug-preview">
-          <% if (profileUser.user_slug) { %>
+          <% if (profileUser.username) { %>
+            Your profile: <code>/members/<%= profileUser.username %></code>
+          <% } else if (profileUser.user_slug) { %>
             Your profile: <code>/members/<%= profileUser.user_slug %></code>
           <% } else { %>
-            Your profile URL will appear after you set a name.
+            Your profile URL will appear after you set a username.
           <% } %>
         </div>
 
@@ -143,9 +165,9 @@
           <span class="t-caption text-tertiary">Email cannot be changed.</span>
         </label>
 
-        <div id="profile-message" hidden></div>
+        <div id="username-message" hidden></div>
 
-        <button type="submit" class="btn btn--primary" id="profile-submit">Save Changes</button>
+        <button type="submit" class="btn btn--primary" id="username-submit">Save Username</button>
       </form>
     </div>
   </div>
@@ -201,22 +223,40 @@
         <% if (profileUser.hasPassword) { %>
           <label class="form-label">
             Current Password
-            <input type="password" name="current_password" class="form-input"
-                   autocomplete="current-password" required>
+            <div class="password-wrapper">
+              <input type="password" name="current_password" class="form-input"
+                     autocomplete="current-password" required>
+              <button type="button" class="password-toggle" aria-label="Show password">
+                <svg class="pw-icon-show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="pw-icon-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
           </label>
         <% } %>
 
         <label class="form-label">
           New Password
-          <input type="password" name="new_password" class="form-input"
-                 autocomplete="new-password" minlength="8" required>
+          <div class="password-wrapper">
+            <input type="password" name="new_password" class="form-input"
+                   autocomplete="new-password" minlength="8" required>
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <svg class="pw-icon-show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="pw-icon-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
           <span class="t-caption text-tertiary">At least 8 characters.</span>
         </label>
 
         <label class="form-label">
           Confirm Password
-          <input type="password" name="confirm_password" class="form-input"
-                 autocomplete="new-password" minlength="8" required>
+          <div class="password-wrapper">
+            <input type="password" name="confirm_password" class="form-input"
+                   autocomplete="new-password" minlength="8" required>
+            <button type="button" class="password-toggle" aria-label="Show password">
+              <svg class="pw-icon-show" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="pw-icon-hide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
         </label>
 
         <div id="password-message" hidden></div>

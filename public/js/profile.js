@@ -123,61 +123,80 @@
     });
   }
 
-  // ---- Slug Preview (with server-side collision check) ----
-  var nameInput = document.querySelector('[name="display_name"]');
+  // ---- Username form + live preview ----
+  var usernameForm = document.getElementById('username-form');
+  var usernameInput = document.getElementById('username-input');
+  var usernameMsg = document.getElementById('username-message');
   var slugPreview = document.getElementById('slug-preview');
   var slugTimer = null;
 
-  function localSlug(val) {
-    return val.toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 80);
-  }
-
-  function updateSlugPreview() {
-    if (!nameInput || !slugPreview) return;
-    var val = nameInput.value.trim();
+  function updateUsernamePreview() {
+    if (!usernameInput || !slugPreview) return;
+    var val = usernameInput.value.trim().toLowerCase();
     if (!val) {
-      slugPreview.innerHTML = 'Your profile URL will appear after you set a name.';
+      slugPreview.innerHTML = 'Your profile URL will appear after you set a username.';
       slugPreview.className = 'slug-preview';
       return;
     }
 
-    var slug = localSlug(val);
-
-    // Instant local feedback
-    slugPreview.innerHTML = 'Checking <code>/members/' + (slug || 'member') + '</code>\u2026';
+    slugPreview.innerHTML = 'Checking <code>/members/' + val + '</code>\u2026';
     slugPreview.className = 'slug-preview';
 
-    // Server-side availability check
-    fetch('/api/auth/check-slug?name=' + encodeURIComponent(val))
+    fetch('/api/auth/check-username?username=' + encodeURIComponent(val))
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        // Only update if input hasn't changed
-        if (nameInput.value.trim() !== val) return;
-        if (data.available) {
-          slugPreview.innerHTML = '\u2713 Your profile: <code>/members/' + data.slug + '</code>';
+        if (usernameInput.value.trim().toLowerCase() !== val) return;
+        if (data.error) {
+          slugPreview.innerHTML = '\u26a0 ' + data.error;
+          slugPreview.className = 'slug-preview slug-preview--taken';
+        } else if (data.available) {
+          slugPreview.innerHTML = '\u2713 Your profile: <code>/members/' + data.username + '</code>';
           slugPreview.className = 'slug-preview slug-preview--available';
         } else {
-          slugPreview.innerHTML = '\u26a0 That name is taken \u2014 you\u2019d get <code>/members/' + data.suggestion + '</code>';
+          slugPreview.innerHTML = '\u26a0 That username is taken \u2014 try <code>' + data.suggestion + '</code>';
           slugPreview.className = 'slug-preview slug-preview--taken';
         }
       })
       .catch(function () {
-        // Graceful fallback — show local preview without status
-        if (nameInput.value.trim() !== val) return;
-        slugPreview.innerHTML = 'Your profile: <code>/members/' + (slug || 'member') + '</code>';
+        if (usernameInput.value.trim().toLowerCase() !== val) return;
+        slugPreview.innerHTML = 'Your profile: <code>/members/' + val + '</code>';
         slugPreview.className = 'slug-preview';
       });
   }
 
-  if (nameInput && slugPreview) {
-    nameInput.addEventListener('input', function () {
+  if (usernameInput && slugPreview) {
+    usernameInput.addEventListener('input', function () {
+      // Force lowercase
+      usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
       clearTimeout(slugTimer);
-      slugTimer = setTimeout(updateSlugPreview, 350);
+      slugTimer = setTimeout(updateUsernamePreview, 350);
+    });
+  }
+
+  if (usernameForm) {
+    var usernameBtn = document.getElementById('username-submit');
+
+    usernameForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var username = usernameInput.value.trim().toLowerCase();
+      if (!username) return;
+      usernameBtn.disabled = true;
+      usernameBtn.textContent = 'Saving\u2026';
+      clearMsg(usernameMsg);
+
+      try {
+        var result = await apiPut('/api/auth/username', { username: username });
+        if (result.ok && result.data.success) {
+          showMsg(usernameMsg, 'success', 'Username saved!');
+        } else {
+          showMsg(usernameMsg, 'error', result.data.error || 'Something went wrong.');
+        }
+      } catch (err) {
+        showMsg(usernameMsg, 'error', 'Network error. Please try again.');
+      }
+
+      usernameBtn.disabled = false;
+      usernameBtn.textContent = 'Save Username';
     });
   }
 
@@ -257,4 +276,16 @@
       pwBtn.textContent = pwForm.querySelector('[name="current_password"]') ? 'Update Password' : 'Set Password';
     });
   }
+
+  // ---- 5. Password visibility toggles ----
+  document.querySelectorAll('.password-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = btn.parentElement.querySelector('input');
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.querySelector('.pw-icon-show').hidden = show;
+      btn.querySelector('.pw-icon-hide').hidden = !show;
+      btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  });
 })();

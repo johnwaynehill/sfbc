@@ -192,6 +192,22 @@
           cursorOffset = 1; // place cursor after [
         }
         break;
+      case 'strikethrough':
+        replacement = '~~' + (selected || 'strikethrough text') + '~~';
+        cursorOffset = selected ? replacement.length : 2;
+        break;
+      case 'heading':
+        replacement = '### ' + (selected || 'Heading');
+        cursorOffset = selected ? replacement.length : 4;
+        break;
+      case 'ordered-list':
+        if (selected) {
+          replacement = selected.split('\n').map(function (l, i) { return (i + 1) + '. ' + l; }).join('\n');
+        } else {
+          replacement = '1. ';
+        }
+        cursorOffset = replacement.length;
+        break;
       default:
         return;
     }
@@ -248,6 +264,9 @@
     // Spoiler: ||text||
     html = html.replace(/\|\|(.+?)\|\|/g, '<span class="spoiler">$1</span>');
 
+    // Strikethrough: ~~text~~
+    html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
     // Bold: **text** or __text__
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
@@ -263,17 +282,38 @@
     var lines = html.split('\n');
     var result = [];
     var inList = false;
+    var inOl = false;
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
 
+      // Headings: ### text
+      if (/^#{1,3}\s+/.test(line)) {
+        if (inList) { result.push('</ul>'); inList = false; }
+        if (inOl) { result.push('</ol>'); inOl = false; }
+        var level = line.match(/^(#{1,3})/)[1].length;
+        result.push('<h' + level + '>' + line.replace(/^#{1,3}\s+/, '') + '</h' + level + '>');
+        continue;
+      }
+
       // Unordered list
       if (/^[-*+]\s+/.test(line)) {
+        if (inOl) { result.push('</ol>'); inOl = false; }
         if (!inList) { result.push('<ul>'); inList = true; }
         result.push('<li>' + line.replace(/^[-*+]\s+/, '') + '</li>');
         continue;
       }
+
+      // Ordered list
+      if (/^\d+\.\s+/.test(line)) {
+        if (inList) { result.push('</ul>'); inList = false; }
+        if (!inOl) { result.push('<ol>'); inOl = true; }
+        result.push('<li>' + line.replace(/^\d+\.\s+/, '') + '</li>');
+        continue;
+      }
+
       if (inList) { result.push('</ul>'); inList = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
 
       // Blockquote
       if (/^&gt;\s?/.test(line)) {
@@ -291,6 +331,7 @@
       result.push(line + '<br>');
     }
     if (inList) result.push('</ul>');
+    if (inOl) result.push('</ol>');
 
     return '<p>' + result.join('\n') + '</p>';
   }
