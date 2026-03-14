@@ -1609,15 +1609,15 @@ a.activity-item__target:hover {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--s-3);
+  gap: var(--s-4);
   border-left: 2px solid var(--border);
   margin-left: var(--s-1);
 }
 
 .upcoming-docket__item {
   display: flex;
-  align-items: flex-start;
-  gap: var(--s-3);
+  flex-direction: column;
+  gap: var(--s-1);
   padding-left: var(--s-4);
   position: relative;
 }
@@ -1637,8 +1637,6 @@ a.activity-item__target:hover {
 
 .upcoming-docket__marker {
   flex-shrink: 0;
-  min-width: 88px;
-  padding-top: 2px;
 }
 
 .upcoming-docket__month {
@@ -1670,7 +1668,7 @@ a.activity-item__target:hover {
 }
 
 .upcoming-docket__cover {
-  width: 96px;
+  width: 120px;
   aspect-ratio: 2 / 3;
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -1732,23 +1730,14 @@ a.activity-item__target:hover {
   margin-top: 2px;
 }
 
-/* Responsive: stack on narrow screens */
+/* Responsive: smaller covers on narrow screens */
 @media (max-width: 480px) {
-  .upcoming-docket__item {
-    flex-direction: column;
-    gap: var(--s-1);
-  }
-
-  .upcoming-docket__marker {
-    min-width: 0;
+  .upcoming-docket__cover {
+    width: 96px;
   }
 
   .upcoming-docket__card {
     padding: var(--s-2);
-  }
-
-  .upcoming-docket__cover {
-    width: 72px;
   }
 }
 
@@ -4717,8 +4706,8 @@ textarea.form-input {
 }
 
 /* ---- Edit Modal ---- */
-.edit-modal {
-  max-width: 480px;
+.app-dialog.edit-modal {
+  max-width: 640px;
   width: calc(100% - var(--s-4));
 }
 .edit-modal::backdrop {
@@ -4728,7 +4717,7 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
-  padding: var(--s-4);
+  padding: var(--s-5);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -4754,15 +4743,6 @@ textarea.form-input {
   margin: 0;
 }
 .edit-modal__divider[hidden] { display: none; }
-.edit-modal__search-row {
-  display: flex;
-  gap: var(--s-2);
-  margin-top: var(--s-1);
-}
-.edit-modal__search-row input {
-  flex: 1;
-  min-width: 0;
-}
 .edit-modal__covers {
   display: flex;
   gap: var(--s-2);
@@ -4772,7 +4752,7 @@ textarea.form-input {
 }
 .edit-modal__cover-item {
   flex-shrink: 0;
-  width: 80px;
+  width: 120px;
   cursor: pointer;
   text-align: center;
   border-radius: var(--radius-sm);
@@ -4780,7 +4760,7 @@ textarea.form-input {
 }
 .edit-modal__cover-item:hover { opacity: 0.7; }
 .edit-modal__cover-item img {
-  width: 80px;
+  width: 120px;
   aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: var(--radius-sm);
@@ -4797,11 +4777,25 @@ textarea.form-input {
 .edit-modal__actions {
   display: flex;
   justify-content: flex-end;
+  gap: var(--s-2);
 }
 .edit-modal__cover-section {
   display: flex;
   flex-direction: column;
   gap: var(--s-1);
+}
+.edit-modal__cover-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.edit-modal__cover-label .t-caption-bold {
+  flex-shrink: 0;
+}
+.edit-modal__cover-status {
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  color: var(--text3);
 }
 
 /* ---- Admin Events ---- */
