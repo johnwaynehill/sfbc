@@ -150,6 +150,13 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Events CRUD on picks** — Admin can create, edit, and delete event sessions on any pick; events section on pick detail page with inline editing; home page hero now enriched with first event data (meeting_time, location_text); begins decoupling event details from the meetings table
 - **Home hero event enrichment** — Home page hero section now pulls meeting_time, location_text, and meetup_event_url from the events table when meetings table data is empty
 
+## Features & Usability (Sprint 12)
+
+- **Show/hide password toggle** — Eye icon toggle on all password inputs (member login, profile, admin login, admin settings) to reveal/hide passwords; accessible `aria-label` updates on toggle
+- **Extended markdown support** — Added strikethrough (`~~text~~`), headings (`### Heading`), and numbered lists (`1. item`) to review toolbar, client preview, and server rendering
+- **Global library checkout link** — Admin enters a library catalog search URL in settings (e.g. SFPL); every book detail page shows a "Library" pill link that searches for the book at that library
+- **Separate usernames** — Users can set a stable username independent of their display name; profile URLs use username (`/members/:username`); changing display name no longer changes the URL; admin user list shows `@username`; existing slugs seeded as usernames
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background

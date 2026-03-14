@@ -195,7 +195,7 @@ router.get('/changelog', (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/profile', requireMember, (req, res) => {
   const profileUser = db.prepare(
-    'SELECT id, email, display_name, avatar_style, user_slug, goodreads_url, storygraph_url, instagram_handle, threads_handle, password_hash FROM users WHERE id = ?'
+    'SELECT id, email, display_name, avatar_style, user_slug, username, goodreads_url, storygraph_url, instagram_handle, threads_handle, password_hash FROM users WHERE id = ?'
   ).get(req.user.id);
 
   res.render('profile', {
@@ -214,11 +214,11 @@ router.get('/profile', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/members', requireMember, (req, res) => {
   const members = db.prepare(`
-    SELECT u.id, u.display_name, u.avatar_style, u.user_slug, u.email, u.created_at,
+    SELECT u.id, u.display_name, u.avatar_style, u.user_slug, u.username, u.email, u.created_at,
            COUNT(r.id) AS review_count
     FROM users u
     LEFT JOIN reviews r ON r.user_id = u.id
-    WHERE u.display_name IS NOT NULL AND u.user_slug IS NOT NULL
+    WHERE u.display_name IS NOT NULL AND (u.username IS NOT NULL OR u.user_slug IS NOT NULL)
     GROUP BY u.id
     ORDER BY u.display_name COLLATE NOCASE ASC
   `).all();
@@ -234,12 +234,12 @@ router.get('/members', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/members/:slug', requireMember, (req, res) => {
   const member = db.prepare(`
-    SELECT id, display_name, email, avatar_style, user_slug,
+    SELECT id, display_name, email, avatar_style, user_slug, username,
            goodreads_url, storygraph_url, instagram_handle, threads_handle,
            created_at
     FROM users
-    WHERE user_slug = ?
-  `).get(req.params.slug);
+    WHERE username = ? OR user_slug = ?
+  `).get(req.params.slug, req.params.slug);
 
   if (!member) {
     return res.status(404).render('error', {
@@ -376,7 +376,7 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   const reviews = db.prepare(`
     SELECT r.id, r.grade, r.body_markdown, r.has_spoilers, r.did_finish,
            r.created_at, r.updated_at,
-           r.user_id, u.display_name, u.avatar_style, u.user_slug, u.email,
+           r.user_id, u.display_name, u.avatar_style, u.user_slug, u.username, u.email,
            gw.weight
     FROM reviews r
     JOIN grade_weights gw ON gw.grade = r.grade
@@ -436,6 +436,9 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   // Book-to-book navigation (prev/next by month)
   const adjacentPicks = picksService.getAdjacentPicks(book.month_year);
 
+  // Site settings
+  const libraryRow = db.prepare("SELECT value FROM site_settings WHERE key = 'library_url'").get();
+
   res.render('book-detail', {
     pageTitle: `${book.title} by ${book.author}`,
     book,
@@ -455,6 +458,7 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     formatMonthYear,
     bookPath,
     renderMarkdown,
+    libraryUrl: libraryRow ? libraryRow.value : '',
   });
 });
 

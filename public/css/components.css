@@ -1869,6 +1869,39 @@ a.activity-item__target:hover {
   color: var(--text3);
 }
 
+/* Password toggle */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-wrapper .form-input {
+  flex: 1;
+  padding-right: 36px;
+  min-width: 0;
+}
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+.password-toggle:hover {
+  color: var(--text);
+}
+.password-toggle .pw-slash {
+  display: none;
+}
+.password-toggle.is-visible .pw-slash {
+  display: inline;
+}
+
 textarea.form-input {
   resize: vertical;
   min-height: 60px;

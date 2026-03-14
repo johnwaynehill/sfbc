@@ -98,6 +98,12 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           Bookshop
         </a>
+        <% if (libraryUrl) { %>
+          <a href="<%= libraryUrl %><%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Library
+          </a>
+        <% } %>
         <% if (book.meeting_status === 'results' && book.month_year && book.has_vote_data) { %>
           <a href="/results/<%= monthYearSlug(book.month_year) %>" class="book-links__pill">Results</a>
         <% } %>
@@ -208,8 +214,8 @@
         <div class="review-card__body">
           <div class="review-card__meta">
             <% if (user && review.display_name) { %>
-              <% if (review.user_slug) { %>
-                <a href="/members/<%= review.user_slug %>" class="review-card__reviewer">
+              <% if (review.username || review.user_slug) { %>
+                <a href="/members/<%= review.username || review.user_slug %>" class="review-card__reviewer">
                   <%- include('partials/avatar', { avatarUser: review, avatarSize: 'sm', avatarClass: '' }) %>
                   <span class="review-card__author"><%= review.display_name %></span>
                 </a>
@@ -263,8 +269,8 @@
                 <% for (const reply of reviewReplies) { %>
                   <div class="reply" data-reply-id="<%= reply.id %>" data-user-id="<%= reply.user_id %>">
                     <div class="reply__meta">
-                      <% if (user && reply.user_slug) { %>
-                        <a href="/members/<%= reply.user_slug %>" class="reply__author-link">
+                      <% if (user && (reply.username || reply.user_slug)) { %>
+                        <a href="/members/<%= reply.username || reply.user_slug %>" class="reply__author-link">
                           <%- include('partials/avatar', { avatarUser: reply, avatarSize: 'sm', avatarClass: '' }) %>
                           <span class="reply__author"><%= reply.display_name %></span>
                         </a>

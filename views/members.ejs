@@ -16,7 +16,7 @@
 
   <div class="members-grid" id="membersGrid">
     <% for (const m of members) { %>
-      <a href="/members/<%= m.user_slug %>" class="member-card" data-name="<%= (m.display_name || '').toLowerCase() %>">
+      <a href="/members/<%= m.username || m.user_slug %>" class="member-card" data-name="<%= (m.display_name || '').toLowerCase() %>">
         <%- include('partials/avatar', { avatarUser: m, avatarSize: 'md', avatarClass: '' }) %>
         <div class="member-card__info">
           <span class="member-card__name t-body-bold"><%= m.display_name %></span>

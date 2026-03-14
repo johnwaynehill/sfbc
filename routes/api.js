@@ -133,27 +133,28 @@ router.post('/auth/admin-logout', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Check slug availability
-// GET /api/auth/check-slug?name=...
+// Check username availability
+// GET /api/auth/check-username?username=...
 // ---------------------------------------------------------------------------
-router.get('/auth/check-slug', requireMember, (req, res) => {
-  const name = (req.query.name || '').trim();
-  if (!name) return res.json({ available: true, slug: '' });
+router.get('/auth/check-username', requireMember, (req, res) => {
+  const username = (req.query.username || '').trim().toLowerCase();
+  if (!username) return res.json({ available: true, username: '' });
 
-  const base = slugify(name) || 'member';
-  let slug = base;
-
-  const taken = db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(slug, req.user.id);
-  if (!taken) {
-    return res.json({ available: true, slug });
+  if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(username) && username.length > 1 || username.length < 3) {
+    return res.json({ available: false, username, error: 'Must be 3-30 chars: letters, numbers, hyphens.' });
   }
 
-  // Slug is taken — compute suggestion with -2, -3 suffix
+  const taken = db.prepare('SELECT 1 FROM users WHERE username = ? AND id != ?').get(username, req.user.id);
+  if (!taken) {
+    return res.json({ available: true, username });
+  }
+
+  // Username is taken — compute suggestion
   let n = 2;
-  while (db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(base + '-' + n, req.user.id)) {
+  while (db.prepare('SELECT 1 FROM users WHERE username = ? AND id != ?').get(username + '-' + n, req.user.id)) {
     n++;
   }
-  res.json({ available: false, slug, suggestion: base + '-' + n });
+  res.json({ available: false, username, suggestion: username + '-' + n });
 });
 
 // ---------------------------------------------------------------------------
@@ -163,16 +164,50 @@ router.get('/auth/check-slug', requireMember, (req, res) => {
 router.put('/auth/display-name', requireMember, ...displayNameChain, handleValidationErrors, (req, res) => {
   const name = req.body.display_name; // already trimmed + length-checked by chain
 
-  // Regenerate slug to match the new name
-  const base = slugify(name) || 'member';
-  let slug = base;
-  let n = 2;
-  while (db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(slug, req.user.id)) {
-    slug = base + '-' + n++;
+  // Check if user already has a username — if so, don't change slug
+  const current = db.prepare('SELECT username, user_slug FROM users WHERE id = ?').get(req.user.id);
+
+  if (current.username) {
+    // User has a username — only update display_name
+    db.prepare('UPDATE users SET display_name = ? WHERE id = ?').run(name, req.user.id);
+    res.json({ success: true, display_name: name, user_slug: current.user_slug });
+  } else {
+    // No username yet — auto-generate slug from display name (legacy behavior)
+    const base = slugify(name) || 'member';
+    let slug = base;
+    let n = 2;
+    while (db.prepare('SELECT 1 FROM users WHERE user_slug = ? AND id != ?').get(slug, req.user.id)) {
+      slug = base + '-' + n++;
+    }
+    db.prepare('UPDATE users SET display_name = ?, user_slug = ?, username = ? WHERE id = ?').run(name, slug, slug, req.user.id);
+    res.json({ success: true, display_name: name, user_slug: slug, username: slug });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Update username
+// PUT /api/auth/username
+// ---------------------------------------------------------------------------
+router.put('/auth/username', requireMember, (req, res) => {
+  const username = (req.body.username || '').trim().toLowerCase();
+
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required.' });
+  }
+  if (username.length < 3 || username.length > 30) {
+    return res.status(400).json({ error: 'Username must be 3-30 characters.' });
+  }
+  if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(username)) {
+    return res.status(400).json({ error: 'Letters, numbers, and hyphens only. Cannot start or end with a hyphen.' });
   }
 
-  db.prepare('UPDATE users SET display_name = ?, user_slug = ? WHERE id = ?').run(name, slug, req.user.id);
-  res.json({ success: true, display_name: name, user_slug: slug });
+  const taken = db.prepare('SELECT 1 FROM users WHERE username = ? AND id != ?').get(username, req.user.id);
+  if (taken) {
+    return res.status(409).json({ error: 'Username is already taken.' });
+  }
+
+  db.prepare('UPDATE users SET username = ?, user_slug = ? WHERE id = ?').run(username, username, req.user.id);
+  res.json({ success: true, username });
 });
 
 // ---------------------------------------------------------------------------
@@ -694,6 +729,25 @@ router.delete('/admin/announcements/:id', requireAdmin, (req, res) => {
 
   announcementsService.deleteById(id);
   broadcastHomeAnnouncements();
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// Site settings
+// PUT /api/admin/settings
+// ---------------------------------------------------------------------------
+router.put('/admin/settings', requireAdmin, (req, res) => {
+  const { library_url } = req.body;
+
+  if (library_url !== undefined) {
+    const val = (library_url || '').trim();
+    if (val) {
+      db.prepare('INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)').run('library_url', val);
+    } else {
+      db.prepare('DELETE FROM site_settings WHERE key = ?').run('library_url');
+    }
+  }
+
   res.json({ success: true });
 });
 

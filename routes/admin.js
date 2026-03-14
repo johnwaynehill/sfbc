@@ -238,7 +238,7 @@ router.get('/users', (req, res) => {
   const totalPages = Math.ceil(total / per) || 1;
 
   const users = db.prepare(`
-    SELECT id, email, display_name, role, avatar_style, user_slug, created_at
+    SELECT id, email, display_name, role, avatar_style, user_slug, username, created_at
     FROM users
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
@@ -310,10 +310,12 @@ router.get('/announcements', (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/settings', (req, res) => {
   const admins = db.prepare("SELECT id, email, display_name FROM users WHERE role = 'admin' ORDER BY id").all();
+  const libraryUrl = db.prepare("SELECT value FROM site_settings WHERE key = 'library_url'").get();
 
   res.render('admin/settings', {
     pageTitle: 'Settings',
     admins,
+    libraryUrl: libraryUrl ? libraryUrl.value : '',
   });
 });
 
