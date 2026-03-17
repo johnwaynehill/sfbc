@@ -22,4 +22,11 @@ module.exports = {
     tagline: process.env.CLUB_TAGLINE || 'A San Francisco sci-fi & fantasy book club exploring worlds beyond.',
     meetupUrl: process.env.MEETUP_URL || 'https://www.meetup.com/san-francisco-fantasy-book-club/',
   },
+  sentry: {
+    dsn: process.env.SENTRY_DSN || '',
+  },
+  posthog: {
+    apiKey: process.env.POSTHOG_API_KEY || '',
+    host: process.env.POSTHOG_HOST || 'https://us.i.posthog.com',
+  },
 };

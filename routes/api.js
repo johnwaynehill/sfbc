@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const config = require('../config');
+const analytics = require('../services/analytics');
 const { slugify } = require('../utils/slug');
 const { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook, downloadCover } = require('../services/books');
 const { getFingerprint } = require('../services/fingerprint');
@@ -170,6 +171,7 @@ router.put('/auth/display-name', requireMember, ...displayNameChain, handleValid
   if (current.username) {
     // User has a username — only update display_name
     db.prepare('UPDATE users SET display_name = ? WHERE id = ?').run(name, req.user.id);
+    analytics.track(req.user.id, 'profile_updated', { field: 'display_name' });
     res.json({ success: true, display_name: name, user_slug: current.user_slug });
   } else {
     // No username yet — auto-generate slug from display name (legacy behavior)
@@ -180,6 +182,7 @@ router.put('/auth/display-name', requireMember, ...displayNameChain, handleValid
       slug = base + '-' + n++;
     }
     db.prepare('UPDATE users SET display_name = ?, user_slug = ?, username = ? WHERE id = ?').run(name, slug, slug, req.user.id);
+    analytics.track(req.user.id, 'profile_updated', { field: 'display_name' });
     res.json({ success: true, display_name: name, user_slug: slug, username: slug });
   }
 });
@@ -207,6 +210,7 @@ router.put('/auth/username', requireMember, (req, res) => {
   }
 
   db.prepare('UPDATE users SET username = ?, user_slug = ? WHERE id = ?').run(username, username, req.user.id);
+  analytics.track(req.user.id, 'profile_updated', { field: 'username' });
   res.json({ success: true, username });
 });
 
@@ -245,6 +249,7 @@ router.put('/auth/social-links', requireMember, ...socialLinksChain, handleValid
     WHERE id = ?
   `).run(goodreads_url, storygraph_url, instagram_handle, threads_handle, req.user.id);
 
+  analytics.track(req.user.id, 'profile_updated', { field: 'social_links' });
   res.json({ success: true });
 });
 
@@ -363,6 +368,7 @@ router.put('/admin/meetings/:id/status', requireAdmin, ...meetingStatusChain, ha
     broadcastStatusChange(id, 'results');
   }
 
+  analytics.track(req.user.id, 'meeting_status_changed', { meetingId: id, from: oldMeeting?.status, to: newStatus });
   res.json({ success: true, meeting: result.meeting });
 });
 
@@ -792,6 +798,7 @@ router.post('/reviews/:reviewId/reactions', requireMember, ...emojiChain, handle
 
   const result = reactionsService.toggleReaction(reviewId, req.user.id, emoji);
   broadcastHomeActivity();
+  if (result.active) analytics.track(req.user.id, 'reaction_added', { reviewId, emoji });
   res.json(result);
 });
 
@@ -819,6 +826,7 @@ router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValid
   const didFinish = req.body.did_finish !== undefined ? !!req.body.did_finish : true;
   reviewsService.create(bookId, req.user.id, grade, body, hasSpoilers, didFinish);
   broadcastHomeActivity();
+  analytics.track(req.user.id, 'review_submitted', { bookId, grade, hasSpoiler: hasSpoilers, didFinish });
   res.status(201).json({ success: true });
 });
 
@@ -844,6 +852,7 @@ router.put('/books/:bookId/reviews', requireMember, ...reviewChain, handleValida
   const hasSpoilers = !!req.body.has_spoilers;
   const didFinish = req.body.did_finish !== undefined ? !!req.body.did_finish : true;
   reviewsService.update(bookId, req.user.id, grade, body, hasSpoilers, didFinish);
+  analytics.track(req.user.id, 'review_updated', { bookId, grade, hasSpoiler: hasSpoilers, didFinish });
   res.json({ success: true });
 });
 
@@ -888,6 +897,7 @@ router.post('/reviews/:reviewId/replies', requireMember, ...replyChain, handleVa
   const replyBody = req.body.body;
   const newId = repliesService.create(reviewId, req.user.id, replyBody);
   broadcastHomeActivity();
+  analytics.track(req.user.id, 'reply_created', { reviewId });
 
   // Return the newly created reply so the client can render it immediately
   const reply = repliesService.getById(newId);
@@ -1102,6 +1112,7 @@ router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nomination
   broadcastAdminMeetingNominees(meetingId);
   broadcastPublicNominees(meetingId);
   broadcastHomeActivity();
+  analytics.track(req.session?.userId || 'anonymous', 'nomination_created', { meetingId, bookTitle: book.title });
 
   const slug = monthYearSlug(meeting.month_year);
   const wantsJson = req.get('Accept')?.includes('application/json');
@@ -1313,6 +1324,7 @@ router.post('/meetings/:meetingId/votes', submissionLimiter, (req, res) => {
   // Broadcast updated results to SSE clients
   broadcastResults(meetingId);
   broadcastAdminMeetingVoteCount(meetingId);
+  analytics.track(req.session?.userId || fingerprint, 'vote_cast', { meetingId });
 
   const wantsJson = req.get('Accept')?.includes('application/json');
   if (wantsJson) {
@@ -1515,6 +1527,7 @@ router.post('/invites', requireMember, (req, res) => {
   const code = crypto.randomBytes(4).toString('hex'); // 8-char hex
   db.prepare('INSERT INTO invites (code, invited_by) VALUES (?, ?)').run(code, req.user.id);
   const url = `${req.protocol}://${req.get('host')}/join/${code}`;
+  analytics.track(req.user.id, 'invite_created', { code });
   res.json({ success: true, code, url });
 });
 

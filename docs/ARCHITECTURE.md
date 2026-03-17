@@ -1,6 +1,6 @@
 # GatherBound - Architecture & Technology Stack
 
-A technical reference for the core architecture, data flow, and technology decisions powering GatherBound (SF Fantasy & Sci-Fi Book Club).
+A technical reference for the core architecture, data flow, and technology decisions powering GatherBound.
 
 Read this alongside:
 - **Tech-Specs.md** - data model and API contracts
@@ -8,6 +8,7 @@ Read this alongside:
 - **PRD.md** - product specification, user stories, page definitions
 - **ROADMAP.md** - milestone planning
 - **SHIPPED.md** - release history
+- **MIGRATION-PLAN.md** - multi-club migration engineering plan
 
 ---
 
@@ -128,7 +129,7 @@ In production the database lives on a persistent Fly.io volume at `/data/bookclu
 
 ### Migration System
 
-Migrations are numbered SQL files (`001-initial-schema.sql` through `019-invites.sql`) in `db/migrations/`. The runner:
+Migrations are numbered SQL files (`001-initial-schema.sql` through `021-usernames.sql`, with `022-028` planned for multi-club) in `db/migrations/`. The runner:
 
 - Creates a `_migrations` tracking table if it doesn't exist
 - Applies any `.sql` file not yet in the tracking table, in sorted order
@@ -140,23 +141,29 @@ All migrations run automatically on server start. No manual migration commands a
 
 ### Core Tables
 
-| Table | Purpose |
-|-------|---------|
-| `users` | Members and admins (email, password hash, display name, role, avatar style, social links, slug) |
-| `books` | Canonical book records (title, author, cover, ISBN, description, publisher, language, slugs) |
-| `meetings` | Monthly club contexts (month/year, status, winning book, scheduling data) |
-| `monthly_picks` | Current and historical picks with full lifecycle timestamps |
-| `events` | Meeting event sessions (time, location, Meetup link) — decoupled from meetings |
-| `nominations` | Proposed books per meeting |
-| `votes` | Member votes on nominees |
-| `reviews` | Book reviews (grade, body, spoiler flag, did-finish flag) |
-| `review_replies` | Threaded comments on reviews |
-| `emoji_reactions` | Emoji reactions to reviews |
-| `grade_weights` | Letter grade to numeric weight mapping (F=0.0 through S=4.3) |
-| `magic_link_tokens` | Passwordless auth tokens (15-minute TTL) |
-| `announcements` | Club announcements |
-| `invites` | Shareable invite codes with usage tracking |
-| `_migrations` | Applied migration tracking |
+| Table | Scope | Purpose |
+|-------|-------|---------|
+| `users` | Platform | Members and admins (email, password hash, display name, role, avatar style, social links, username, is_platform_admin) |
+| `books` | Platform | Canonical book records (title, author, cover, ISBN, description, publisher, language, slugs) — shared catalog across clubs |
+| `grade_weights` | Platform | Letter grade to numeric weight mapping (F=0.0 through S=4.3) |
+| `magic_link_tokens` | Platform | Passwordless auth tokens (15-minute TTL) |
+| `_migrations` | Platform | Applied migration tracking |
+| `clubs` | Platform | Club definitions (slug, name, tagline, artifact_type, meetup_url) — **planned, Sprint 14** |
+| `club_memberships` | Platform | User-to-club relationships with roles (owner/organizer/member) — **planned, Sprint 14** |
+| `monthly_picks` | Club | Current and historical picks with full lifecycle timestamps + `club_id` |
+| `meetings` | Club | Monthly club contexts (month/year, status, winning book) + `club_id` |
+| `events` | Club | Meeting event sessions (time, location, Meetup link) + `club_id` |
+| `nominations` | Club | Proposed books per meeting + `club_id` |
+| `votes` | Club | Member votes on nominees + `club_id` |
+| `reviews` | Club | Book reviews (grade, body, spoiler flag, did-finish flag) + `club_id` |
+| `review_replies` | Club | Threaded comments on reviews + `club_id` |
+| `emoji_reactions` | Club | Emoji reactions to reviews + `club_id` |
+| `announcements` | Club | Club announcements + `club_id` |
+| `invites` | Club | Shareable invite codes with usage tracking + `club_id` |
+
+> **Multi-club scoping (planned, Sprint 14):** All "Club"-scoped tables will have a `club_id` foreign key
+> referencing the `clubs` table. Every query on these tables will include `WHERE club_id = ?`
+> to ensure complete data isolation between clubs. See [MIGRATION-PLAN.md](MIGRATION-PLAN.md) Phase 3.
 
 ### Query Patterns
 
@@ -207,6 +214,7 @@ Two gate functions in `middleware/auth.js`:
 
 Routes are organized by concern, mounted in `server.js`:
 
+### Current structure (single-club)
 ```
 /              → routes/public.js     (home, books, history, members, changelog)
 /              → routes/nominate.js   (nomination form)
@@ -218,6 +226,27 @@ Routes are organized by concern, mounted in `server.js`:
 /admin         → routes/admin.js      (admin dashboard pages)
 /api           → routes/api.js        (REST API for all AJAX operations)
 ```
+
+### Planned structure (multi-club, Sprint 15)
+```
+/              → Platform landing page
+/auth          → routes/auth.js       (login, logout, magic links — platform-level)
+/platform      → routes/platform.js   (platform admin — club CRUD, user list)
+/c/:clubSlug   → ClubContext middleware → club-scoped routes:
+  /            → Club home (hero, activity feed, meeting info)
+  /history     → Book archive
+  /books/...   → Book detail
+  /members     → Members directory
+  /nominate/.. → Nomination form
+  /vote/...    → Voting UI
+  /results/... → Vote results
+  /admin       → Club admin dashboard
+  /api         → Club-scoped API endpoints
+```
+
+The `ClubContext` middleware (`middleware/club-context.js`) resolves the club from `:clubSlug`,
+loads the user's club membership, and injects `res.locals.club`, `res.locals.membership`,
+`res.locals.isClubMember`, and `res.locals.isClubOrganizer`. See [MIGRATION-PLAN.md](MIGRATION-PLAN.md) Phase 4.
 
 **Pattern:** Routes are thin controllers. They validate input (via `middleware/validate.js` chains), call service functions for business logic, and render templates or return JSON. No business logic lives in route files.
 
@@ -243,16 +272,26 @@ Services contain all business logic and database queries. They export plain func
 **monthly-picks.js** (largest service) — Manages the pick lifecycle state machine:
 - States: `scheduled` → `nominations` → `voting` → `reading` → `results`
 - Each transition updates lifecycle timestamps (`nominations_open_at`, `voting_open_at`, etc.)
-- `getHero()` powers the home page with the current active pick
+- `getHero(clubId)` powers the home page with the current active pick
 - `getEvents()`, `createEvent()`, `updateEvent()`, `deleteEvent()` manage meeting sessions
+- **Multi-club:** All functions will accept `clubId` and filter by `club_id` (Sprint 14)
 
 **books.js** — Google Books API integration:
 - `searchGoogleBooksMulti(query)` — Searches by title/author, returns candidates
 - `findOrCreateBook(data)` — Upserts a book record with slug generation
 - `enrichBookMetadata(bookId)` — Fills in ISBN, page count, publisher, language
 - `downloadCover(imageUrl, filename)` — Downloads cover images, rejects placeholders under 15KB
+- **Multi-club:** Books are a global catalog — no `club_id` needed
 
 **voting.js** — Vote tallying with seeded shuffle for ballot randomization to eliminate position bias.
+
+**clubs.js** (planned, Sprint 14) — Club and membership management:
+- `getClubBySlug(slug)` — Returns active club by slug
+- `getMembership(clubId, userId)` — Returns membership row
+- `getClubMembers(clubId)` — Returns members with roles
+- `addMember(clubId, userId, role)` — Upserts membership
+- `createClub({ name, slug, ... })` — Creates a new club
+- `getActiveClubs()` — Returns all active clubs
 
 ---
 
@@ -424,8 +463,10 @@ HTTPS:           Force-enabled, auto-stop/start machines
 | `BOOTSTRAP_KEY` | Once | First admin account creation |
 | `GOOGLE_BOOKS_API_KEY` | No | Book metadata enrichment |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | For email | Magic link delivery |
-| `SUPER_ADMIN_EMAIL` | No | Grants elevated privileges |
-| `CLUB_NAME`, `CLUB_TAGLINE`, `MEETUP_URL` | No | Club branding |
+| `SUPER_ADMIN_EMAIL` | No | Grants platform admin privileges |
+| `CLUB_NAME`, `CLUB_TAGLINE`, `MEETUP_URL` | Deprecated | Replaced by `clubs` table in Sprint 14 |
+| `POSTHOG_API_KEY` | No | Product analytics (Sprint 13) |
+| `SENTRY_DSN` | No | Error tracking (Sprint 13) |
 
 ### Deploy Workflow
 
@@ -443,8 +484,9 @@ The Dockerfile uses `node:20-slim`, installs build tools for better-sqlite3's na
 
 - **Trust proxy** (`app.set('trust proxy', 1)`) is required for secure cookies behind Fly.io's HTTPS termination
 - **Migrations run on startup** — no separate migration command needed
-- **Single machine** — SQLite doesn't support multi-writer. The app runs on one Fly machine with auto-stop/start
+- **Single machine** — SQLite doesn't support multi-writer. The app runs on one Fly machine with auto-stop/start. This is sufficient for 10-20 clubs.
 - **Volume persistence** — The `/data` mount survives deploys; the SQLite file is never rebuilt
+- **Multi-club on single instance** — All clubs share one database, one process, one deploy. Data isolation is via `club_id` scoping, not infrastructure separation.
 
 ---
 
@@ -452,14 +494,25 @@ The Dockerfile uses `node:20-slim`, installs build tools for better-sqlite3's na
 
 ### Why SQLite (not Postgres)?
 
-The app serves a single book club with ~30 members. SQLite provides:
+The app serves 10-20 book clubs with ~25 members each. SQLite provides:
 - Zero operational overhead (no database server to manage)
 - Sub-millisecond query latency (no network round-trip)
-- Synchronous API that simplifies route handlers
+- Synchronous API that simplifies route handlers and keeps the codebase simple
 - WAL mode for concurrent reads during writes
 - Single-file backups
 
-The trade-off is single-machine deployment, which is acceptable at this scale.
+The trade-off is single-machine deployment, which is acceptable at this scale. At 20 clubs × 25 members × a few hundred rows each, SQLite handles the load trivially. Migrate to Postgres when horizontal scaling (multiple machines) or 50+ clubs justify the operational complexity. See [MIGRATION-PLAN.md](MIGRATION-PLAN.md) § "When to Migrate to Postgres."
+
+### Why Multi-Tenant (not Multi-Instance)?
+
+We considered deploying separate Fly.io instances per club. Multi-tenant (single database, `club_id` scoping) was chosen because:
+- Single deploy for bug fixes and features — no N-deploy problem
+- Shared book catalog across clubs (two clubs reading the same book share metadata)
+- Single user accounts across clubs — members can belong to multiple clubs
+- Lower infrastructure cost and operational overhead
+- The `club_id` scoping pattern is well-understood and the codebase is small enough to refactor in a single sprint with AI-assisted development
+
+The trade-off is migration complexity (adding `club_id` to all tables and queries), which is a one-time cost.
 
 ### Why Server-Rendered (not SPA)?
 

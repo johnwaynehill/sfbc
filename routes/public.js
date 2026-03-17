@@ -503,4 +503,32 @@ router.get('/join/:code', (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// GET /landing — GatherBound platform landing page
+// ---------------------------------------------------------------------------
+router.get('/landing', (req, res) => {
+  const totalBooks = picksService.countCompleted();
+  const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+  const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
+
+  // Grab recent book covers for the social proof section
+  const recentBooks = db.prepare(`
+    SELECT b.title, b.cover_url
+    FROM monthly_picks mp
+    JOIN books b ON b.id = mp.book_id
+    WHERE mp.status = 'results' AND b.cover_url IS NOT NULL
+    ORDER BY mp.created_at DESC
+    LIMIT 8
+  `).all();
+
+  res.render('landing', {
+    layout: 'layouts/landing-shell',
+    pageTitle: 'The digital home for in-person book clubs',
+    totalBooks,
+    totalMembers,
+    totalReviews,
+    recentBooks,
+  });
+});
+
 module.exports = router;

@@ -1,0 +1,143 @@
+<!-- ===== Hero ===== -->
+<section class="landing-hero">
+  <div class="page-container">
+    <h1 class="landing-hero__title">The digital home for<br>in-person book clubs</h1>
+    <p class="landing-hero__subtitle">Your club deserves more than a group chat. GatherBound gives every member a place to nominate, vote, review, and discuss — whether they made it to the meeting or not.</p>
+    <a href="#waitlist" class="btn-primary landing-hero__cta">Start Your Club</a>
+  </div>
+</section>
+
+<!-- ===== Problem ===== -->
+<section class="landing-section">
+  <div class="page-container">
+    <h2 class="landing-section__heading">Your community is bigger than the room</h2>
+    <p class="landing-section__intro">Every growing book club hits the same wall. The meeting room holds 25, but your community is 10x that. The members who can't make it have no way to participate.</p>
+    <div class="landing-problems">
+      <div class="landing-problem">
+        <div class="landing-problem__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        </div>
+        <h3 class="landing-problem__title">Meetup handles logistics</h3>
+        <p class="landing-problem__text">It gets people in the door — then provides zero engagement between events. Once you RSVP, there's nothing to do.</p>
+      </div>
+      <div class="landing-problem">
+        <div class="landing-problem__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="landing-problem__title">Discord is noise</h3>
+        <p class="landing-problem__text">Chat is ephemeral and overwhelming. A discussion about Chapter 3 disappears in a flood of memes. Nothing is preserved.</p>
+      </div>
+      <div class="landing-problem">
+        <div class="landing-problem__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <h3 class="landing-problem__title">Goodreads is personal</h3>
+        <p class="landing-problem__text">Great for individual tracking, but it doesn't know your club exists. No shared experience, no community identity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== How It Works ===== -->
+<section class="landing-section landing-section--alt">
+  <div class="page-container">
+    <h2 class="landing-section__heading">How GatherBound works</h2>
+    <div class="landing-steps">
+      <div class="landing-step">
+        <span class="landing-step__number">1</span>
+        <h3 class="landing-step__title">Nominate & Vote</h3>
+        <p class="landing-step__text">Members scan a QR code and nominate books in seconds. Ranked voting picks the winner — live results on the big screen.</p>
+      </div>
+      <div class="landing-step">
+        <span class="landing-step__number">2</span>
+        <h3 class="landing-step__title">Read & Review</h3>
+        <p class="landing-step__text">Everyone reads on the same timeline. Letter-grade reviews, emoji reactions, threaded discussions — participate from anywhere.</p>
+      </div>
+      <div class="landing-step">
+        <span class="landing-step__number">3</span>
+        <h3 class="landing-step__title">Build Your Archive</h3>
+        <p class="landing-step__text">Every book, review, grade, and conversation becomes a permanent record. Your club's history grows richer every month.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Social Proof ===== -->
+<section class="landing-section">
+  <div class="page-container">
+    <h2 class="landing-section__heading">Already powering a real book club</h2>
+    <p class="landing-section__intro">GatherBound was built for the SF Fantasy & Sci-Fi Book Club — 900+ members on Meetup, running monthly since 2023.</p>
+    <div class="landing-stats">
+      <div class="landing-stat">
+        <span class="landing-stat__number"><%= totalBooks %></span>
+        <span class="landing-stat__label">books read</span>
+      </div>
+      <div class="landing-stat">
+        <span class="landing-stat__number"><%= totalReviews %></span>
+        <span class="landing-stat__label">reviews written</span>
+      </div>
+      <div class="landing-stat">
+        <span class="landing-stat__number"><%= totalMembers %></span>
+        <span class="landing-stat__label">members</span>
+      </div>
+    </div>
+    <% if (recentBooks && recentBooks.length > 0) { %>
+    <div class="landing-covers">
+      <% for (const book of recentBooks) { %>
+        <div class="landing-cover">
+          <% if (book.cover_url) { %>
+            <img src="<%= book.cover_url %>" alt="<%= book.title %>" loading="lazy">
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- ===== For Organizers ===== -->
+<section class="landing-section landing-section--alt">
+  <div class="page-container">
+    <h2 class="landing-section__heading">Built for organizers</h2>
+    <p class="landing-section__intro">Set up in minutes. Run effortlessly. You focus on the conversation — GatherBound handles everything else.</p>
+    <div class="landing-features">
+      <div class="landing-feature">
+        <strong>QR Nominations</strong>
+        <span>Attendees scan and nominate in &lt;10 seconds. No app download, no login required.</span>
+      </div>
+      <div class="landing-feature">
+        <strong>Ranked Voting</strong>
+        <span>Drag-to-rank ballot on mobile with live animated results on the projector.</span>
+      </div>
+      <div class="landing-feature">
+        <strong>Full Lifecycle</strong>
+        <span>Nominations &rarr; Voting &rarr; Reading &rarr; Results. One admin panel runs it all.</span>
+      </div>
+      <div class="landing-feature">
+        <strong>Beautiful Archive</strong>
+        <span>Every book gets its own page with covers, reviews, grade distributions, and discussions.</span>
+      </div>
+      <div class="landing-feature">
+        <strong>Member Engagement</strong>
+        <span>Reviews, emoji reactions, threaded replies, and an activity feed keep the community alive between meetings.</span>
+      </div>
+      <div class="landing-feature">
+        <strong>Dark Mode</strong>
+        <span>Mobile-first responsive design that looks great in any lighting, on any device.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Waitlist CTA ===== -->
+<section class="landing-section landing-waitlist" id="waitlist">
+  <div class="page-container">
+    <h2 class="landing-section__heading">Start your club on GatherBound</h2>
+    <p class="landing-section__intro">We're onboarding a small group of book clubs for our private beta. Tell us about your club and we'll get you set up.</p>
+    <div class="landing-waitlist__form">
+      <iframe data-tally-src="https://tally.so/embed/vG2BJg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" height="300" frameborder="0" marginheight="0" marginwidth="0" title="GatherBound Waitlist"></iframe>
+      <script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s)}else v();</script>
+    </div>
+    <p class="landing-waitlist__note text-tertiary t-caption">No credit card required. Free during beta.</p>
+  </div>
+</section>

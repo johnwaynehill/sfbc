@@ -7,8 +7,21 @@ const rateLimit = require('express-rate-limit');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const Sentry = require('@sentry/node');
 const config = require('./config');
+const analytics = require('./services/analytics');
 const { formatMonthYear, formatStatus, monthYearSlug, formatMeetingTime } = require('./utils/format');
+
+// ---------------------------------------------------------------------------
+// Sentry (error tracking) — init before anything else
+// ---------------------------------------------------------------------------
+if (config.sentry.dsn) {
+  Sentry.init({
+    dsn: config.sentry.dsn,
+    environment: config.nodeEnv,
+    tracesSampleRate: 0.1,
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Database & migrations
@@ -31,12 +44,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", 'https://us-assets.i.posthog.com', 'https://tally.so'],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       imgSrc: ["'self'", 'data:', 'https://api.dicebear.com', 'https://books.google.com', 'https://covers.openlibrary.org'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      connectSrc: ["'self'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://api.dicebear.com'],
-      frameSrc: ["'none'"],
+      connectSrc: ["'self'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://api.dicebear.com', 'https://us.i.posthog.com', 'https://us-assets.i.posthog.com'],
+      frameSrc: ["'self'", 'https://tally.so'],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
     },
@@ -126,6 +139,18 @@ app.use((req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
+// Sentry user context
+// ---------------------------------------------------------------------------
+app.use((req, res, next) => {
+  if (config.sentry.dsn && res.locals.user) {
+    Sentry.setUser({ id: String(res.locals.user.id), email: res.locals.user.email });
+  } else if (config.sentry.dsn) {
+    Sentry.setUser(null);
+  }
+  next();
+});
+
+// ---------------------------------------------------------------------------
 // Global template locals
 // ---------------------------------------------------------------------------
 app.use((req, res, next) => {
@@ -136,6 +161,8 @@ app.use((req, res, next) => {
   res.locals.formatMeetingTime = formatMeetingTime;
   res.locals.monthYearSlug = monthYearSlug;
   res.locals.colorHash = require('./utils/colorHash').colorHash;
+  res.locals.posthogApiKey = config.posthog.apiKey;
+  res.locals.posthogHost = config.posthog.host;
   res.locals.gradeTier = function (grade) {
     if (!grade) return '';
     var letter = grade.charAt(0).toUpperCase();
@@ -185,6 +212,7 @@ app.use((req, res) => {
 // Error handler
 // ---------------------------------------------------------------------------
 app.use((err, req, res, _next) => {
+  if (config.sentry.dsn) Sentry.captureException(err);
   console.error(err.stack);
   res.status(500).render('error', {
     pageTitle: 'Error',
@@ -197,6 +225,15 @@ app.use((err, req, res, _next) => {
 // Start
 // ---------------------------------------------------------------------------
 const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
-app.listen(config.port, host, () => {
-  console.log(`\n  SF Book Club running at http://${host}:${config.port}\n`);
+const server = app.listen(config.port, host, () => {
+  console.log(`\n  GatherBound running at http://${host}:${config.port}\n`);
+});
+
+// ---------------------------------------------------------------------------
+// Graceful shutdown — flush analytics before exit
+// ---------------------------------------------------------------------------
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received — shutting down gracefully');
+  await analytics.shutdown();
+  server.close(() => process.exit(0));
 });

@@ -79,20 +79,23 @@ GatherBound starts with book clubs — because that's where we have a working pr
 
 ## What Exists Today
 
-We have a working app ([sf-book-club.fly.dev](https://sf-book-club.fly.dev)) serving the SF Fantasy & Sci-Fi Book Club. It handles:
+We have a working app ([sf-book-club.fly.dev](https://sf-book-club.fly.dev)) serving the SF Fantasy & Sci-Fi Book Club. Across 12 sprints, we've shipped:
 
 - QR-based nominations and ranked voting (in person, no login required)
 - Live real-time results via SSE
-- Letter-grade reviews (F through S) with markdown support and spoiler tags
-- A browseable archive of 30+ books with covers, metadata, and grade distributions
+- Letter-grade reviews (F through S) with markdown formatting toolbar and spoiler tags
+- Emoji reactions, threaded replies, and a real-time activity feed
+- A browseable archive of 30+ books with immersive covers, metadata, and grade distributions
 - Magic-link + password authentication
-- Public member profiles with DiceBear avatars
+- Public member profiles with DiceBear avatars, usernames, and social links
+- Members directory with invite links
 - Dark mode, mobile-first responsive design
-- Admin panel with full meeting lifecycle management
+- Admin panel with full meeting lifecycle management, pagination, events CRUD
+- Library checkout integration
 
-The foundation is solid. The architecture already treats books as canonical entities with their own slugs and URLs. Reviews already link to books, not meetings. The editorial "permanent cultural artifact" aesthetic is established.
+The foundation is solid and feature-complete for a single club. The architecture already treats books as canonical entities with their own slugs and URLs. Reviews link to books, not meetings. The editorial "permanent cultural artifact" aesthetic is established. All P0 and P1 items are shipped.
 
-What's missing is everything that transforms it from a tool for 25 meeting attendees into a community platform for 900 members — and eventually, a platform for thousands of clubs.
+**We're now validating the platform thesis.** The next phase (Sprints 13-15) transforms GatherBound from a single-club tool into a multi-club platform serving 10-20 book clubs. The goal is to learn whether this is a real startup opportunity by measuring activation and engagement across multiple independent clubs. See [ROADMAP.md](ROADMAP.md) and [MIGRATION-PLAN.md](MIGRATION-PLAN.md) for the plan.
 
 ---
 
@@ -114,6 +117,14 @@ What's missing is everything that transforms it from a tool for 25 meeting atten
 
 ## What's Next
 
-See [PRD.md](PRD.md) for the current product specification — pages, features, functional requirements, and technical architecture.
+**Sprint 13:** Observability (PostHog, Sentry) and a GatherBound landing page to start generating demand signal.
 
-See [ROADMAP.md](ROADMAP.md) for the phased feature plan — what we're building and in what order, starting with the artifacts-as-center refactor that unlocks everything else.
+**Sprint 14:** Multi-club data model — `clubs` table, `club_memberships`, `club_id` scoping on all tables, service query updates.
+
+**Sprint 15:** Multi-club routes (`/c/:clubSlug`), platform admin dashboard, club-scoped invites, onboard club #2.
+
+**Post-Sprint 15:** Validate. Onboard 10-20 clubs. Measure activation and engagement. Let real multi-club usage drive the feature roadmap.
+
+See [ROADMAP.md](ROADMAP.md) for the full milestone plan.
+See [MIGRATION-PLAN.md](MIGRATION-PLAN.md) for the detailed engineering plan.
+See [PRD.md](PRD.md) for the product specification.

@@ -1,10 +1,10 @@
-GatherBound — SF Fantasy & Sci-Fi Book Club
+GatherBound — The Digital Home for In-Person Communities
 
 ## Product Requirements Document (PRD)
 
-Product: GatherBound (SF Fantasy & Sci-Fi Book Club)
+Product: GatherBound
 Owner: You
-Date: February 8, 2026 (revised February 24, 2026)
+Date: February 8, 2026 (revised March 16, 2026)
 
 ---
 
@@ -18,18 +18,25 @@ Date: February 8, 2026 (revised February 24, 2026)
 
 # 2. Background / Context
 
-The SF Fantasy & Sci-Fi Book Club has 900+ members on Meetup. Meetings cap at 25. A core group of 8–10 always attends, which means the vast majority of members rarely — or never — get a seat. Three audiences, in priority order:
+GatherBound started with the SF Fantasy & Sci-Fi Book Club (900+ members on Meetup, ~25 per meeting). Across 12 sprints, we built a complete product: nomination → voting → reading → results lifecycle, letter-grade reviews, emoji reactions, threaded replies, activity feed, DiceBear avatars, public profiles with usernames, dark mode, and a 30+ book archive.
 
-1. **The 875+ who can't get a seat** — The app IS the club for them. Reading along, reacting to reviews, joining discussions, tracking reading status.
-2. **The ~25 who attend each month** — Smooth nominations, voting, reviews, and meeting tools.
-3. **Admins/organizers** — Streamlined nomination→voting→winner flow, meeting management, announcements.
+**The single-club product is validated.** Now we're expanding to serve 10-20 book clubs to test whether GatherBound is a viable multi-club platform — and a real startup opportunity.
 
-The app should:
+### Audience tiers (per club)
+
+1. **Club members who can't attend meetings** — The app IS the club for them. Reading along, reacting to reviews, joining discussions.
+2. **Meeting attendees** (~25 per meeting) — Smooth nominations, voting, reviews, and meeting tools.
+3. **Club organizers** — Streamlined nomination→voting→winner flow, meeting management, announcements.
+4. **Platform admin** (new) — Creates and manages multiple clubs, onboards organizers, monitors health.
+
+### The app should:
 * Support nominations and ranked voting in person via QR code scan.
-* Keep a public, browseable archive of every book the club has read.
+* Keep a public, browseable archive of every book a club has read.
 * Allow authenticated members to leave letter-grade reviews, react, and discuss.
 * Enable participation for members who can't attend meetings.
 * Feel like a curated editorial experience, not a utility tool.
+* Host multiple independent clubs on a single platform with isolated data.
+* Allow organizers to run their club independently after initial onboarding.
 
 ---
 
@@ -43,6 +50,9 @@ The app should:
 * Enable community engagement between meetings — reactions, replies, discussion threads, reading status.
 * Support multiple meetings per book so more members can participate in person.
 * Keep Admin section separate from the main navigation. Admins can just bookmark the link directly. Admin section should be in a different structure all together.
+* **Host 10-20 clubs on a single platform** with data isolation and independent organizer control.
+* **Validate multi-club demand** by tracking activation and engagement per club via PostHog.
+* **Enable zero-code club onboarding** — platform admin creates a club, shares an invite link, organizer is running within minutes.
 
 ---
 
@@ -51,7 +61,10 @@ The app should:
 * Replacing Meetup for event discovery and RSVPs.
 * Building a general-purpose social network or forum — engagement should be structured around artifacts, not freeform feeds.
 * Complex moderation workflows beyond basic admin controls.
-* Full artifact-type expansion (movies, podcasts, etc.) — only when another club actually exists.
+* Full artifact-type expansion (movies, podcasts, etc.) — deferred until book club demand is validated.
+* Self-serve club creation — platform admin creates clubs manually during private beta.
+* Postgres migration — SQLite handles the current scale; revisit at 50+ clubs.
+* Cross-club social features (following members across clubs, global feed) — each club is its own community.
 
 ---
 
@@ -112,11 +125,23 @@ These were originally post-MVP but are now central to the artifacts-as-center mo
 * Reply to reviews / discussion threads.
 * Activity feed on Home page.
 
-## Future (Post-MVP)
-Tracked for architectural awareness but explicitly out of scope for current phases.
+## Now Platform (Promoted from Future)
+Multi-club is the current strategic priority. See [MIGRATION-PLAN.md](MIGRATION-PLAN.md) for engineering details.
+
+* Multi-club data model (`clubs` + `club_memberships` tables, `club_id` scoping).
+* Club-scoped routes under `/c/:clubSlug/`.
+* Platform admin dashboard for creating and managing clubs.
+* Club-scoped invite flow for onboarding organizers and members.
+* PostHog product analytics for per-club engagement tracking.
+* Sentry error tracking.
+* GatherBound landing page with waitlist.
+
+## Future (Post-Validation)
+Tracked for architectural awareness, prioritized after multi-club demand is validated.
 
 * Supporter/premium features.
-* Multi-club / platform capabilities.
+* Self-serve club creation.
+* Artifact-type expansion (film clubs, album clubs).
 
 ---
 
@@ -124,8 +149,10 @@ Tracked for architectural awareness but explicitly out of scope for current phas
 
 * **Community member** (reads along, writes reviews, reacts, discusses — may never attend a meeting).
 * **Attending member** (in-person voter, nominator, meeting participant).
-* **Admin organizer** (manages nomination→voting→winner cycle, meetings, announcements).
+* **Club organizer** (manages nomination→voting→winner cycle, meetings, announcements for their club).
 * **Casual public visitor** (browses history and archive only).
+* **Platform admin** (new) — creates clubs, onboards organizers, monitors platform health. Currently a single person (you) during private beta.
+* **External organizer** (new) — runs a different book club, invited to the platform. Needs to set up their club and invite their members without technical knowledge.
 
 ---
 
@@ -153,6 +180,12 @@ Tracked for architectural awareness but explicitly out of scope for current phas
 * As a community member, I can engage with the club's current book on the same timeline as attendees, even if I can't make the meeting.
 * As an admin, I can create multiple meeting sessions for the same book to serve more members.
 * As an admin, I can publish announcements visible on the Home page.
+* As a platform admin, I can create a new club with a name, slug, and tagline via the platform dashboard.
+* As a platform admin, I can view all clubs and their member counts on a single dashboard.
+* As a platform admin, I can promote a member to organizer within a club.
+* As an external organizer, I can accept an invite link and land in my club's admin panel ready to run my first cycle.
+* As a member, I can belong to multiple clubs with a single account and switch between them.
+* As a member, I can join a new club by clicking an invite link shared by the organizer.
 
 ---
 
@@ -182,43 +215,64 @@ Open nominations -> monitor count -> close -> open voting -> monitor count + liv
 
 # 6B. Information Architecture (Pages)
 
-* Home / Landing
-* History (public)
-* Book Detail (public, reviews show avatars + profile links for authenticated users)
-* About (standalone page with club description, stats, How It Works, CTAs)
-* Nominate (QR entry, no login)
-* Vote (QR entry, no login)
-* Live Results (auto-updating)
-* Login (magic link + optional password auth)
+## Platform-level pages (no club context)
+* GatherBound Landing Page (`/`) — platform value prop, screenshots, waitlist form
+* Login (`/login`) — magic link + optional password auth
+* Auth callbacks (`/auth/*`) — magic link verification, logout
+
+## Club-scoped pages (`/c/:clubSlug/...`)
+* Club Home / Landing (`/c/:clubSlug`) — current book hero, activity feed, meeting info
+* History (`/c/:clubSlug/history`) — browsable archive
+* Book Detail (`/c/:clubSlug/books/:authorSlug/:titleSlug`) — reviews, grades, metadata
+* About (`/c/:clubSlug/about`) — club description, stats, How It Works
+* Nominate (`/c/:clubSlug/nominate/:meetingId`) — QR entry, no login
+* Vote (`/c/:clubSlug/vote/:meetingId`) — QR entry, no login
+* Live Results (`/c/:clubSlug/results/:meetingId`) — auto-updating
 * Review (authenticated, grade slider)
 * My Reviews (authenticated)
 * Profile (authenticated — avatar picker, display name, social links, password)
-* Member Profile (authenticated — public view of another member's stats and reviews at `/members/:slug`)
-* Admin Dashboard (open/close controls, counts, exports)
-* Admin Users (/admin/users — user list, delete, send magic link)
-* Changelog (public — "What's New" version history at `/changelog`)
-* Optional: Book lookup / details preview (for nomination validation)
+* Member Profile (`/c/:clubSlug/members/:username`) — public view of stats and reviews
+* Members Directory (`/c/:clubSlug/members`) — all club members
+* Club Admin Dashboard (`/c/:clubSlug/admin`) — open/close controls, counts, exports
+* Club Admin Users (`/c/:clubSlug/admin/users`) — club member list, roles
+* Changelog (`/c/:clubSlug/changelog`) — "What's New" version history
+
+## Platform admin pages (`/platform/...`)
+* Platform Clubs (`/platform/clubs`) — list all clubs, create new club
+* Platform Club Detail (`/platform/clubs/:id`) — edit club, view members, promote organizer
+* Platform Users (`/platform/users`) — platform-wide user list
 
 ---
 
-# 6C. Admin Information Architecture 
+# 6C. Admin Information Architecture
 
-The Admin experience should be a dedicated mode under /admin/* with its own navigation and page layout, separate from public pages.
+Two separate admin contexts:
 
-## Overview (/admin)
+## Club Admin (`/c/:clubSlug/admin/*`)
+The organizer experience for running a single club. Dedicated mode with its own navigation and page layout.
 
-## Meetings (/admin/meetings)
+* Overview (`/c/:clubSlug/admin`) — current pick state, quick actions
+* Picks (`/c/:clubSlug/admin/picks`) — pick lifecycle management
+* Users (`/c/:clubSlug/admin/users`) — club member list, roles
+* Settings (`/c/:clubSlug/admin/settings`) — club branding, library URL
 
-## Users (/admin/users)
-
-## Settings (/admin/settings)
-
-### Admin UX Goals
-
+### Club Admin UX Goals
 * Reduce cognitive load by showing only high-frequency actions on Overview.
 * Move destructive and low-frequency actions into clearly marked sections.
-* Keep meeting flow obvious: Open nominations -> Close nominations -> Open voting -> Close voting/archive.
+* Keep meeting flow obvious: Open nominations → Close nominations → Open voting → Close voting/archive.
 * Maintain mobile usability with clear status indicators and large action targets.
+
+## Platform Admin (`/platform/*`)
+The platform owner experience for managing multiple clubs. Gated by `is_platform_admin`.
+
+* Clubs (`/platform/clubs`) — list all clubs with member counts, create new club
+* Club Detail (`/platform/clubs/:id`) — edit club details, view/manage members, promote organizer
+* Users (`/platform/users`) — platform-wide user list, cross-club membership view
+
+### Platform Admin UX Goals
+* Quick overview of all clubs and their health (member count, last activity, pick state).
+* One-click club creation with minimal required fields (name, slug).
+* Easy organizer promotion from the club detail view.
 
 ---
 
@@ -865,7 +919,12 @@ Key architectural principles:
 * **Book is canonical; Meeting is contextual** — Reviews, reactions, discussions, and reading status all link to the book, not a meeting.
 * **Artifact cycles decouple from meetings** — The nomination→voting→winner flow operates at the cycle level, not the meeting level.
 * **Use the canonical component system** — BookHero, BookCard, ReviewCard are reusable across artifact types.
-* **Do not hardcode club identity** — use configuration/env vars for name, tagline, links.
+* **Club identity is data, not code** — club name, tagline, branding live in the `clubs` table, resolved by `ClubContext` middleware from the URL slug.
 * **Keep First Edition tokens in their own layer** — future clubs swap tokens, not components.
+* **Books are a global catalog** — the `books` table is shared across clubs. Two clubs reading the same book reference the same canonical record.
+* **Users are platform-level, membership is per-club** — a single account can belong to multiple clubs via `club_memberships`.
+* **All club data is scoped by `club_id`** — every query on club-owned tables filters by club. No data leaks between clubs.
+
+> See [MIGRATION-PLAN.md](MIGRATION-PLAN.md) for the detailed engineering plan for the multi-club migration.
 
 ---

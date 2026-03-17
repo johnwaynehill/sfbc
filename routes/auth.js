@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const { validationResult } = require('express-validator');
 const router = require('express').Router();
 const db = require('../db');
+const analytics = require('../services/analytics');
 const { sendMagicLink } = require('../services/email');
 const { emailChain, handleValidationErrors } = require('../middleware/validate');
 
@@ -98,6 +99,8 @@ router.post('/auth/send-link', authLimiter, ...emailChain, async (req, res) => {
     user = findUserByEmail.get(email);
   }
 
+  analytics.track(user.id, 'magic_link_requested', { email });
+
   // Generate a token
   const token = crypto.randomBytes(32).toString('hex');
   insertToken.run(token, user.id);
@@ -158,6 +161,7 @@ router.get('/auth/callback', (req, res) => {
 
   // Set session
   req.session.userId = row.uid;
+  analytics.track(row.uid, 'user_login', { method: 'magic_link' });
 
   // Attribute invite if present
   if (req.session.inviteCode) {
@@ -201,6 +205,7 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
   }
 
   req.session.userId = user.id;
+  analytics.track(user.id, 'user_login', { method: 'password' });
 
   // Attribute invite if present
   if (req.session.inviteCode) {
