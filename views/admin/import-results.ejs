@@ -1,0 +1,112 @@
+<section class="admin-page">
+  <a href="/admin/picks" class="admin-back-link t-caption">&larr; All Picks</a>
+
+  <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
+  <p class="t-body text-secondary" style="margin-bottom: var(--s-4);">
+    Backfill historical voting results.
+  </p>
+
+  <!-- Coverage summary -->
+  <div style="margin-bottom: var(--s-4);">
+    <h2 class="t-body-bold" style="margin-bottom: var(--s-2);">Coverage</h2>
+    <p class="t-body" style="margin-bottom: var(--s-3);">
+      <strong><%= withResults %></strong> of <strong><%= totalFinished %></strong> finished picks have results.
+      <% if (withoutResults > 0) { %>
+        <strong><%= withoutResults %></strong> are missing.
+      <% } else { %>
+        All picks have results!
+      <% } %>
+    </p>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th class="t-caption" style="width: 25%;">Month</th>
+            <th class="t-caption" style="width: 55%;">Winner</th>
+            <th class="t-caption" style="width: 20%;">Results</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% coverage.forEach(function(c) { %>
+            <tr>
+              <td class="t-body"><%= formatMonthYear(c.month_year) %></td>
+              <td class="t-body text-secondary">
+                <% if (c.book_title && c.book_title !== '(no winner)') { %>
+                  <%= c.book_title %><br><span class="t-caption text-tertiary"><%= c.book_author %></span>
+                <% } else { %>
+                  &mdash;
+                <% } %>
+              </td>
+              <td>
+                <% if (c.hasResults) { %>
+                  <span class="status-pill status-pill--results">Has Data</span>
+                <% } else { %>
+                  <span class="status-pill status-pill--nominations">Missing</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Workflow -->
+  <div style="margin-bottom: var(--s-4);">
+    <h2 class="t-body-bold" style="margin-bottom: var(--s-3);">Import Workflow</h2>
+
+    <!-- Step 1: Download template -->
+    <div style="margin-bottom: var(--s-4);">
+      <h3 class="t-caption-bold">Step 1: Download Template</h3>
+      <p class="t-caption text-secondary" style="margin: var(--s-1) 0 var(--s-2);">
+        JSON file pre-filled with your finished picks. Fill in the <code>pollResults</code> arrays
+        using AI and your StrawPoll screenshots.
+      </p>
+      <a href="/api/admin/import-results/template" class="btn btn--secondary btn--sm" download>
+        Download Template
+      </a>
+    </div>
+
+    <!-- Step 2: Upload completed file -->
+    <div style="margin-bottom: var(--s-4);">
+      <h3 class="t-caption-bold">Step 2: Upload Completed File</h3>
+      <p class="t-caption text-secondary" style="margin: var(--s-1) 0 var(--s-2);">
+        Upload your JSON file with <code>pollResults</code> filled in.
+        Months without <code>pollResults</code> will be skipped automatically.
+      </p>
+      <input type="file" id="import-file-input" accept=".json,application/json" class="form-input" style="max-width: 400px;">
+      <div id="import-file-message" hidden style="margin-top: var(--s-2);"></div>
+    </div>
+
+    <!-- Step 3: Preview (populated by JS) -->
+    <div id="preview-section" hidden>
+      <h3 class="t-caption-bold">Step 3: Review &amp; Confirm</h3>
+      <div id="preview-summary" style="margin: var(--s-2) 0 var(--s-3);"></div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="preview-table">
+          <thead>
+            <tr>
+              <th class="t-caption">Month</th>
+              <th class="t-caption">Winner</th>
+              <th class="t-caption" style="text-align: right;">Books</th>
+              <th class="t-caption" style="text-align: right;">Votes</th>
+              <th class="t-caption">Status</th>
+            </tr>
+          </thead>
+          <tbody id="preview-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: var(--s-3); display: flex; gap: var(--s-2); align-items: center;">
+        <button type="button" class="btn btn--primary" id="commit-btn" disabled>
+          Import Results
+        </button>
+        <button type="button" class="btn btn--secondary" id="reset-btn">
+          Reset
+        </button>
+      </div>
+      <div id="commit-message" hidden style="margin-top: var(--s-2);"></div>
+    </div>
+  </div>
+</section>

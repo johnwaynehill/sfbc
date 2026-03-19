@@ -487,6 +487,287 @@ router.put('/admin/meetings/:id/nominees/:bookId', requireAdmin, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Import historical results (backfill from StrawPoll screenshots)
+// POST /api/admin/meetings/:id/import-results
+// ---------------------------------------------------------------------------
+router.post('/admin/meetings/:id/import-results', requireAdmin, (req, res) => {
+  const meetingId = parseInt(req.params.id, 10);
+  if (isNaN(meetingId)) return res.status(400).json({ error: 'Invalid meeting ID.' });
+
+  const meeting = meetings.getById(meetingId);
+  if (!meeting) return res.status(404).json({ error: 'Meeting not found.' });
+
+  const { rankings, voteCount } = req.body;
+  if (!Array.isArray(rankings) || rankings.length === 0) {
+    return res.status(400).json({ error: 'At least one ranking entry is required.' });
+  }
+
+  const totalVotes = parseInt(voteCount, 10) || 0;
+
+  // Build results: find/create each book, add as nominee, compute percentages
+  const sortedRankings = rankings
+    .map(r => ({
+      title: String(r.title || '').trim(),
+      author: String(r.author || '').trim(),
+      points: parseInt(r.points, 10) || 0,
+    }))
+    .filter(r => r.title && r.author)
+    .sort((a, b) => b.points - a.points);
+
+  if (sortedRankings.length === 0) {
+    return res.status(400).json({ error: 'No valid ranking entries found.' });
+  }
+
+  const maxPoints = sortedRankings[0].points;
+
+  const resultsRankings = sortedRankings.map((r, i) => {
+    const book = findOrCreateBook(r.title, r.author);
+    // Add as nominee (idempotent via INSERT OR IGNORE)
+    meetings.addNominee(meetingId, book.id);
+    return {
+      book_id: book.id,
+      title: book.title,
+      author: book.author,
+      cover_url: book.cover_url || null,
+      author_slug: book.author_slug,
+      title_slug: book.title_slug,
+      points: r.points,
+      rank: i + 1,
+      pct: maxPoints > 0 ? Math.round((r.points / maxPoints) * 100) : 0,
+      nominator_name: null,
+    };
+  });
+
+  const resultsJson = JSON.stringify({
+    rankings: resultsRankings,
+    voteCount: totalVotes,
+    maxPoints,
+  });
+
+  // Save to both meeting and pick
+  db.prepare('UPDATE meetings SET vote_results_json = ?, winning_book_id = ? WHERE id = ?')
+    .run(resultsJson, resultsRankings[0].book_id, meetingId);
+
+  const picksService = require('../services/monthly-picks');
+  const pick = picksService.getByMonthYear(meeting.month_year);
+  if (pick) {
+    db.prepare('UPDATE monthly_picks SET vote_results_json = ?, updated_at = datetime(\'now\') WHERE id = ?')
+      .run(resultsJson, pick.id);
+  }
+
+  res.json({ success: true, resultsCount: resultsRankings.length });
+});
+
+// ---------------------------------------------------------------------------
+// Download bulk import template JSON
+// GET /api/admin/import-results/template
+// ---------------------------------------------------------------------------
+router.get('/admin/import-results/template', requireAdmin, (req, res) => {
+  const allMeetings = meetings.getAll();
+  const finishedMeetings = allMeetings
+    .filter(m => m.status === 'results')
+    .sort((a, b) => a.month_year.localeCompare(b.month_year));
+
+  const template = finishedMeetings.map(m => ({
+    monthYear: m.month_year,
+    title: m.book_title || '',
+    author: m.book_author || '',
+    pollResults: [],
+    totalVotes: 0,
+  }));
+
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="sfbc-results-template.json"');
+  res.json(template);
+});
+
+// ---------------------------------------------------------------------------
+// Preview bulk import (dry-run validation)
+// POST /api/admin/import-results/preview
+// ---------------------------------------------------------------------------
+router.post('/admin/import-results/preview', requireAdmin, (req, res) => {
+  const entries = req.body;
+  if (!Array.isArray(entries)) {
+    return res.status(400).json({ error: 'Request body must be a JSON array.' });
+  }
+
+  const picksService = require('../services/monthly-picks');
+  const preview = [];
+
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const monthYear = String(entry.monthYear || '').trim();
+    const title = String(entry.title || '').trim();
+    const author = String(entry.author || '').trim();
+
+    // Skip entries without pollResults
+    if (!entry.pollResults || !Array.isArray(entry.pollResults) || entry.pollResults.length === 0) {
+      continue;
+    }
+
+    // Validate monthYear format
+    if (!/^\d{4}-\d{2}$/.test(monthYear)) {
+      preview.push({ monthYear, title, author, status: 'error', reason: 'Invalid monthYear format. Expected YYYY-MM.' });
+      continue;
+    }
+
+    // Check meeting exists
+    const meeting = meetings.getByMonthYear(monthYear);
+    if (!meeting) {
+      preview.push({ monthYear, title, author, status: 'error', reason: 'No meeting found for ' + monthYear + '.' });
+      continue;
+    }
+
+    // Check for existing results
+    const pick = picksService.getByMonthYear(monthYear);
+    const hasExisting = !!(meeting.vote_results_json || (pick && pick.vote_results_json));
+
+    // Validate pollResults entries
+    const validRankings = entry.pollResults
+      .map(r => ({ title: String(r.title || '').trim(), author: String(r.author || '').trim(), points: parseInt(r.points, 10) || 0 }))
+      .filter(r => r.title && r.author);
+
+    if (validRankings.length === 0) {
+      preview.push({ monthYear, title, author, status: 'error', reason: 'No valid entries in pollResults (need title + author).' });
+      continue;
+    }
+
+    preview.push({
+      monthYear, title, author,
+      status: hasExisting ? 'overwrite' : 'import',
+      reason: hasExisting ? 'Will overwrite existing results.' : null,
+      rankingsCount: validRankings.length,
+      totalVotes: parseInt(entry.totalVotes, 10) || 0,
+    });
+  }
+
+  res.json({
+    success: true,
+    preview,
+    summary: {
+      total: preview.length,
+      toImport: preview.filter(p => p.status === 'import').length,
+      toOverwrite: preview.filter(p => p.status === 'overwrite').length,
+      errors: preview.filter(p => p.status === 'error').length,
+    },
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Commit bulk import (atomic write)
+// POST /api/admin/import-results/commit
+// ---------------------------------------------------------------------------
+router.post('/admin/import-results/commit', requireAdmin, (req, res) => {
+  const entries = req.body;
+  if (!Array.isArray(entries)) {
+    return res.status(400).json({ error: 'Request body must be a JSON array.' });
+  }
+
+  const picksService = require('../services/monthly-picks');
+  const results = [];
+  let imported = 0;
+  let overwritten = 0;
+  let skipped = 0;
+  let errors = 0;
+
+  const importAll = db.transaction(() => {
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      const monthYear = String(entry.monthYear || '').trim();
+
+      // Skip entries without pollResults
+      if (!entry.pollResults || !Array.isArray(entry.pollResults) || entry.pollResults.length === 0) {
+        skipped++;
+        continue;
+      }
+
+      if (!/^\d{4}-\d{2}$/.test(monthYear)) {
+        errors++;
+        results.push({ monthYear, status: 'error', reason: 'Invalid monthYear format.' });
+        continue;
+      }
+
+      const meeting = meetings.getByMonthYear(monthYear);
+      if (!meeting) {
+        errors++;
+        results.push({ monthYear, status: 'error', reason: 'Meeting not found.' });
+        continue;
+      }
+
+      const validRankings = entry.pollResults
+        .map(r => ({ title: String(r.title || '').trim(), author: String(r.author || '').trim(), points: parseInt(r.points, 10) || 0 }))
+        .filter(r => r.title && r.author)
+        .sort((a, b) => b.points - a.points);
+
+      if (validRankings.length === 0) {
+        errors++;
+        results.push({ monthYear, status: 'error', reason: 'No valid pollResults entries.' });
+        continue;
+      }
+
+      const totalVotes = parseInt(entry.totalVotes, 10) || 0;
+      const maxPoints = validRankings[0].points;
+
+      // Check if overwrite
+      const pick = picksService.getByMonthYear(monthYear);
+      const hadExisting = !!(meeting.vote_results_json || (pick && pick.vote_results_json));
+
+      // Build rankings with book resolution
+      const resultsRankings = validRankings.map((r, idx) => {
+        const book = findOrCreateBook(r.title, r.author);
+        meetings.addNominee(meeting.id, book.id);
+        return {
+          book_id: book.id,
+          title: book.title,
+          author: book.author,
+          cover_url: book.cover_url || null,
+          author_slug: book.author_slug,
+          title_slug: book.title_slug,
+          points: r.points,
+          rank: idx + 1,
+          pct: maxPoints > 0 ? Math.round((r.points / maxPoints) * 100) : 0,
+          nominator_name: null,
+        };
+      });
+
+      const resultsJson = JSON.stringify({
+        rankings: resultsRankings,
+        voteCount: totalVotes,
+        maxPoints,
+      });
+
+      // Save to meeting
+      db.prepare('UPDATE meetings SET vote_results_json = ?, winning_book_id = ? WHERE id = ?')
+        .run(resultsJson, resultsRankings[0].book_id, meeting.id);
+
+      // Save to pick
+      if (pick) {
+        db.prepare("UPDATE monthly_picks SET vote_results_json = ?, updated_at = datetime('now') WHERE id = ?")
+          .run(resultsJson, pick.id);
+      }
+
+      if (hadExisting) {
+        overwritten++;
+        results.push({ monthYear, status: 'overwritten', count: resultsRankings.length });
+      } else {
+        imported++;
+        results.push({ monthYear, status: 'imported', count: resultsRankings.length });
+      }
+    }
+  });
+
+  try {
+    importAll();
+  } catch (err) {
+    return res.status(500).json({
+      error: 'Import failed. No changes were made. Error: ' + (err.message || 'Unknown error'),
+    });
+  }
+
+  res.json({ success: true, imported, overwritten, skipped, errors, results });
+});
+
+// ---------------------------------------------------------------------------
 // Delete meeting (super-admin only)
 // DELETE /api/admin/meetings/:id
 // ---------------------------------------------------------------------------
