@@ -230,6 +230,34 @@ router.get('/picks/:slug', async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Import Results (bulk backfill tool)
+// ---------------------------------------------------------------------------
+router.get('/import-results', (req, res) => {
+  const allMeetings = meetings.getAll();
+  const finishedMeetings = allMeetings.filter(m => m.status === 'results');
+
+  const coverage = finishedMeetings.map(m => {
+    const pick = picksService.getByMonthYear(m.month_year);
+    const hasResults = !!(m.vote_results_json || (pick && pick.vote_results_json));
+    return {
+      month_year: m.month_year,
+      book_title: m.book_title || '(no winner)',
+      book_author: m.book_author || '',
+      hasResults,
+    };
+  });
+
+  res.render('admin/import-results', {
+    pageTitle: 'Import Results',
+    pageScript: '/js/admin-import-results.js',
+    coverage,
+    withResults: coverage.filter(c => c.hasResults).length,
+    withoutResults: coverage.filter(c => !c.hasResults).length,
+    totalFinished: finishedMeetings.length,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Users list
 // ---------------------------------------------------------------------------
 router.get('/users', (req, res) => {
