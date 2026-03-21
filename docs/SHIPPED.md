@@ -157,6 +157,14 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Global library checkout link** — Admin enters a library catalog search URL in settings (e.g. SFPL); every book detail page shows a "Library" pill link that searches for the book at that library
 - **Separate usernames** — Users can set a stable username independent of their display name; profile URLs use username (`/members/:username`); changing display name no longer changes the URL; admin user list shows `@username`; existing slugs seeded as usernames
 
+## Observability & Demand Signal (Sprint 13)
+
+- **Sentry error tracking** — `@sentry/node` integration with user context middleware and global error handler capture; silently no-ops when DSN is not configured
+- **PostHog server-side analytics** — `posthog-node` wrapper in `services/analytics.js` tracking 11 events: `magic_link_requested`, `user_login`, `review_submitted`, `review_updated`, `reaction_added`, `reply_created`, `nomination_created`, `vote_cast`, `profile_updated`, `invite_created`, `meeting_status_changed`; no-ops when API key is absent
+- **PostHog client-side snippet** — Browser snippet in all 4 shell layouts (app, admin, focus, landing) for automatic page views and session recording; conditional on `posthogApiKey` template local; `identified_only` person profiles
+- **GatherBound landing page** — `/landing` route with dedicated `landing-shell.ejs` layout; hero, problem/solution sections, how it works, social proof stats (live data), book cover strip, organizer features grid, Tally waitlist embed; full dark mode support
+- **Multi-club project docs** — Updated PRD, ROADMAP, BACKLOG, ARCHITECTURE, VISION for multi-club pivot; added MIGRATION-PLAN.md with 6-phase SQLite-based plan
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background

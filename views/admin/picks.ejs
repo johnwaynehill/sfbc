@@ -1,7 +1,10 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
     <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
-    <a href="/admin/picks/new" class="btn btn--primary btn--sm">New Pick</a>
+    <div style="display: flex; gap: var(--s-2);">
+      <a href="/admin/import-results" class="btn btn--secondary btn--sm">Import Results</a>
+      <a href="/admin/picks/new" class="btn btn--primary btn--sm">New Pick</a>
+    </div>
   </div>
 
   <% if (activeMeetings.length > 0) { %>

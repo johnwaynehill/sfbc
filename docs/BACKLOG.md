@@ -15,10 +15,10 @@ Prioritized items for sprint planning. Organized by Epic, sized (S/M/L), and pri
 
 | Priority | Size | Item | Notes |
 |----------|------|------|-------|
-| P0 | S | PostHog server-side integration | `posthog-node` — track review_submitted, vote_cast, nomination_created, user_login, reaction_added, reply_created |
-| P0 | S | PostHog client-side snippet | Browser snippet in app shell for page views + session recording |
-| P0 | S | Sentry error tracking | `@sentry/node` — request handler + error handler middleware |
-| P0 | M | GatherBound landing page | Platform landing page with value prop, SF club screenshots, waitlist form (Tally/Typeform) |
+| ~~P0~~ | ~~S~~ | ~~PostHog server-side integration~~ | ✅ Shipped Sprint 13 |
+| ~~P0~~ | ~~S~~ | ~~PostHog client-side snippet~~ | ✅ Shipped Sprint 13 |
+| ~~P0~~ | ~~S~~ | ~~Sentry error tracking~~ | ✅ Shipped Sprint 13 |
+| ~~P0~~ | ~~M~~ | ~~GatherBound landing page~~ | ✅ Shipped Sprint 13 |
 
 ## Multi-Club Data Model
 *Roadmap: Milestone 6 — Multi-Club Foundation*
