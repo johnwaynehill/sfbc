@@ -185,6 +185,18 @@ app.get('/health', (_req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GatherBound domain routing
+// When gatherbound.club hits /, serve the landing page instead of club home
+// ---------------------------------------------------------------------------
+app.use((req, res, next) => {
+  const host = req.hostname;
+  if ((host === 'gatherbound.club' || host === 'www.gatherbound.club') && req.path === '/') {
+    req.url = '/landing';
+  }
+  next();
+});
+
+// ---------------------------------------------------------------------------
 // Routes
 // ---------------------------------------------------------------------------
 app.use('/', require('./routes/public'));
