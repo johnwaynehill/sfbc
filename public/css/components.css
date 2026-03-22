@@ -375,27 +375,7 @@
   text-decoration: underline;
 }
 
-/* Home hero compatibility — keep existing patterns working */
-.book-hero__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  flex-wrap: wrap;
-}
-
-.book-hero__meta--stacked {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--s-2);
-}
-
 /* Meeting info — time & location */
-.book-hero__meeting-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-1) var(--s-3);
-  margin-top: var(--s-2);
-}
 .meeting-info__item {
   display: inline-flex;
   align-items: center;
@@ -585,7 +565,7 @@
   grid-template-columns: auto 1fr;
   gap: var(--s-5);
   align-items: start;
-  max-width: var(--content-width, 960px);
+  max-width: var(--content-width);
   margin: 0 auto;
 }
 
@@ -1232,11 +1212,8 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #b45309;
+  color: var(--accent);
   white-space: nowrap;
-}
-:is([data-theme="dark"], :root:not([data-theme="light"])) .spoiler-badge {
-  color: #fbbf24;
 }
 
 .dnf-badge {
@@ -1245,14 +1222,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #b91c1c;
+  color: var(--danger);
   background: rgba(185, 28, 28, 0.08);
   padding: 2px 5px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 :is([data-theme="dark"], :root:not([data-theme="light"])) .dnf-badge {
-  color: #f87171;
   background: rgba(239, 68, 68, 0.12);
 }
 
@@ -2003,6 +1979,13 @@ a.activity-item__target:hover {
   display: inline;
 }
 
+/* Label + hint on the same line */
+.form-label__row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+
 .form-required {
   color: var(--danger, #dc2626);
   margin-left: 2px;
@@ -2311,7 +2294,7 @@ textarea.form-input {
   font-family: var(--font-ui);
   font-size: var(--t-sm);
   font-weight: 600;
-  color: var(--success, #16a34a);
+  color: var(--success);
   background: rgba(22, 163, 74, 0.08);
   border: 1px solid rgba(22, 163, 74, 0.2);
   border-radius: var(--radius-sm);
@@ -5054,6 +5037,23 @@ textarea.form-input {
   flex-direction: column;
   gap: var(--s-3);
   margin-top: var(--s-2);
+}
+
+.admin-form__row {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-form__flex-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.form-select--auto,
+.form-input--auto {
+  width: auto;
 }
 
 /* ---- Lifecycle Stepper ---- */
@@ -7830,5 +7830,36 @@ a.reply__author-link:hover .reply__author {
   .lp-cta {
     padding: var(--s-7) 0 var(--s-8);
   }
+}
+
+/* ============================================
+   COMPONENT CLASSES — replace inline styles
+   ============================================ */
+
+/* Section flush to previous (no top padding) */
+.section--flush { padding-top: 0; }
+
+/* Login page layout */
+.login-form__btn { width: 100%; }
+.login-form__toggle {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Error page */
+.error-page {
+  padding: var(--s-7) 0;
+  text-align: center;
+}
+.error-page__title { margin-bottom: var(--s-3); }
+.error-page__cta {
+  margin-top: var(--s-5);
+  display: inline-flex;
+}
+
+/* Anonymous reviewer label */
+.review-card__anon {
+  font-style: italic;
+  opacity: 0.7;
 }
 

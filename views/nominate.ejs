@@ -2,7 +2,7 @@
   <h1 class="t-section nom-page__heading"><%= pageTitle %></h1>
   <p class="t-body text-secondary nom-page__subheading">for <%= formatMonthYear(meeting.month_year) %></p>
   <% if (user) { %>
-    <p class="t-caption text-secondary" style="margin-bottom: var(--s-3);">Nominating as <strong><%= user.display_name %></strong></p>
+    <p class="t-caption text-secondary mb-3">Nominating as <strong><%= user.display_name %></strong></p>
   <% } %>
 
   <% if (alreadyNominated) { %>

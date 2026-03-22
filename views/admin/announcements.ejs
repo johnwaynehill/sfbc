@@ -4,19 +4,19 @@
   <!-- Create form -->
   <div class="admin-settings-card">
     <h2 class="t-body-bold">New Announcement</h2>
-    <form id="announcement-form" class="admin-form" style="margin-top: var(--s-2);">
-      <div style="display: flex; gap: var(--s-2); flex-wrap: wrap;">
-        <select name="type" class="form-select" style="width: auto;">
+    <form id="announcement-form" class="admin-form mt-2">
+      <div class="admin-form__row">
+        <select name="type" class="form-select form-select--auto">
           <option value="info">Info</option>
           <option value="success">Success</option>
           <option value="warning">Warning</option>
         </select>
-        <input type="text" name="title" class="form-input" placeholder="Title (required)" maxlength="200" required style="flex: 1; min-width: 200px;">
+        <input type="text" name="title" class="form-input admin-form__flex-input" placeholder="Title (required)" maxlength="200" required>
       </div>
-      <textarea name="body" class="form-textarea" placeholder="Body text (optional)" maxlength="1000" rows="2" style="margin-top: var(--s-2);"></textarea>
-      <div style="display: flex; gap: var(--s-2); align-items: center; margin-top: var(--s-2);">
+      <textarea name="body" class="form-textarea mt-2" placeholder="Body text (optional)" maxlength="1000" rows="2"></textarea>
+      <div class="admin-form__row mt-2">
         <label class="t-caption text-secondary" for="expires-at">Expires:</label>
-        <input type="datetime-local" name="expires_at" id="expires-at" class="form-input" style="width: auto;">
+        <input type="datetime-local" name="expires_at" id="expires-at" class="form-input form-input--auto">
         <button type="submit" class="btn btn--primary btn--sm" id="announcement-submit">Create</button>
       </div>
     </form>
@@ -27,7 +27,7 @@
   <div class="admin-settings-card">
     <h2 class="t-body-bold">All Announcements</h2>
     <% if (announcements.length === 0) { %>
-      <p class="t-body text-secondary" style="margin-top: var(--s-2);">No announcements yet.</p>
+      <p class="t-body text-secondary mt-2">No announcements yet.</p>
     <% } else { %>
       <div class="announcement-admin-list" id="announcement-list">
         <% for (const a of announcements) { %>

@@ -21,6 +21,11 @@
   <% } %>
 </div>
 
+<%
+  // Determine banner CTA (shared between hero and empty states)
+  var bannerStatus = activeMeeting ? activeMeeting.status : null;
+%>
+
 <% if (currentMeeting) { %>
 <!-- ===== Home Hero ===== -->
 <% const heroUrl = getCoverUrl(currentMeeting); %>
@@ -85,49 +90,30 @@
   </div>
 </section>
 
-<!-- ===== Banner CTA ===== -->
-<% if (activeMeeting && activeMeeting.status === 'nominations') { %>
-<section class="section" style="padding-top: 0;">
+<% if (bannerStatus === 'nominations' || bannerStatus === 'voting') { %>
+<section class="section section--flush">
   <div class="banner">
     <div class="banner__text">
-      <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Submit your pick!</p>
+      <p class="t-body text-inherit"><strong><%= bannerStatus === 'nominations' ? 'Nominations are open' : 'Voting is open' %></strong> for <%= formatMonthYear(activeMeeting.month_year) %>. <%= bannerStatus === 'nominations' ? 'Submit your pick!' : 'Cast your vote!' %></p>
     </div>
-    <a href="/nominate" class="btn-primary">Nominate a Book</a>
-  </div>
-</section>
-<% } else if (activeMeeting && activeMeeting.status === 'voting') { %>
-<section class="section" style="padding-top: 0;">
-  <div class="banner">
-    <div class="banner__text">
-      <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Cast your vote!</p>
-    </div>
-    <a href="/vote" class="btn-primary">Vote Now</a>
+    <a href="<%= bannerStatus === 'nominations' ? '/nominate' : '/vote' %>" class="btn-primary"><%= bannerStatus === 'nominations' ? 'Nominate a Book' : 'Vote Now' %></a>
   </div>
 </section>
 <% } %>
 
 <% } else { %>
 <!-- ===== Empty State (no reading book) ===== -->
-<% if (activeMeeting && activeMeeting.status === 'nominations') { %>
+<% if (bannerStatus === 'nominations' || bannerStatus === 'voting') { %>
 <section class="section">
   <div class="banner">
     <div class="banner__text">
-      <p class="t-body" style="color: inherit;"><strong>Nominations are open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Submit your pick!</p>
+      <p class="t-body text-inherit"><strong><%= bannerStatus === 'nominations' ? 'Nominations are open' : 'Voting is open' %></strong> for <%= formatMonthYear(activeMeeting.month_year) %>. <%= bannerStatus === 'nominations' ? 'Submit your pick!' : 'Cast your vote!' %></p>
     </div>
-    <a href="/nominate" class="btn-primary">Nominate a Book</a>
-  </div>
-</section>
-<% } else if (activeMeeting && activeMeeting.status === 'voting') { %>
-<section class="section">
-  <div class="banner">
-    <div class="banner__text">
-      <p class="t-body" style="color: inherit;"><strong>Voting is open</strong> for <%= formatMonthYear(activeMeeting.month_year) %>. Cast your vote!</p>
-    </div>
-    <a href="/vote" class="btn-primary">Vote Now</a>
+    <a href="<%= bannerStatus === 'nominations' ? '/nominate' : '/vote' %>" class="btn-primary"><%= bannerStatus === 'nominations' ? 'Nominate a Book' : 'Vote Now' %></a>
   </div>
 </section>
 <% } else { %>
-<div class="empty-state" style="padding: var(--s-7) 0;">
+<div class="empty-state">
   <p class="empty-state__message">No books selected yet. Check back soon!</p>
 </div>
 <% } %>
@@ -292,7 +278,7 @@
 <!-- ===== About ===== -->
 <section class="about-section">
   <div class="about-section__content">
-    <h2 class="t-section" style="margin-bottom: var(--s-2);">About the Club</h2>
+    <h2 class="t-section mb-2">About the Club</h2>
     <p class="t-body text-secondary"><%= club.tagline %></p>
     <div class="about-section__stats">
       <div class="about-section__stat">
@@ -308,7 +294,7 @@
         <span class="t-body text-secondary">reviews</span>
       </div>
     </div>
-    <div style="margin-top: var(--s-3);">
+    <div class="mt-3">
       <a href="<%= club.meetupUrl %>" class="btn-secondary" target="_blank" rel="noopener">Join us on Meetup</a>
     </div>
   </div>
