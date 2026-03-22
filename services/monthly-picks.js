@@ -536,7 +536,7 @@ function deleteEvent(pickId, eventId) {
  * Returns { prev: {...} | null, next: {...} | null }
  */
 const getPrevPickStmt = db.prepare(`
-  SELECT mp.month_year, b.title, b.author, b.author_slug, b.title_slug
+  SELECT mp.month_year, b.title, b.author, b.author_slug, b.title_slug, b.cover_url
   FROM monthly_picks mp
   JOIN books b ON b.id = mp.book_id
   WHERE mp.month_year < ? AND mp.status = 'results'
@@ -545,7 +545,7 @@ const getPrevPickStmt = db.prepare(`
 `);
 
 const getNextPickStmt = db.prepare(`
-  SELECT mp.month_year, b.title, b.author, b.author_slug, b.title_slug
+  SELECT mp.month_year, b.title, b.author, b.author_slug, b.title_slug, b.cover_url
   FROM monthly_picks mp
   JOIN books b ON b.id = mp.book_id
   WHERE mp.month_year > ? AND mp.status IN ('results', 'reading')
