@@ -92,8 +92,50 @@
     if (!sortDropdown.contains(e.target)) closeMenu();
   });
 
+  // Keyboard navigation for sort dropdown
+  sortBtn.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openMenu();
+      var first = sortMenu.querySelector('.sort-dropdown__item');
+      if (first) first.focus();
+    }
+  });
+
+  sortMenu.addEventListener('keydown', function (e) {
+    var items = Array.prototype.slice.call(sortMenu.querySelectorAll('.sort-dropdown__item'));
+    var focused = document.activeElement;
+    var idx = items.indexOf(focused);
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      var next = items[(idx + 1) % items.length];
+      next.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      var prev = items[(idx - 1 + items.length) % items.length];
+      prev.focus();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (focused && focused.classList.contains('sort-dropdown__item')) {
+        focused.click();
+      }
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      items[0].focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      items[items.length - 1].focus();
+    }
+  });
+
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeMenu();
+    if (e.key === 'Escape') {
+      if (sortDropdown.classList.contains('is-open')) {
+        closeMenu();
+        sortBtn.focus();
+      }
+    }
   });
 
   function sortReviews(mode) {

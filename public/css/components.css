@@ -882,21 +882,7 @@
   white-space: nowrap;
 }
 
-.status-pill--reading {
-  background: #E0F2F1;
-  color: var(--accent2);
-}
-
-.status-pill--nominations,
-.status-pill--voting {
-  background: #FFF8E1;
-  color: #92400e;
-}
-
-.status-pill--results {
-  background: var(--surface);
-  color: var(--text2);
-}
+/* Status pill colors defined in admin section below */
 
 .status-pill__dot {
   width: 6px;
@@ -1569,9 +1555,11 @@
   cursor: pointer;
   transition: background 100ms ease;
 }
-.sort-dropdown__item:hover {
+.sort-dropdown__item:hover,
+.sort-dropdown__item:focus {
   background: var(--surface);
   color: var(--text);
+  outline: none;
 }
 .sort-dropdown__item.is-selected {
   color: var(--text);
@@ -1707,7 +1695,7 @@
 .activity-item__text {
   margin: 0;
   font-size: var(--t-sm);
-  color: var(--text-secondary);
+  color: var(--text2);
   line-height: 1.45;
 }
 
@@ -1960,7 +1948,7 @@ a.activity-item__target:hover {
 }
 
 .placeholder-cover__initial {
-  font-family: var(--font-heading);
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 2.5rem;
   line-height: 1;
@@ -2394,6 +2382,18 @@ textarea.form-input {
   background: #FEF2F2;
   color: var(--danger);
   border: 1px solid #FECACA;
+}
+
+/* Dark mode: tone down pastel backgrounds */
+:is([data-theme="dark"], :root:not([data-theme="light"])) .nom-message--success {
+  background: rgba(14, 116, 108, 0.15);
+  color: #5eead4;
+  border-color: rgba(14, 116, 108, 0.3);
+}
+:is([data-theme="dark"], :root:not([data-theme="light"])) .nom-message--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.25);
 }
 
 @keyframes fadeIn {

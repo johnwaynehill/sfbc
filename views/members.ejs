@@ -9,7 +9,7 @@
 
   <% if (members.length > 5) { %>
     <div class="members-search">
-      <svg class="members-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <svg class="members-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" id="memberSearchInput" class="members-search__input" placeholder="Search members…" autocomplete="off">
     </div>
   <% } %>
@@ -30,7 +30,7 @@
     <% } %>
   </div>
 
-  <div id="noMembers" class="admin-empty" hidden>
+  <div id="noMembers" class="admin-empty" role="status" aria-live="polite" hidden>
     <p class="t-body text-secondary">No members match your search.</p>
   </div>
 </section>
