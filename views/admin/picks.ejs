@@ -49,7 +49,7 @@
   <% if (finishedMeetings.length > 0) { %>
     <div class="admin-collapsible" id="finished-section">
       <button type="button" class="admin-collapsible__toggle" id="finished-toggle">
-        <svg class="admin-collapsible__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg aria-hidden="true" class="admin-collapsible__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 4 10 8 6 12"></polyline>
         </svg>
         Finished (<%= finishedMeetings.length %>)

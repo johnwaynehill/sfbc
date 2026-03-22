@@ -27,7 +27,7 @@
                  value="<%= email || '' %>">
         </label>
 
-        <div id="login-message" hidden></div>
+        <div id="login-message" role="alert" hidden></div>
 
         <button type="submit" class="btn btn--primary" id="login-submit" style="width: 100%;">
           Send Login Link
@@ -46,11 +46,11 @@
             <input type="password" name="pw_password" required autocomplete="current-password"
                    class="form-input" placeholder="Your password">
             <button type="button" class="password-toggle" aria-label="Show password">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line class="pw-slash" x1="2" y1="2" x2="22" y2="22"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line class="pw-slash" x1="2" y1="2" x2="22" y2="22"/></svg>
             </button>
           </div>
         </label>
-        <div id="pw-message" hidden></div>
+        <div id="pw-message" role="alert" hidden></div>
         <button type="submit" class="btn btn--primary" id="pw-submit" style="width: 100%;">
           Sign In with Password
         </button>

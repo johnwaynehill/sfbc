@@ -5,16 +5,16 @@
     <% if (reviews.length > 1) { %>
       <div class="admin-toolbar">
         <div class="admin-search" id="adminSearch">
-          <svg class="admin-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg aria-hidden="true" class="admin-search__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="text" id="searchInput" class="admin-search__input" placeholder="Search this page…" autocomplete="off">
           <button type="button" class="admin-search__clear" id="searchClear" hidden aria-label="Clear search">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
 
         <div class="sort-dropdown" id="sortDropdown">
           <button type="button" class="admin-toolbar__btn" id="sortBtn" aria-label="Sort reviews" aria-haspopup="listbox" aria-expanded="false">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h6"/></svg>
           </button>
           <ul class="sort-dropdown__menu" id="sortMenu" role="listbox" aria-label="Sort order">
             <li class="sort-dropdown__item is-selected" role="option" data-sort="newest" aria-selected="true">Newest first</li>
