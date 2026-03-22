@@ -1,5 +1,33 @@
 [
   {
+    "version": "0.12",
+    "date": "2026-03-22",
+    "title": "Bolder Book Pages",
+    "intro": "Book detail pages got a dramatic redesign \u2014 a clearer information hierarchy, member-sourced pull quotes, and richer navigation between picks.",
+    "entries": [
+      {
+        "icon": "book",
+        "text": "Three-zone hero \u2014 the book page hero is now split into Identity, Verdict, and Context zones so the title and cover dominate, the club grade stands on its own, and metadata stays out of the way."
+      },
+      {
+        "icon": "magic",
+        "text": "Pull-quote blurbs \u2014 when a book has enough reviews, a featured excerpt appears between the hero and the reviews section, styled like a book-jacket quote with attribution."
+      },
+      {
+        "icon": "calendar",
+        "text": "Inline grade distribution \u2014 the grade strip moved into the reviews section as a slim 8px bar so it adds context without stealing focus from the book itself."
+      },
+      {
+        "icon": "user",
+        "text": "Book navigation with covers \u2014 the Previous / Next links at the bottom now show cover thumbnails and serif titles, making it easier to browse the reading history."
+      },
+      {
+        "icon": "moon",
+        "text": "Visual polish \u2014 larger 300px cover with deeper shadows, an amber-dash month label, streamlined metadata (pp instead of pages), and text-only external links for a cleaner look."
+      }
+    ]
+  },
+  {
     "version": "0.11",
     "date": "2026-03-13",
     "title": "UX Polish & Admin Improvements",
