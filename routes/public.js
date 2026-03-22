@@ -433,6 +433,23 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
   const gradeGradient = buildGradeGradient(gradeDistribution);
   const avgGradePercent = avgGrade ? gradeToPercent(avgGrade) : null;
 
+  // Featured review for pull-quote — pick the review with the most reactions,
+  // falling back to the first non-spoiler review with enough body text
+  let featuredReview = null;
+  if (reviews.length >= 3) {
+    const candidates = reviews.filter(r => !r.has_spoilers && r.body_markdown && r.body_markdown.length >= 80);
+    if (candidates.length > 0) {
+      // Score by total reaction count
+      featuredReview = candidates.reduce((best, r) => {
+        const rReactions = reactionCounts.get(r.id) || [];
+        const total = rReactions.reduce((s, rx) => s + rx.count, 0);
+        const bestReactions = reactionCounts.get(best.id) || [];
+        const bestTotal = bestReactions.reduce((s, rx) => s + rx.count, 0);
+        return total > bestTotal ? r : best;
+      }, candidates[0]);
+    }
+  }
+
   // Book-to-book navigation (prev/next by month)
   const adjacentPicks = picksService.getAdjacentPicks(book.month_year);
 
@@ -452,6 +469,7 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
     reactionCounts,
     userReactions,
     repliesMap,
+    featuredReview,
     prevBook: adjacentPicks.prev,
     nextBook: adjacentPicks.next,
     getCoverUrl,

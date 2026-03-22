@@ -31,12 +31,26 @@
   </div>
 
   <div class="book-hero__body">
-    <div class="book-hero__primary">
+    <!-- Zone 1 — Identity -->
+    <div class="book-hero__identity">
       <% if (book.month_year) { %>
         <span class="book-hero__date"><%= formatMonthYear(book.month_year) %></span>
       <% } %>
       <h1 class="t-display book-hero__title"><%= book.title %></h1>
-      <p class="book-hero__author"><%= book.author %></p>
+      <p class="book-hero__author"><span class="book-hero__by">by</span> <%= book.author %></p>
+    </div>
+
+    <!-- Zone 2 — Verdict -->
+    <div class="book-hero__verdict">
+      <% if (avgGrade) { %>
+        <div class="book-hero__grade">
+          <span class="grade-badge <%= gradeTier(avgGrade) %>"><%= avgGrade %></span>
+          <span class="book-hero__grade-meta">
+            <span class="book-hero__grade-label">Club Average</span>
+            <span class="book-hero__grade-count">from <%= reviews.length %> review<%= reviews.length !== 1 ? 's' : '' %></span>
+          </span>
+        </div>
+      <% } %>
 
       <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
         <div class="book-hero__tags">
@@ -45,30 +59,25 @@
           <% }); %>
         </div>
       <% } %>
-
-      <% if (avgGrade) { %>
-        <div class="book-hero__grade">
-          <span class="grade-badge <%= gradeTier(avgGrade) %>"><%= avgGrade %></span>
-          <span class="t-body text-secondary"><%= reviews.length %> review<%= reviews.length !== 1 ? 's' : '' %></span>
-        </div>
-      <% } %>
     </div>
 
-    <% if (book.description) { %>
-      <div class="book-description">
-        <p class="book-description__text" id="book-desc-text"><%= book.description %></p>
-        <% if (book.description.length > 200) { %>
-          <button class="book-description__toggle" id="book-desc-toggle">Read more</button>
-        <% } %>
-      </div>
-    <% } %>
+    <!-- Zone 3 — Context -->
+    <div class="book-hero__context">
+      <hr class="book-hero__divider">
 
-    <!-- Metadata + actions row — inside the hero -->
-    <div class="book-hero__footer">
+      <% if (book.description) { %>
+        <div class="book-description">
+          <p class="book-description__text" id="book-desc-text"><%= book.description %></p>
+          <% if (book.description.length > 200) { %>
+            <button class="book-description__toggle" id="book-desc-toggle">Read more</button>
+          <% } %>
+        </div>
+      <% } %>
+
       <% if (hasMetadata) { %>
         <div class="book-meta-inline">
           <% if (book.page_count) { %>
-            <span class="book-meta-inline__item"><%= book.page_count %> pages</span>
+            <span class="book-meta-inline__item"><%= book.page_count %> pp</span>
           <% } %>
           <% if (book.publication_year) { %>
             <span class="book-meta-inline__item"><%= book.publication_year %></span>
@@ -86,23 +95,11 @@
       <% } %>
 
       <div class="book-hero__actions">
-        <a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          Goodreads
-        </a>
-        <a href="https://app.thestorygraph.com/browse?search_term=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          StoryGraph
-        </a>
-        <a href="https://bookshop.org/search?keywords=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-          Bookshop
-        </a>
+        <a href="https://www.goodreads.com/search?q=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">Goodreads</a>
+        <a href="https://app.thestorygraph.com/browse?search_term=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">StoryGraph</a>
+        <a href="https://bookshop.org/search?keywords=<%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">Bookshop</a>
         <% if (libraryUrl) { %>
-          <a href="<%= libraryUrl %><%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Library
-          </a>
+          <a href="<%= libraryUrl %><%= encodeURIComponent(book.title + ' ' + book.author) %>" target="_blank" rel="noopener" class="book-links__pill">Library</a>
         <% } %>
         <% if (book.meeting_status === 'results' && book.month_year && book.has_vote_data) { %>
           <a href="/results/<%= monthYearSlug(book.month_year) %>" class="book-links__pill">Results</a>
@@ -113,41 +110,23 @@
 </div>
 </section>
 
-<!-- ===== Grade Distribution ===== -->
-<% if (gradeDistribution.length > 0) { %>
+<!-- ===== Pull Quote ===== -->
+<% if (featuredReview && featuredReview.body_markdown) { %>
 <%
-  // Collect which tier letters have at least one review + per-tier counts
-  const activeTiers = new Set(gradeDistribution.map(r => r.grade.charAt(0).toUpperCase()));
-  const totalReviews = gradeDistribution.reduce((s, r) => s + r.count, 0);
-  const tierCounts = {};
-  for (const r of gradeDistribution) {
-    const t = r.grade.charAt(0).toUpperCase();
-    tierCounts[t] = (tierCounts[t] || 0) + r.count;
+  // Truncate to ~200 chars at a word boundary
+  let quoteText = featuredReview.body_markdown.replace(/[#*_~`>\[\]()!]/g, '').trim();
+  if (quoteText.length > 220) {
+    quoteText = quoteText.substring(0, 220).replace(/\s+\S*$/, '') + '\u2026';
   }
 %>
-<section class="section">
-  <div class="grade-dist">
-    <div class="grade-dist__header">
-      <span class="grade-dist__title">Grade Distribution</span>
-      <div class="grade-dist__right">
-        <% if (avgGrade) { %>
-          <span class="grade-dist__avg-badge grade-dist__avg-badge--<%= avgGrade.charAt(0).toLowerCase() %>"><%= avgGrade %></span>
-        <% } %>
-        <span class="grade-dist__count"><%= totalReviews %> review<%= totalReviews !== 1 ? 's' : '' %></span>
-      </div>
-    </div>
-    <div class="grade-dist__strip-wrap">
-      <div class="grade-dist__strip" style="background: <%= gradeGradient %>;"></div>
-      <% if (avgGradePercent != null) { %>
-        <div class="grade-dist__tick" style="left: <%= avgGradePercent %>%;"></div>
-      <% } %>
-    </div>
-    <div class="grade-dist__axis">
-      <% for (const tier of ['F','D','C','B','A','S']) { %>
-        <span<%- activeTiers.has(tier) ? ` class="active" data-count="${tierCounts[tier]}"` : '' %>><%= tier %></span>
-      <% } %>
-    </div>
-  </div>
+<section class="book-pullquote">
+  <blockquote class="book-pullquote__block">
+    <span class="book-pullquote__mark" aria-hidden="true">&ldquo;</span>
+    <p class="book-pullquote__text"><%= quoteText %></p>
+    <% if (featuredReview.display_name) { %>
+      <cite class="book-pullquote__cite">&mdash; <%= featuredReview.display_name %></cite>
+    <% } %>
+  </blockquote>
 </section>
 <% } %>
 
@@ -179,6 +158,27 @@
       <% } %>
     </div>
   </div>
+
+  <!-- Inline Grade Distribution -->
+  <% if (gradeDistribution.length > 0) { %>
+  <%
+    const totalReviews = gradeDistribution.reduce((s, r) => s + r.count, 0);
+  %>
+  <div class="grade-dist grade-dist--inline">
+    <div class="grade-dist--inline__row">
+      <% if (avgGrade) { %>
+        <span class="grade-dist__avg-badge grade-dist__avg-badge--<%= avgGrade.charAt(0).toLowerCase() %>"><%= avgGrade %></span>
+      <% } %>
+      <div class="grade-dist__strip-wrap">
+        <div class="grade-dist__strip" style="background: <%= gradeGradient %>;"></div>
+        <% if (avgGradePercent != null) { %>
+          <div class="grade-dist__tick" style="left: <%= avgGradePercent %>%;"></div>
+        <% } %>
+      </div>
+      <span class="grade-dist__count"><%= totalReviews %></span>
+    </div>
+  </div>
+  <% } %>
 
   <% if (spoilerCount > 0) { %>
     <div class="spoiler-filter">
@@ -348,6 +348,9 @@
   <% if (prevBook) { %>
     <a href="/books/<%= prevBook.author_slug %>/<%= prevBook.title_slug %>" class="book-nav__link book-nav__link--prev">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <% if (prevBook.cover_url) { %>
+        <img src="<%= prevBook.cover_url %>" alt="" class="book-nav__cover" loading="lazy">
+      <% } %>
       <span class="book-nav__text">
         <span class="book-nav__label">Previous</span>
         <span class="book-nav__title"><%= prevBook.title %></span>
@@ -362,6 +365,9 @@
         <span class="book-nav__label">Next</span>
         <span class="book-nav__title"><%= nextBook.title %></span>
       </span>
+      <% if (nextBook.cover_url) { %>
+        <img src="<%= nextBook.cover_url %>" alt="" class="book-nav__cover" loading="lazy">
+      <% } %>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
   <% } %>
@@ -383,4 +389,3 @@
 })();
 </script>
 <% } %>
-
