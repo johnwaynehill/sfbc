@@ -411,7 +411,6 @@
 
 /* ---- Pull Quote ---- */
 .book-pullquote {
-  background: var(--surface);
   padding: var(--s-6) var(--s-5);
   text-align: center;
 }
