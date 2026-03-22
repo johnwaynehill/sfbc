@@ -1088,7 +1088,7 @@
 .grade-dist--inline .grade-dist__tick {
   top: -3px;
   bottom: -3px;
-  width: 3px;
+  width: 4px;
   background: var(--text1, #1A1A1A);
   border-radius: 2px;
   box-shadow: 0 0 4px rgba(0,0,0,0.2);
