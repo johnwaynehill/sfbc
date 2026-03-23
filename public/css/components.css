@@ -1521,9 +1521,9 @@
   display: block;
 }
 .sort-dropdown__item {
-  padding: 8px 14px;
+  padding: 10px 14px;
   font-family: var(--font-body);
-  font-size: var(--t-xs);
+  font-size: var(--t-sm);
   color: var(--text2);
   cursor: pointer;
   transition: background 100ms ease;
@@ -4347,9 +4347,33 @@ textarea.form-input {
     margin-bottom: 0;
   }
 
+  .admin-table--users td[data-label]::before {
+    display: none;
+  }
+
+  .user-row {
+    gap: var(--s-3);
+  }
+
+  .user-row .avatar--sm {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+
   .user-actions {
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .user-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hide USER/ACTIONS data-labels on users table — card is self-evident */
+  .admin-table--users td[data-label="Actions"]::before {
+    display: none;
   }
 
   /* ---- Reviews table: data-label card layout ---- */
@@ -4799,7 +4823,9 @@ textarea.form-input {
   border-radius: var(--radius-md);
   color: var(--text2);
   cursor: pointer;
-  padding: 6px;
+  padding: var(--s-2);
+  min-height: 36px;
+  min-width: 36px;
   transition: background 120ms ease, color 120ms ease;
 }
 
@@ -4820,6 +4846,16 @@ textarea.form-input {
   display: flex;
   align-items: center;
   gap: var(--s-1);
+}
+
+.user-row__link {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+.user-row__link:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 /* ---- Pagination Controls ---- */
@@ -5410,6 +5446,19 @@ textarea.form-input {
   background: var(--danger);
   color: #fff;
   border: 1px solid var(--danger);
+}
+
+/* Tertiary danger — text only, for de-emphasized destructive actions */
+.btn--danger-quiet {
+  background: none;
+  color: var(--danger);
+  border: none;
+  font-weight: 500;
+  opacity: 0.8;
+}
+.btn--danger-quiet:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 .btn--danger:hover {
@@ -8065,5 +8114,10 @@ a.reply__author-link:hover .reply__author {
 .review-card__anon {
   font-style: italic;
   opacity: 0.7;
+}
+
+/* Hide view-profile icon button on mobile — username is already a link */
+@media (max-width: 640px) {
+  .user-actions .js-view-profile { display: none; }
 }
 
