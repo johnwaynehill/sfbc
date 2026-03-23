@@ -13,7 +13,7 @@
     <% } %>
 
     <% if (error) { %>
-      <div class="nom-message nom-message--error" class="mb-3">
+      <div class="nom-message nom-message--error mb-3">
         <%= error %>
       </div>
     <% } %>
@@ -29,7 +29,7 @@
 
         <div id="login-message" role="alert" hidden></div>
 
-        <button type="submit" class="btn btn--primary" id="login-submit" class="login-form__btn">
+        <button type="submit" class="btn btn--primary login-form__btn" id="login-submit">
           Send Login Link
         </button>
       </form>
@@ -51,7 +51,7 @@
           </div>
         </label>
         <div id="pw-message" role="alert" hidden></div>
-        <button type="submit" class="btn btn--primary" id="pw-submit" class="login-form__btn">
+        <button type="submit" class="btn btn--primary login-form__btn" id="pw-submit">
           Sign In with Password
         </button>
       </form>

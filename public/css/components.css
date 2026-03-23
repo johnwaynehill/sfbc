@@ -5845,6 +5845,7 @@ textarea.form-input {
 .member-card:hover {
   border-color: var(--accent);
   box-shadow: var(--shadow);
+  text-decoration: none;
 }
 
 .member-card__info {
@@ -6235,12 +6236,12 @@ textarea.form-input {
 }
 
 .toast--success {
-  background: #065F46;
+  background: color-mix(in srgb, var(--accent2) 90%, black);
   color: #D1FAE5;
 }
 
 .toast--error {
-  background: #991B1B;
+  background: color-mix(in srgb, var(--danger) 85%, black);
   color: #FEE2E2;
 }
 
@@ -6252,7 +6253,7 @@ textarea.form-input {
 .reaction-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--s-2);
   align-items: center;
   margin-top: var(--s-3);
   padding-top: var(--s-3);
@@ -6284,8 +6285,8 @@ textarea.form-input {
 
 .reaction-pill.is-active {
   border-color: var(--accent);
-  background: rgba(180, 83, 9, 0.08);
-  box-shadow: 0 0 0 1px rgba(180, 83, 9, 0.15);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 .reaction-pill:disabled {
@@ -6615,12 +6616,12 @@ a.reply__author-link:hover .reply__author {
   all: unset;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--s-2);
   font-family: var(--font-ui);
   font-size: var(--t-xs);
   color: var(--text3);
   cursor: pointer;
-  padding: 6px 12px;
+  padding: var(--s-1) var(--s-3);
   min-height: 32px;
   border-radius: var(--radius-md);
   transition: color 150ms ease, background 150ms ease;
@@ -7204,6 +7205,68 @@ a.reply__author-link:hover .reply__author {
   }
   :root:not([data-theme="light"]) .app-dialog__btn--cancel:hover {
     background: var(--border);
+  }
+}
+
+/* ============================================
+   MOBILE TOUCH ADAPTATIONS
+   Ensures 44×44px touch targets and better
+   mobile spacing for interactive elements.
+   ============================================ */
+@media (max-width: 640px) {
+  /* Reaction pills — bump to 44px touch target */
+  .reaction-pill {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+
+  .reaction-add {
+    min-height: 44px;
+    padding: 8px 10px;
+  }
+
+  /* Sort dropdown items — larger touch targets */
+  .sort-dropdown__item {
+    padding: 12px 14px;
+  }
+
+  /* Reply trigger — proper touch target */
+  .reply-trigger {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+
+  /* Members search — full width on mobile */
+  .members-search__input {
+    max-width: 100%;
+  }
+
+  /* Members page header — stack on narrow */
+  .members-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-2);
+  }
+
+  /* Review card grade column — tighter on mobile */
+  .review-card {
+    gap: var(--s-2);
+  }
+
+  /* History search — wider input */
+  .history-search__input {
+    width: 140px;
+  }
+
+  /* Emoji picker — full width on mobile */
+  .emoji-picker {
+    width: calc(100vw - var(--gutter) * 2);
+    max-width: 320px;
+  }
+
+  /* Login page — reduce vertical padding on mobile */
+  .login-page {
+    padding: var(--s-5) 0;
   }
 }
 
