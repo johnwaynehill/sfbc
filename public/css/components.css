@@ -3376,6 +3376,12 @@ textarea.form-input {
   border-bottom: none;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   background: var(--surface);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;           /* Firefox */
+}
+.md-toolbar::-webkit-scrollbar {
+  display: none;                    /* Chrome/Safari */
 }
 .md-toolbar__btn {
   display: flex;
@@ -3384,6 +3390,7 @@ textarea.form-input {
   min-width: 36px;
   height: 36px;
   padding: 0 var(--s-1);
+  flex-shrink: 0;
   border: none;
   border-radius: var(--radius-xs);
   background: none;
@@ -3407,7 +3414,7 @@ textarea.form-input {
   padding: 0 10px;
 }
 .md-toolbar__spacer {
-  flex: 1;
+  flex: 1 0 var(--s-2);
 }
 
 /* Textarea attached to toolbar (no top border radius) */
