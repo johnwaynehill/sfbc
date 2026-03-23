@@ -165,6 +165,27 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **GatherBound landing page** — `/landing` route with dedicated `landing-shell.ejs` layout; hero, problem/solution sections, how it works, social proof stats (live data), book cover strip, organizer features grid, Tally waitlist embed; full dark mode support
 - **Multi-club project docs** — Updated PRD, ROADMAP, BACKLOG, ARCHITECTURE, VISION for multi-club pivot; added MIGRATION-PLAN.md with 6-phase SQLite-based plan
 
+## Accessibility & Hardening (Sprint 14)
+
+- **Skip navigation** — Skip-to-content links in all 4 shell layouts (app, admin, focus, landing) for keyboard users
+- **ARIA live regions** — Announcements, activity feed, login messages, and member search results announce updates to screen readers
+- **Decorative SVG cleanup** — `aria-hidden="true"` added to all 47+ decorative SVGs across every view
+- **Keyboard sort dropdown** — Full ARIA listbox keyboard pattern (Arrow, Home, End, Escape) for review and history sort menus
+- **CSS token fixes** — Replaced undefined `--font-heading` → `--font-display`, `--text-secondary` → `--text2`; removed duplicate status-pill rules
+- **Dark mode message colors** — Success/error `.nom-message` variants get proper dark-mode backgrounds
+
+## Design Normalization & Polish (Sprint 14)
+
+- **Missing design tokens** — Defined `--success`, `--content-width`, `--text1`, `--border-light` in tokens.css (light + dark); eliminates all CSS fallback expressions
+- **Hardcoded colors normalized** — `.spoiler-badge`, `.dnf-badge`, reaction-pill active state, toast notifications, and 5 focus-ring box-shadows all converted from raw hex/rgba to `var()` or `color-mix()` with design tokens
+- **Inline styles distilled** — ~25 `style=""` attributes across views replaced with utility classes (`mt-3`, `mb-4`, `w-full`, `text-center`, `text-inherit`) and new component classes (`.section--flush`, `.login-form__btn`, `.error-page`, `.review-card__anon`, `.form-label__row`, `.admin-form__row`)
+- **Duplicate markup consolidated** — Home page banner CTA was copy-pasted 4 times; now uses shared `bannerStatus` variable with single template
+- **Orphaned CSS removed** — Deleted unused `.book-hero__meta`, `.book-hero__meta--stacked`, `.book-hero__meeting-info` compatibility stubs
+- **Mobile touch targets** — Reaction pills, reply trigger, sort dropdown items, markdown toolbar buttons all bumped to 44px min-height on ≤640px screens
+- **Mobile responsive fixes** — Members page header stacks vertically, search inputs go full-width, emoji picker adapts to viewport, review form buttons stack full-width, markdown toolbar scrolls horizontally instead of overflowing
+- **Review form spacing** — Removed compounding margins on spoiler/finish checkboxes (form gap + margins = 40px → now just 16px gap on mobile)
+- **Grid-aligned spacing** — Bare `2px`, `6px` gaps in reaction-bar, reply-trigger, grade-picker strip, md-toolbar normalized to `--s-1`/`--s-2` tokens
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background
