@@ -1326,8 +1326,6 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  margin-top: var(--s-3);
-  margin-bottom: var(--s-3);
   user-select: none;
 }
 
@@ -1404,9 +1402,8 @@
 .finish-checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--s-2);
   cursor: pointer;
-  margin-bottom: var(--s-3);
   user-select: none;
 }
 .finish-checkbox input[type="checkbox"] {
@@ -3425,7 +3422,7 @@ textarea.form-input {
 
 /* ---- Character Count ---- */
 .char-count {
-  margin-top: 4px;
+  margin-top: var(--s-1);
   font-family: var(--font-ui);
   font-size: var(--t-xs);
   color: var(--text3);
@@ -7276,9 +7273,13 @@ a.reply__author-link:hover .reply__author {
     padding: var(--s-5) 0;
   }
 
-  /* Review form — stack buttons and tighten spacing */
+  /* Review form — tighten spacing and stack buttons */
   .review-form-page {
     padding: var(--s-5) var(--s-3);
+  }
+
+  .review-form {
+    gap: var(--s-3);
   }
 
   .review-form__actions {
