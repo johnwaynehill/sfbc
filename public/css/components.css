@@ -8122,3 +8122,19 @@ a.reply__author-link:hover .reply__author {
   .user-actions .btn--danger-quiet { margin-left: auto; }
 }
 
+/* ---- Admin toolbar: search + sort height alignment ---- */
+.admin-toolbar .admin-search {
+  height: 44px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.admin-toolbar .admin-search .admin-search__input {
+  padding: 0;
+  height: 100%;
+}
+.admin-toolbar .admin-toolbar__btn {
+  height: 44px;
+  min-width: 44px;
+  box-sizing: border-box;
+}
+
