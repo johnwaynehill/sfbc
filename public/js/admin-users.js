@@ -342,11 +342,19 @@
       if (res.ok && data.success) {
         var row = btn.closest('tr');
         if (row) {
+          var nextFocus = row.nextElementSibling || row.previousElementSibling;
+          if (nextFocus) nextFocus.setAttribute('tabindex', '-1');
           animateRowOut(row, function () {
             showToast(name + ' has been deleted', 'success');
             if (countEl) {
               var current = parseInt(countEl.textContent, 10) || 0;
               countEl.textContent = Math.max(0, current - 1);
+            }
+            if (nextFocus && nextFocus.parentNode) {
+              nextFocus.focus();
+            } else if (tbody && tbody.parentNode) {
+              tbody.parentNode.setAttribute('tabindex', '-1');
+              tbody.parentNode.focus();
             }
           });
         }
@@ -371,6 +379,8 @@
 
     var userId = btn.dataset.userId;
     var email = btn.dataset.email;
+
+    if (!await showConfirm('Send a magic login link to ' + email + '?')) return;
 
     btn.disabled = true;
     btn.textContent = 'Sending\u2026';

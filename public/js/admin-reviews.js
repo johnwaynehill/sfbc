@@ -247,7 +247,18 @@
         var row = btn.closest('tr');
         if (row) {
           var expandRow = row.nextElementSibling;
-          if (expandRow && expandRow.classList.contains('review-expand-row')) {
+          var hasExpand = expandRow && expandRow.classList.contains('review-expand-row');
+          // Find next visible review row for focus (skip expand rows)
+          var nextFocus = hasExpand ? expandRow.nextElementSibling : row.nextElementSibling;
+          if (!nextFocus || !nextFocus.classList.contains('js-review-row')) {
+            nextFocus = row.previousElementSibling;
+            // Skip expand rows when going backwards
+            if (nextFocus && nextFocus.classList.contains('review-expand-row')) {
+              nextFocus = nextFocus.previousElementSibling;
+            }
+          }
+          if (nextFocus) nextFocus.setAttribute('tabindex', '-1');
+          if (hasExpand) {
             expandRow.remove();
           }
           animateRowOut(row, function () {
@@ -256,6 +267,12 @@
             if (countEl) {
               var current = parseInt(countEl.textContent, 10) || 0;
               countEl.textContent = Math.max(0, current - 1);
+            }
+            if (nextFocus && nextFocus.parentNode) {
+              nextFocus.focus();
+            } else if (tbody && tbody.parentNode) {
+              tbody.parentNode.setAttribute('tabindex', '-1');
+              tbody.parentNode.focus();
             }
           });
         }

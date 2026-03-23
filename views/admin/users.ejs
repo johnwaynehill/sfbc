@@ -55,7 +55,7 @@
                 data-role="<%= u.role %>"
                 data-date="<%= u.created_at %>"
                 data-slug="<%= u.user_slug || '' %>">
-              <td>
+              <td data-label="User">
                 <div class="user-row">
                   <%- include('../partials/avatar', { avatarUser: u, avatarSize: 'sm', avatarClass: '' }) %>
                   <div class="user-row__info">
@@ -73,7 +73,7 @@
                   </div>
                 </div>
               </td>
-              <td>
+              <td data-label="Actions">
                 <div class="user-actions">
                   <% if (u.username || u.user_slug) { %>
                     <a href="/members/<%= u.username || u.user_slug %>" class="btn btn--ghost btn--sm" target="_blank" title="View profile">
