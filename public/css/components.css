@@ -8113,9 +8113,7 @@ a.reply__author-link:hover .reply__author {
     flex-wrap: wrap;
     gap: var(--s-2);
     align-items: center;
-    padding-top: var(--s-2);
-    border-top: 1px solid var(--border);
-    margin-top: var(--s-1);
+    margin-top: var(--s-2);
   }
 
   .user-actions .btn { width: auto; }
