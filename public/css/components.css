@@ -4742,7 +4742,8 @@ textarea.form-input {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 4px 10px;
+  padding: var(--s-2) 10px;
+  min-height: 36px;
   transition: border-color 150ms ease;
 }
 
@@ -4800,8 +4801,8 @@ textarea.form-input {
   color: var(--text2);
   cursor: pointer;
   padding: var(--s-2);
-  min-height: 36px;
-  min-width: 36px;
+  min-height: 40px;
+  min-width: 40px;
   transition: background 120ms ease, color 120ms ease;
 }
 
