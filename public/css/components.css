@@ -2010,7 +2010,7 @@ a.activity-item__target:hover {
 .form-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .form-input::placeholder {
@@ -2242,7 +2242,7 @@ textarea.form-input {
 .nom-preview:hover,
 .nom-preview:focus-visible {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .nom-preview__info {
@@ -3211,7 +3211,7 @@ textarea.form-input {
 .form-select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .form-textarea {
@@ -3232,7 +3232,7 @@ textarea.form-input {
 .form-textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .form-textarea::placeholder {
@@ -3291,11 +3291,11 @@ textarea.form-input {
 /* Scrollable pill strip */
 .grade-picker__strip {
   display: flex;
-  gap: 6px;
+  gap: var(--s-2);
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 4px 2px 8px;
+  padding: var(--s-1) 2px var(--s-2);
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;          /* Firefox */
@@ -3370,8 +3370,8 @@ textarea.form-input {
 .md-toolbar {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 4px;
+  gap: var(--s-1);
+  padding: var(--s-1);
   border: 1px solid var(--border);
   border-bottom: none;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
@@ -3381,9 +3381,9 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 6px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 var(--s-1);
   border: none;
   border-radius: var(--radius-xs);
   background: none;
@@ -5100,7 +5100,7 @@ textarea.form-input {
 
 .lifecycle-step--active .lifecycle-step__dot {
   background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 .lifecycle-step--done .lifecycle-step__dot {
@@ -7267,6 +7267,50 @@ a.reply__author-link:hover .reply__author {
   /* Login page — reduce vertical padding on mobile */
   .login-page {
     padding: var(--s-5) 0;
+  }
+
+  /* Review form — stack buttons and tighten spacing */
+  .review-form-page {
+    padding: var(--s-5) var(--s-3);
+  }
+
+  .review-form__actions {
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .review-form__actions .btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  /* Markdown toolbar — larger touch targets */
+  .md-toolbar__btn {
+    min-width: 40px;
+    height: 40px;
+  }
+
+  /* Reply form buttons — larger touch targets */
+  .btn--xs {
+    min-height: 36px;
+    padding: var(--s-2) var(--s-3);
+  }
+
+  /* Review card delete — more tappable */
+  .review-card__delete {
+    padding: var(--s-2) 0;
+    min-height: 36px;
+  }
+
+  /* Grade picker — tighter on narrow screens */
+  .grade-picker__strip {
+    gap: var(--s-1);
+  }
+
+  .grade-picker__value {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
   }
 }
 
