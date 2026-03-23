@@ -28,6 +28,7 @@
   /* === Accents (use sparingly) === */
   --accent: #b45309;    /* amber — detail links, club identity nod */
   --accent2: #0f766e;   /* teal — status dots (e.g., "Currently Reading") */
+  --success: #16a34a;   /* green — confirmation badges, success states */
   --star: #F5A623;      /* gold — star ratings only */
   --amber: #f59e0b;     /* amber — badges, warnings */
   --danger: #b91c1c;
@@ -46,6 +47,7 @@
 
   /* === Layout === */
   --maxw: 860px;
+  --content-width: 960px;   /* wider sections (home hero) */
   --gutter: 24px;
 
   /* === Spacing scale (8pt grid) === */
@@ -73,6 +75,10 @@
   --font-ui: 'IBM Plex Sans', -apple-system, sans-serif;
   --font-secondary: 'Source Sans 3', -apple-system, sans-serif;
 
+  /* === Aliases (semantic shortcuts) === */
+  --text1: var(--text);        /* primary text (alias for use in generated CSS) */
+  --border-light: var(--border);
+
   /* === Admin-specific === */
   --admin-surface: #F8F6F2;
   --admin-border: #E8E4DC;
@@ -99,6 +105,7 @@
 
     --accent: #d97706;
     --accent2: #14b8a6;
+    --success: #22c55e;
     --star: #F5A623;
     --amber: #f59e0b;
     --danger: #ef4444;
@@ -107,6 +114,9 @@
     --cta-text: #000000;
 
     --shadow: 0 2px 8px rgba(0,0,0,0.25);
+
+    --text1: var(--text);
+    --border-light: var(--border);
 
     --admin-surface: #1E1C18;
     --admin-border: #3a3630;
@@ -127,6 +137,7 @@
 
   --accent: #d97706;
   --accent2: #14b8a6;
+  --success: #22c55e;
   --star: #F5A623;
   --amber: #f59e0b;
   --danger: #ef4444;
@@ -135,6 +146,9 @@
   --cta-text: #000000;
 
   --shadow: 0 2px 8px rgba(0,0,0,0.25);
+
+  --text1: var(--text);
+  --border-light: var(--border);
 
   --admin-surface: #1E1C18;
   --admin-border: #3a3630;

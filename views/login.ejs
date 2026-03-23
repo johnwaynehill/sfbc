@@ -13,7 +13,7 @@
     <% } %>
 
     <% if (error) { %>
-      <div class="nom-message nom-message--error" style="margin-bottom: var(--s-3);">
+      <div class="nom-message nom-message--error mb-3">
         <%= error %>
       </div>
     <% } %>
@@ -29,7 +29,7 @@
 
         <div id="login-message" role="alert" hidden></div>
 
-        <button type="submit" class="btn btn--primary" id="login-submit" style="width: 100%;">
+        <button type="submit" class="btn btn--primary login-form__btn" id="login-submit">
           Send Login Link
         </button>
       </form>
@@ -51,7 +51,7 @@
           </div>
         </label>
         <div id="pw-message" role="alert" hidden></div>
-        <button type="submit" class="btn btn--primary" id="pw-submit" style="width: 100%;">
+        <button type="submit" class="btn btn--primary login-form__btn" id="pw-submit">
           Sign In with Password
         </button>
       </form>
@@ -61,7 +61,7 @@
       <span class="login-divider__text t-caption text-tertiary">or</span>
     </div>
 
-    <button type="button" class="btn-quiet" id="toggle-pw" style="width: 100%; justify-content: center;">
+    <button type="button" class="btn-quiet login-form__toggle" id="toggle-pw">
       Use password instead
     </button>
 
@@ -74,7 +74,7 @@
       <p class="t-body text-secondary">
         Click the link in the email to sign in. It expires in 15 minutes.
       </p>
-      <p class="t-caption text-secondary" style="margin-top: var(--s-4);">
+      <p class="t-caption text-secondary mt-4">
         Didn't receive it? Check your spam folder or
         <a href="/login">try again</a>.
       </p>
@@ -83,7 +83,7 @@
   <% } else if (step === 'error') { %>
     <div class="login-sent">
       <h1 class="t-section login-page__heading"><%= pageTitle %></h1>
-      <div class="nom-message nom-message--error" style="margin-bottom: var(--s-4);">
+      <div class="nom-message nom-message--error mb-4">
         <%= error %>
       </div>
       <a href="/login" class="btn btn--primary">Try Again</a>
@@ -158,10 +158,10 @@
         var container = document.getElementById('form-container');
         container.innerHTML =
           '<div class="login-sent">' +
-          '<h2 class="t-section" style="margin-bottom: var(--s-3);">Check Your Email</h2>' +
+          '<h2 class="t-section mb-3">Check Your Email</h2>' +
           '<p class="t-body">We sent a login link to <strong>' + email + '</strong>.</p>' +
           '<p class="t-body text-secondary">Click the link in the email to sign in. It expires in 15 minutes.</p>' +
-          '<p class="t-caption text-secondary" style="margin-top: var(--s-4);">' +
+          '<p class="t-caption text-secondary mt-4">' +
           'Didn\'t receive it? Check your spam folder or <a href="/login">try again</a>.</p>' +
           '</div>';
         // Hide divider and toggle

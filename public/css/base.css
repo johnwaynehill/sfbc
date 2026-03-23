@@ -691,6 +691,18 @@ img.avatar {
   border: 0;
 }
 
+/* Spacing utilities — replace common inline styles */
+.mt-0 { margin-top: 0; }
+.mt-2 { margin-top: var(--s-2); }
+.mt-3 { margin-top: var(--s-3); }
+.mt-4 { margin-top: var(--s-4); }
+.mb-2 { margin-bottom: var(--s-2); }
+.mb-3 { margin-bottom: var(--s-3); }
+.mb-4 { margin-bottom: var(--s-4); }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.text-inherit { color: inherit; }
+
 /* ============================================
    DARK MODE TRANSITIONS
    ============================================ */

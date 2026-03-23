@@ -72,7 +72,7 @@
             <div class="member-review-card__body">
               <a href="<%= bookPath(review.title, review.author) %>" class="member-review-card__book">
                 <strong class="t-body-bold"><%= review.title %></strong>
-                <span class="t-caption text-secondary" style="font-style: italic;">by <%= review.author %></span>
+                <span class="t-author" style="font-size: var(--t-xs);">by <%= review.author %></span>
               </a>
               <% if (review.body_markdown) { %>
                 <div class="member-review-card__text t-body"><%- renderMarkdown(review.body_markdown) %></div>
@@ -107,7 +107,7 @@
         <% } %>
       </div>
     <% } else { %>
-      <p class="t-body text-secondary" style="margin-top: var(--s-3);">No reviews yet.</p>
+      <p class="t-body text-secondary mt-3">No reviews yet.</p>
     <% } %>
   </div>
 

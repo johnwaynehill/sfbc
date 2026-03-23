@@ -1,9 +1,9 @@
 <section class="login-page">
-  <h1 class="t-section" style="margin-bottom: var(--s-4); text-align: center;">Admin Login</h1>
+  <h1 class="t-section mb-4 text-center">Admin Login</h1>
 
   <% if (error) { %>
     <div class="alert alert--error">
-      <p class="t-body" style="color: var(--danger);"><%= error %></p>
+      <p class="t-body" style="color:var(--danger)"><%= error %></p>
     </div>
   <% } %>
 
@@ -38,11 +38,11 @@
       </div>
     </div>
 
-    <div id="login-error" class="alert alert--error" style="display: none;">
-      <p class="t-body" style="color: var(--danger); margin: 0;" id="login-error-text"></p>
+    <div id="login-error" class="alert alert--error" hidden>
+      <p class="t-body" id="login-error-text" style="color:var(--danger);margin:0"></p>
     </div>
 
-    <button type="submit" class="btn-primary" style="margin-top: var(--s-2); width: 100%;">
+    <button type="submit" class="btn-primary mt-2 w-full login-form__btn">
       Sign In
     </button>
   </form>
@@ -57,7 +57,7 @@
 
       btn.disabled = true;
       btn.textContent = 'Signing in\u2026';
-      errorEl.style.display = 'none';
+      errorEl.hidden = true;
 
       try {
         const res = await fetch('/api/auth/admin-login', {
@@ -75,13 +75,13 @@
           window.location.href = data.redirect || '/admin';
         } else {
           errorText.textContent = data.error || 'Login failed.';
-          errorEl.style.display = 'block';
+          errorEl.hidden = false;
           btn.disabled = false;
           btn.textContent = 'Sign In';
         }
       } catch (err) {
         errorText.textContent = 'Network error. Please try again.';
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
         btn.disabled = false;
         btn.textContent = 'Sign In';
       }
