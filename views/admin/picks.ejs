@@ -1,10 +1,7 @@
 <section class="admin-page">
   <div class="admin-page__header-row">
     <h1 class="t-section admin-page__heading"><%= pageTitle %></h1>
-    <div style="display: flex; gap: var(--s-2);">
-      <a href="/admin/import-results" class="btn btn--secondary btn--sm">Import Results</a>
-      <a href="/admin/picks/new" class="btn btn--primary btn--sm">New Pick</a>
-    </div>
+    <a href="/admin/picks/new" class="btn btn--primary btn--sm admin-picks__new-btn">New Pick</a>
   </div>
 
   <% if (activeMeetings.length > 0) { %>
@@ -12,20 +9,20 @@
       <table class="admin-table">
         <thead>
           <tr>
-            <th class="t-caption" style="width: 35%;">Month / Year</th>
-            <th class="t-caption" style="width: 20%;">Status</th>
-            <th class="t-caption" style="width: 30%;">Winner</th>
-            <th class="t-caption" style="width: 15%;"></th>
+            <th class="t-caption">Month / Year</th>
+            <th class="t-caption">Status</th>
+            <th class="t-caption">Winner</th>
+            <th class="t-caption"></th>
           </tr>
         </thead>
         <tbody>
           <% activeMeetings.forEach(function(m) { %>
             <tr>
-              <td class="t-body"><%= formatMonthYear(m.month_year) %></td>
-              <td>
+              <td class="t-body" data-label="Month"><%= formatMonthYear(m.month_year) %></td>
+              <td data-label="Status">
                 <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
               </td>
-              <td class="t-body text-secondary">
+              <td class="t-body text-secondary" data-label="Winner">
                 <% if (m.book_title) { %>
                   <%= m.book_title %>
                 <% } else { %>
@@ -48,31 +45,31 @@
 
   <% if (finishedMeetings.length > 0) { %>
     <div class="admin-collapsible" id="finished-section">
-      <button type="button" class="admin-collapsible__toggle" id="finished-toggle">
+      <button type="button" class="admin-collapsible__toggle" id="finished-toggle" aria-expanded="false" aria-controls="finished-body">
         <svg aria-hidden="true" class="admin-collapsible__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 4 10 8 6 12"></polyline>
         </svg>
         Finished (<%= finishedMeetings.length %>)
       </button>
-      <div class="admin-collapsible__body">
+      <div class="admin-collapsible__body" id="finished-body">
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
-                <th class="t-caption" style="width: 35%;">Month / Year</th>
-                <th class="t-caption" style="width: 20%;">Status</th>
-                <th class="t-caption" style="width: 30%;">Winner</th>
-                <th class="t-caption" style="width: 15%;"></th>
+                <th class="t-caption">Month / Year</th>
+                <th class="t-caption">Status</th>
+                <th class="t-caption">Winner</th>
+                <th class="t-caption"></th>
               </tr>
             </thead>
             <tbody>
               <% finishedMeetings.forEach(function(m) { %>
                 <tr>
-                  <td class="t-body"><%= formatMonthYear(m.month_year) %></td>
-                  <td>
+                  <td class="t-body" data-label="Month"><%= formatMonthYear(m.month_year) %></td>
+                  <td data-label="Status">
                     <span class="status-pill status-pill--<%= m.status %>"><%= formatStatus(m.status) %></span>
                   </td>
-                  <td class="t-body text-secondary">
+                  <td class="t-body text-secondary" data-label="Winner">
                     <% if (m.book_title) { %>
                       <%= m.book_title %>
                     <% } else { %>
@@ -90,6 +87,10 @@
       </div>
     </div>
   <% } %>
+
+  <div class="admin-picks__footer">
+    <a href="/admin/import-results" class="btn-quiet">Import Results &rarr;</a>
+  </div>
 </section>
 
 <script>
@@ -99,6 +100,8 @@
   if (toggle && section) {
     toggle.addEventListener('click', function () {
       section.classList.toggle('is-open');
+      var isOpen = section.classList.contains('is-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
     });
   }
 })();

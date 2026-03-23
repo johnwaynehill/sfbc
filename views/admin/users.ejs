@@ -55,28 +55,28 @@
                 data-role="<%= u.role %>"
                 data-date="<%= u.created_at %>"
                 data-slug="<%= u.user_slug || '' %>">
-              <td>
+              <td data-label="User">
                 <div class="user-row">
                   <%- include('../partials/avatar', { avatarUser: u, avatarSize: 'sm', avatarClass: '' }) %>
                   <div class="user-row__info">
                     <div class="user-row__name-line">
-                      <span class="t-body"><%= displayName %></span>
+                      <% if (u.username || u.user_slug) { %>
+                        <a href="/members/<%= u.username || u.user_slug %>" class="t-body user-row__link" target="_blank"><%= displayName %></a>
+                      <% } else { %>
+                        <span class="t-body"><%= displayName %></span>
+                      <% } %>
                       <% if (u.role === 'admin') { %>
                         <span class="role-badge role-badge--admin">admin</span>
                       <% } %>
                     </div>
-                    <% if (u.username) { %>
-                      <span class="t-caption text-secondary">@<%= u.username %></span>
-                    <% } else { %>
-                      <span class="t-caption text-secondary"><%= maskEmail(u.email) %></span>
-                    <% } %>
+                    <span class="t-caption text-secondary"><%= maskEmail(u.email) %></span>
                   </div>
                 </div>
               </td>
-              <td>
+              <td data-label="Actions">
                 <div class="user-actions">
                   <% if (u.username || u.user_slug) { %>
-                    <a href="/members/<%= u.username || u.user_slug %>" class="btn btn--ghost btn--sm" target="_blank" title="View profile">
+                    <a href="/members/<%= u.username || u.user_slug %>" class="btn btn--ghost btn--sm js-view-profile" target="_blank" title="View profile">
                       <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
                   <% } %>
@@ -96,7 +96,7 @@
                     Send Link
                   </button>
                   <% if (u.role !== 'admin') { %>
-                    <button type="button" class="btn btn--danger btn--sm js-delete-user"
+                    <button type="button" class="btn btn--danger-quiet btn--sm js-delete-user"
                             data-user-id="<%= u.id %>" data-name="<%= displayName %>">
                       Delete
                     </button>

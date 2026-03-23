@@ -59,17 +59,17 @@
                 data-grade="<%= r.grade %>"
                 data-date="<%= r.created_at %>"
                 class="js-review-row">
-              <td>
+              <td data-label="Grade">
                 <span class="grade-badge grade-badge--sm <%= gradeTier(r.grade) %>"><%= r.grade %></span>
               </td>
-              <td>
+              <td data-label="Book">
                 <div class="review-book-info">
                   <span class="t-body"><%= r.book_title %></span>
                   <span class="t-caption text-secondary"><%= r.book_author %></span>
                 </div>
               </td>
-              <td class="t-body"><%= reviewer %></td>
-              <td class="t-body text-secondary" style="white-space: nowrap;">
+              <td class="t-body" data-label="Reviewer"><%= reviewer %></td>
+              <td class="t-body text-secondary" data-label="Date">
                 <%= dateStr %>
               </td>
               <td>

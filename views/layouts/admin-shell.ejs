@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#F8F6F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1E1C18" media="(prefers-color-scheme: dark)">
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | Admin' : 'Admin' %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16x16.png">
   <link rel="stylesheet" href="/css/tokens.css?v=17">
   <link rel="stylesheet" href="/css/base.css?v=19">
-  <link rel="stylesheet" href="/css/components.css?v=59">
+  <link rel="stylesheet" href="/css/components.css?v=63">
   <script>(function(){var t=localStorage.getItem('theme');if(t!=='dark'&&t!=='light')t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
   <% if (typeof posthogApiKey !== 'undefined' && posthogApiKey) { %>
   <script>
@@ -42,12 +43,12 @@
       </button>
 
       <ul class="nav-links">
-        <li><a href="/admin" class="t-nav<%= adminPath === '/' ? ' is-active' : '' %>">Overview</a></li>
-        <li><a href="/admin/picks" class="t-nav<%= adminPath && adminPath.startsWith('/picks') ? ' is-active' : '' %>">Picks</a></li>
-        <li><a href="/admin/users" class="t-nav<%= adminPath && adminPath.startsWith('/users') ? ' is-active' : '' %>">Users</a></li>
-        <li><a href="/admin/reviews" class="t-nav<%= adminPath && adminPath.startsWith('/reviews') ? ' is-active' : '' %>">Reviews</a></li>
-        <li><a href="/admin/announcements" class="t-nav<%= adminPath && adminPath.startsWith('/announcements') ? ' is-active' : '' %>">Announcements</a></li>
-        <li><a href="/admin/settings" class="t-nav<%= adminPath === '/settings' ? ' is-active' : '' %>">Settings</a></li>
+        <li><a href="/admin" class="t-nav<%= adminPath === '/' ? ' is-active' : '' %>"<%= adminPath === '/' ? ' aria-current="page"' : '' %>>Overview</a></li>
+        <li><a href="/admin/picks" class="t-nav<%= adminPath && adminPath.startsWith('/picks') ? ' is-active' : '' %>"<%= adminPath && adminPath.startsWith('/picks') ? ' aria-current="page"' : '' %>>Picks</a></li>
+        <li><a href="/admin/users" class="t-nav<%= adminPath && adminPath.startsWith('/users') ? ' is-active' : '' %>"<%= adminPath && adminPath.startsWith('/users') ? ' aria-current="page"' : '' %>>Users</a></li>
+        <li><a href="/admin/reviews" class="t-nav<%= adminPath && adminPath.startsWith('/reviews') ? ' is-active' : '' %>"<%= adminPath && adminPath.startsWith('/reviews') ? ' aria-current="page"' : '' %>>Reviews</a></li>
+        <li><a href="/admin/announcements" class="t-nav<%= adminPath && adminPath.startsWith('/announcements') ? ' is-active' : '' %>"<%= adminPath && adminPath.startsWith('/announcements') ? ' aria-current="page"' : '' %>>Announcements</a></li>
+        <li><a href="/admin/settings" class="t-nav<%= adminPath === '/settings' ? ' is-active' : '' %>"<%= adminPath === '/settings' ? ' aria-current="page"' : '' %>>Settings</a></li>
         <li class="admin-nav__extras">
           <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
             <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>

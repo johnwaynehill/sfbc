@@ -26,7 +26,7 @@
                placeholder="e.g. The Interval, San Francisco">
       </label>
 
-      <div id="create-message" hidden></div>
+      <div id="create-message" role="alert" hidden></div>
 
       <button type="submit" class="btn btn--primary" id="create-submit">
         Create Pick
@@ -345,7 +345,7 @@
                  placeholder="e.g. The Interval, San Francisco">
         </label>
 
-        <div id="edit-message" hidden></div>
+        <div id="edit-message" role="alert" hidden></div>
 
         <div style="display: flex; gap: var(--s-2);">
           <button type="submit" class="btn btn--primary btn--sm" id="edit-submit">Save Changes</button>
@@ -411,7 +411,7 @@
         <input type="text" name="author" class="form-input" placeholder="Author name" required>
         <button type="submit" class="btn btn--secondary btn--sm" id="add-nominee-submit">Add</button>
       </form>
-      <div id="nominee-message" hidden></div>
+      <div id="nominee-message" role="alert" hidden></div>
     <% } %>
 
     <!-- Results table -->
