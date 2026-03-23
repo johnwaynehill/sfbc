@@ -8125,7 +8125,7 @@ a.reply__author-link:hover .reply__author {
 /* ---- Admin toolbar: search + sort height alignment ---- */
 .admin-toolbar .admin-search {
   height: 44px;
-  padding: 0 10px;
+  padding: 0 var(--s-3);
   box-sizing: border-box;
 }
 .admin-toolbar .admin-search .admin-search__input {
@@ -8134,7 +8134,58 @@ a.reply__author-link:hover .reply__author {
 }
 .admin-toolbar .admin-toolbar__btn {
   height: 44px;
+  width: 44px;
   min-width: 44px;
   box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* ---- Admin Meeting Card: mobile stacked layout ---- */
+@media (max-width: 640px) {
+  /* Stack cover above content */
+  .admin-meeting-card--with-cover {
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+  }
+
+  .admin-meeting-card__cover {
+    width: 100%;
+    grid-row: auto;
+  }
+
+  .admin-meeting-card__cover .book-cover {
+    width: 160px;
+    margin: 0 auto;
+  }
+
+  /* Larger title/author text */
+  .admin-meeting-card__header {
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-2);
+  }
+
+  .admin-meeting-card__header .t-body-bold {
+    font-size: var(--t-lg);
+    width: 100%;
+  }
+
+  .admin-meeting-card__body .t-caption {
+    font-size: var(--t-sm);
+  }
+
+  /* Single full-width CTA — hide secondary action */
+  .admin-meeting-card__actions {
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .admin-meeting-card__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-meeting-card__actions .btn--secondary {
+    display: none;
+  }
 }
 
