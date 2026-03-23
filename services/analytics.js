@@ -5,7 +5,7 @@ const config = require('../config');
 
 let client = null;
 
-if (config.posthog.apiKey) {
+if (config.posthog.apiKey && process.env.NODE_ENV === 'production') {
   client = new PostHog(config.posthog.apiKey, {
     host: config.posthog.host,
     flushAt: 20,

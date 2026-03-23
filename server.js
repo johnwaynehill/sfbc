@@ -161,7 +161,7 @@ app.use((req, res, next) => {
   res.locals.formatMeetingTime = formatMeetingTime;
   res.locals.monthYearSlug = monthYearSlug;
   res.locals.colorHash = require('./utils/colorHash').colorHash;
-  res.locals.posthogApiKey = config.posthog.apiKey;
+  res.locals.posthogApiKey = process.env.NODE_ENV === 'production' ? config.posthog.apiKey : '';
   res.locals.posthogHost = config.posthog.host;
   res.locals.gradeTier = function (grade) {
     if (!grade) return '';
