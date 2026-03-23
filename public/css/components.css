@@ -4331,7 +4331,7 @@ textarea.form-input {
   .admin-table td:last-child {
     margin-top: var(--s-2);
   }
-  .admin-table td:last-child .btn {
+  .admin-table td:last-child > .btn {
     width: 100%;
     justify-content: center;
   }
@@ -4347,33 +4347,9 @@ textarea.form-input {
     margin-bottom: 0;
   }
 
-  .admin-table--users td[data-label]::before {
-    display: none;
-  }
-
-  .user-row {
-    gap: var(--s-3);
-  }
-
-  .user-row .avatar--sm {
-    width: 40px;
-    height: 40px;
-    font-size: 15px;
-  }
-
   .user-actions {
-    flex-direction: column;
-    gap: var(--s-2);
-  }
-
-  .user-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Hide USER/ACTIONS data-labels on users table — card is self-evident */
-  .admin-table--users td[data-label="Actions"]::before {
-    display: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   /* ---- Reviews table: data-label card layout ---- */
@@ -8116,8 +8092,34 @@ a.reply__author-link:hover .reply__author {
   opacity: 0.7;
 }
 
-/* Hide view-profile icon button on mobile — username is already a link */
+/* ---- Admin Users: mobile card overrides ---- */
 @media (max-width: 640px) {
+  .admin-table--users td[data-label]::before,
+  .admin-table--users td[data-label="Actions"]::before { display: none; }
+
+  .admin-table--users tr { padding: var(--s-3); }
+
+  .user-row { gap: var(--s-3); }
+
+  .user-row .avatar--sm {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+
+  /* Actions: inline row with delete pushed right */
+  .user-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    align-items: center;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--border);
+    margin-top: var(--s-1);
+  }
+
+  .user-actions .btn { width: auto; }
   .user-actions .js-view-profile { display: none; }
+  .user-actions .btn--danger-quiet { margin-left: auto; }
 }
 
