@@ -42,6 +42,14 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ---------------------------------------------------------------------------
+// Static files (served before rate limiting so assets don't eat the budget)
+// ---------------------------------------------------------------------------
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: config.nodeEnv === 'production' ? '7d' : 0,
+  etag: true,
+}));
+
+// ---------------------------------------------------------------------------
 // Security headers
 // ---------------------------------------------------------------------------
 app.use(helmet({
@@ -90,12 +98,8 @@ app.use(compression({
 }));
 
 // ---------------------------------------------------------------------------
-// Static files & body parsing
+// Body parsing
 // ---------------------------------------------------------------------------
-app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: config.nodeEnv === 'production' ? '7d' : 0,
-  etag: true,
-}));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
