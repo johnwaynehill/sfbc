@@ -42,7 +42,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ---------------------------------------------------------------------------
-// Static files (served before rate limiting so assets don't eat the budget)
+// Static files (served before rate limiting so assets don't count against it)
 // ---------------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: config.nodeEnv === 'production' ? '7d' : 0,
