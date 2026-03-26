@@ -37,6 +37,10 @@ const SqliteStore = require('better-sqlite3-session-store')(session);
 
 const app = express();
 
+// Trust the first proxy (Fly.io) so rate limiting and secure cookies use real
+// client IPs instead of the shared proxy address.
+app.set('trust proxy', 1);
+
 // ---------------------------------------------------------------------------
 // Security headers
 // ---------------------------------------------------------------------------
@@ -99,9 +103,6 @@ app.use(cookieParser());
 // ---------------------------------------------------------------------------
 // Session
 // ---------------------------------------------------------------------------
-// Trust the first proxy (Fly.io) so secure cookies work behind HTTPS termination
-app.set('trust proxy', 1);
-
 app.use(session({
   store: new SqliteStore({
     client: db,
