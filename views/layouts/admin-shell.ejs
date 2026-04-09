@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16x16.png">
   <link rel="stylesheet" href="/css/tokens.css?v=17">
   <link rel="stylesheet" href="/css/base.css?v=19">
-  <link rel="stylesheet" href="/css/components.css?v=63">
+  <link rel="stylesheet" href="/css/components.css?v=64">
   <script>(function(){var t=localStorage.getItem('theme');if(t!=='dark'&&t!=='light')t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})()</script>
   <% if (typeof posthogApiKey !== 'undefined' && posthogApiKey) { %>
   <script>
@@ -64,6 +64,16 @@
       <%- body %>
     </div>
   </main>
+
+  <footer class="site-footer">
+    <div class="page-container">
+      <span class="t-nav text-tertiary">&copy; 2026 Admin</span>
+      <div class="footer-links">
+        <a href="/" class="footer-link t-nav">View Site</a>
+        <a href="/changelog" class="footer-link t-nav">What's New</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="/js/dialog.js?v=1" defer></script>
   <script src="/js/nav.js?v=8" defer></script>

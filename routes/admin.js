@@ -121,15 +121,11 @@ router.get('/', async (req, res) => {
 
   let nominees = [];
   let voteCount = 0;
-  let results = null;
   let qrCodes = [];
 
   if (current && current.id) {
     nominees = meetings.getNominees(current.id);
     voteCount = getVoteCount(current.id);
-    if (['voting', 'results', 'reading', 'upcoming'].includes(current.status)) {
-      results = calculateResults(current.id);
-    }
     qrCodes = await generateQrCodes(current.month_year, current.status);
   }
 
@@ -140,7 +136,6 @@ router.get('/', async (req, res) => {
     stats,
     nominees,
     voteCount,
-    results,
     qrCodes,
   });
 });
