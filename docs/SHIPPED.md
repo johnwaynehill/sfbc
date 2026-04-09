@@ -193,6 +193,7 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Read more chevron** — Down chevron SVG added to "Read more" toggle on book detail pages; rotates 180° on expand ("Show less")
 - **Admin footer** — Added `.site-footer` to admin shell layout with "View Site" and "What's New" links
 - **Pick topic/theme** — New `topic` column on `monthly_picks` (migration 022); editable on admin pick detail; displayed as themed banner on nominate and nominations pages
+- **Voting "About this book" link** — Replaced Google Books + Open Library links on ballot cards with single "About this book →" link to in-app book detail page; opens in new tab to preserve ballot order
 
 ## Bug Fixes (Sprint 5)
 
