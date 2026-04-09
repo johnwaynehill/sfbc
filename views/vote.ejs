@@ -57,14 +57,8 @@
                   <p class="ballot-card__reason t-caption">&ldquo;<%= nom.reason %>&rdquo;</p>
                 <% } %>
                 <div class="ballot-card__links">
-                  <% if (nom.google_books_id) { %>
-                    <a href="https://books.google.com/books?id=<%= nom.google_books_id %>"
-                       target="_blank" rel="noopener" class="ballot-card__link t-caption">Google Books</a>
-                  <% } %>
-                  <% if (nom.open_library_id) { %>
-                    <a href="https://openlibrary.org/works/<%= nom.open_library_id %>"
-                       target="_blank" rel="noopener" class="ballot-card__link t-caption">Open Library</a>
-                  <% } %>
+                  <a href="/books/<%= nom.author_slug %>/<%= nom.title_slug %>"
+                     target="_blank" rel="noopener" class="ballot-card__link t-caption">About this book &rarr;</a>
                 </div>
               </div>
             <% } %>
