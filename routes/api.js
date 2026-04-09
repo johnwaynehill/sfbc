@@ -340,6 +340,11 @@ router.put('/admin/meetings/:id', requireAdmin, ...meetingChain, handleValidatio
     location_text: req.body.location_text || null,
   });
 
+  // Save topic to the linked pick if one exists
+  if (typeof req.body.topic !== 'undefined' && meeting.monthly_pick_id) {
+    picksService.updateTopic(meeting.monthly_pick_id, req.body.topic);
+  }
+
   res.json({ success: true, meeting });
 });
 

@@ -52,9 +52,13 @@ const getAllStmt = db.prepare(`
 `);
 
 const createStmt = db.prepare(`
-  INSERT INTO monthly_picks (book_id, month_year, status, nominated_by, picked_at)
-  VALUES (?, ?, ?, ?, datetime('now'))
+  INSERT INTO monthly_picks (book_id, month_year, status, nominated_by, topic, picked_at)
+  VALUES (?, ?, ?, ?, ?, datetime('now'))
 `);
+
+const updateTopicStmt = db.prepare(
+  "UPDATE monthly_picks SET topic = ?, updated_at = datetime('now') WHERE id = ?"
+);
 
 const updateStatusStmt = db.prepare(`
   UPDATE monthly_picks SET status = ?, updated_at = datetime('now') WHERE id = ?
@@ -259,9 +263,17 @@ function getAll() {
  * @param {number|null} [nominatedBy=null] - User ID of nominator
  * @returns {object} The created monthly pick row
  */
-function create(bookId, monthYear, status = 'upcoming', nominatedBy = null) {
-  const info = createStmt.run(bookId, monthYear, status, nominatedBy);
+function create(bookId, monthYear, status = 'upcoming', nominatedBy = null, topic = null) {
+  const info = createStmt.run(bookId, monthYear, status, nominatedBy, topic || null);
   return getByIdStmt.get(info.lastInsertRowid);
+}
+
+/**
+ * Update the topic/theme for a pick.
+ */
+function updateTopic(id, topic) {
+  updateTopicStmt.run(topic || null, id);
+  return getByIdStmt.get(id);
 }
 
 /**
@@ -581,4 +593,5 @@ module.exports = {
   updateEvent,
   deleteEvent,
   getAdjacentPicks,
+  updateTopic,
 };

@@ -2112,6 +2112,13 @@ textarea.form-input {
 }
 
 .nom-page__subheading {
+  margin-bottom: var(--s-2);
+}
+.nom-topic {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  color: var(--accent);
   margin-bottom: var(--s-5);
 }
 
@@ -5723,6 +5730,15 @@ textarea.form-input {
 
 .book-description__toggle:hover {
   text-decoration: underline;
+}
+.book-description__chevron {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 2px;
+  transition: transform 0.2s ease;
+}
+.book-description__toggle.is-expanded .book-description__chevron {
+  transform: rotate(180deg);
 }
 
 /* ---- Book Meta Inline (year, pages in hero) ---- */

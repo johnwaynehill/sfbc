@@ -79,30 +79,6 @@
 
   <%- include('../partials/qr-panel') %>
 
-  <% if (results && results.rankings.length > 0) { %>
-    <h2 class="t-body-bold admin-page__subheading">Current Results</h2>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th class="t-caption">Rank</th>
-          <th class="t-caption">Title</th>
-          <th class="t-caption">Author</th>
-          <th class="t-caption" style="text-align: right;">Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% results.rankings.forEach(function(r) { %>
-          <tr>
-            <td class="t-body"><%= r.rank %></td>
-            <td class="t-body"><%= r.title %></td>
-            <td class="t-body text-secondary"><%= r.author %></td>
-            <td class="t-body" style="text-align: right;"><%= r.points %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  <% } %>
-
   <!-- Upcoming picks -->
   <% if (upcoming.length > 0) { %>
     <h2 class="t-body-bold admin-page__subheading">Upcoming Picks</h2>
