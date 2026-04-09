@@ -186,6 +186,14 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Review form spacing** — Removed compounding margins on spoiler/finish checkboxes (form gap + margins = 40px → now just 16px gap on mobile)
 - **Grid-aligned spacing** — Bare `2px`, `6px` gaps in reaction-bar, reply-trigger, grade-picker strip, md-toolbar normalized to `--s-1`/`--s-2` tokens
 
+## Quick Wins — UX Polish (April 2026)
+
+- **Remove "Add Admin" from Admin Settings** — Removed the "Add Admin" form and JS handler from settings page; API endpoint preserved for future use
+- **Remove "Current Results" from Admin Overview** — Removed the vote results table and cleaned up unused `calculateResults()` call from the overview route
+- **Read more chevron** — Down chevron SVG added to "Read more" toggle on book detail pages; rotates 180° on expand ("Show less")
+- **Admin footer** — Added `.site-footer` to admin shell layout with "View Site" and "What's New" links
+- **Pick topic/theme** — New `topic` column on `monthly_picks` (migration 022); editable on admin pick detail; displayed as themed banner on nominate and nominations pages
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background
