@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const compression = require('compression');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -157,7 +157,10 @@ app.use(rateLimit({
     if (req.session && req.session.userId) {
       return `user-${req.session.userId}`;
     }
-    return req.ip;
+    // Use ipKeyGenerator so IPv6 visitors are bucketed by their subnet
+    // prefix (/56 by default) — otherwise a single user could rotate
+    // addresses within their allocation to bypass the limit.
+    return ipKeyGenerator(req.ip);
   },
 }));
 
