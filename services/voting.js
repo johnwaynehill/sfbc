@@ -54,6 +54,10 @@ const nomineesQuery = db.prepare(`
     b.isbn,
     b.author_slug,
     b.title_slug,
+    b.description,
+    b.subjects,
+    b.publisher,
+    b.language,
     n.reason,
     u.display_name AS nominator_name
   FROM meeting_nominees mn
