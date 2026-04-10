@@ -14,7 +14,7 @@
 
   <p class="t-body vote-page__instructions">
     Rank the books from <strong>most</strong> to <strong>least</strong> wanted.
-    Use the arrows or drag to reorder. Your top pick gets the most points.
+    Your top pick gets the most points.
   </p>
 
   <form id="vote-form"
@@ -40,28 +40,73 @@
           <div class="ballot-card__body">
             <span class="ballot-card__title t-body-bold"><%= nom.title %></span>
             <span class="ballot-card__author t-caption text-secondary"><%= nom.author %><% if (nom.publication_year) { %> (<%= nom.publication_year %>)<% } %></span>
-            <% var hasDetails = nom.reason || nom.nominator_name || nom.page_count || nom.google_books_id || nom.open_library_id; %>
-            <% if (hasDetails) { %>
-              <button type="button" class="ballot-card__details-toggle t-caption text-tertiary" aria-expanded="false">
-                <svg class="ballot-card__details-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-                Details
-              </button>
-              <div class="ballot-card__details" hidden>
-                <% if (nom.page_count) { %>
-                  <span class="ballot-card__pages t-caption text-secondary"><%= nom.page_count %> pages</span>
+            <button type="button" class="ballot-card__details-link t-caption" data-book-id="<%= nom.book_id %>">
+              View
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <%
+              var subjectList = [];
+              if (nom.subjects) {
+                try { subjectList = JSON.parse(nom.subjects); } catch (e) { subjectList = []; }
+              }
+            %>
+            <template class="ballot-card__details-template">
+              <div class="book-details">
+                <div class="book-details__header">
+                  <div class="book-cover book-cover--md book-details__cover">
+                    <% if (nom.cover_url) { %>
+                      <img src="<%= nom.cover_url %>" alt="<%= nom.title %> cover" loading="lazy">
+                    <% } else { %>
+                      <%- include('partials/placeholder-cover', { phTitle: nom.title, phSize: 'md' }) %>
+                    <% } %>
+                  </div>
+                  <div class="book-details__meta">
+                    <h2 class="book-details__title t-display"><%= nom.title %></h2>
+                    <p class="book-details__author t-author">by <%= nom.author %></p>
+                    <% var metaParts = []; %>
+                    <% if (nom.publication_year) metaParts.push(nom.publication_year); %>
+                    <% if (nom.page_count) metaParts.push(nom.page_count + ' pages'); %>
+                    <% if (nom.publisher) metaParts.push(nom.publisher); %>
+                    <% if (nom.language && nom.language !== 'en') metaParts.push(nom.language.toUpperCase()); %>
+                    <% if (metaParts.length > 0) { %>
+                      <p class="book-details__inline-meta t-caption text-secondary"><%= metaParts.join(' · ') %></p>
+                    <% } %>
+                    <% if (subjectList.length > 0) { %>
+                      <div class="book-details__tags">
+                        <% subjectList.slice(0, 4).forEach(function(tag) { %>
+                          <span class="book-tag"><%= tag %></span>
+                        <% }); %>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+
+                <% if (nom.description) { %>
+                  <div class="book-details__section">
+                    <p class="book-details__description t-body"><%= nom.description %></p>
+                  </div>
                 <% } %>
-                <% if (nom.nominator_name) { %>
-                  <span class="ballot-card__nominator t-caption text-secondary">Nominated by <%= nom.nominator_name %></span>
+
+                <% if (nom.reason || nom.nominator_name) { %>
+                  <div class="book-details__section book-details__nomination">
+                    <% if (nom.nominator_name) { %>
+                      <p class="t-label">Nominated by <%= nom.nominator_name %></p>
+                    <% } %>
+                    <% if (nom.reason) { %>
+                      <p class="book-details__reason t-body">&ldquo;<%= nom.reason %>&rdquo;</p>
+                    <% } %>
+                  </div>
                 <% } %>
-                <% if (nom.reason) { %>
-                  <p class="ballot-card__reason t-caption">&ldquo;<%= nom.reason %>&rdquo;</p>
-                <% } %>
-                <div class="ballot-card__links">
+
+                <div class="book-details__footer">
                   <a href="/books/<%= nom.author_slug %>/<%= nom.title_slug %>"
-                     target="_blank" rel="noopener" class="ballot-card__link t-caption">About this book &rarr;</a>
+                     target="_blank" rel="noopener" class="book-details__link">
+                    View Details
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
                 </div>
               </div>
-            <% } %>
+            </template>
           </div>
 
           <div class="ballot-card__controls">
@@ -89,7 +134,8 @@
       <% }); %>
     </ol>
 
-    <p class="t-caption text-tertiary ballot-hint">Drag cards or use the arrows to rank your picks</p>
+    <p class="t-caption text-tertiary ballot-hint ballot-hint--desktop">Drag cards or use the arrows to rank your picks</p>
+    <p class="t-caption text-tertiary ballot-hint ballot-hint--mobile">Use the arrows to rank your picks</p>
 
     <!-- Hidden field keeps ranking in sync for no-JS form POST fallback -->
     <input type="hidden" name="ranking" id="ranking-input"
@@ -118,4 +164,11 @@
       Submit Vote
     </button>
   </form>
+
+  <dialog id="book-details-dialog" class="book-details-dialog" aria-labelledby="book-details-dialog-title">
+    <button type="button" class="book-details-dialog__close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="book-details-dialog__body" id="book-details-dialog-body"></div>
+  </dialog>
 </section>

@@ -30,10 +30,13 @@
     return Array.from(list.querySelectorAll('.ballot-card'));
   }
 
+  var isMobile = window.matchMedia('(max-width: 640px)').matches;
+
   function updateRanks() {
     var cards = getCards();
     cards.forEach(function (card, i) {
-      card.querySelector('.ballot-card__rank').textContent = i + 1;
+      var rankEl = card.querySelector('.ballot-card__rank');
+      if (rankEl) rankEl.textContent = i + 1;
 
       // Update up/down button disabled states
       var upBtn = card.querySelector('.ballot-card__move--up');
@@ -108,85 +111,136 @@
   });
 
   // -----------------------------------------------------------------------
-  // Mobile touch reordering
+  // Mobile touch reordering (desktop only — mobile uses arrow buttons)
   // -----------------------------------------------------------------------
 
-  var touchCard = null;
-  var ghost = null;
-  var touchStartY = 0;
-  var touchOffsetY = 0;
+  if (!isMobile) {
+    var touchCard = null;
+    var ghost = null;
+    var touchStartY = 0;
+    var touchOffsetY = 0;
 
-  list.addEventListener('touchstart', function (e) {
-    // Allow drag from anywhere on the card (not just the grip handle)
-    var card = e.target.closest('.ballot-card');
-    if (!card) return;
+    list.addEventListener('touchstart', function (e) {
+      var card = e.target.closest('.ballot-card');
+      if (!card) return;
 
-    touchCard = card;
-    var rect = card.getBoundingClientRect();
-    touchStartY = e.touches[0].clientY;
-    touchOffsetY = touchStartY - rect.top;
+      touchCard = card;
+      var rect = card.getBoundingClientRect();
+      touchStartY = e.touches[0].clientY;
+      touchOffsetY = touchStartY - rect.top;
 
-    // Create floating ghost clone
-    ghost = card.cloneNode(true);
-    ghost.classList.add('ballot-card--ghost');
-    ghost.style.width = rect.width + 'px';
-    ghost.style.position = 'fixed';
-    ghost.style.left = rect.left + 'px';
-    ghost.style.top = rect.top + 'px';
-    ghost.style.zIndex = '1000';
-    ghost.style.pointerEvents = 'none';
-    document.body.appendChild(ghost);
+      // Create floating ghost clone
+      ghost = card.cloneNode(true);
+      ghost.classList.add('ballot-card--ghost');
+      ghost.style.width = rect.width + 'px';
+      ghost.style.position = 'fixed';
+      ghost.style.left = rect.left + 'px';
+      ghost.style.top = rect.top + 'px';
+      ghost.style.zIndex = '1000';
+      ghost.style.pointerEvents = 'none';
+      document.body.appendChild(ghost);
 
-    card.classList.add('ballot-card--dragging');
-  }, { passive: true });
+      card.classList.add('ballot-card--dragging');
+    }, { passive: true });
 
-  list.addEventListener('touchmove', function (e) {
-    if (!touchCard || !ghost) return;
-    e.preventDefault();
+    list.addEventListener('touchmove', function (e) {
+      if (!touchCard || !ghost) return;
+      e.preventDefault();
 
-    var y = e.touches[0].clientY;
-    ghost.style.top = (y - touchOffsetY) + 'px';
+      var y = e.touches[0].clientY;
+      ghost.style.top = (y - touchOffsetY) + 'px';
 
-    var target = getCardFromPoint(e.touches[0].clientX, y, touchCard);
-    if (target) {
-      if (target.before) {
-        list.insertBefore(touchCard, target.card);
-      } else {
-        list.insertBefore(touchCard, target.card.nextSibling);
+      var target = getCardFromPoint(e.touches[0].clientX, y, touchCard);
+      if (target) {
+        if (target.before) {
+          list.insertBefore(touchCard, target.card);
+        } else {
+          list.insertBefore(touchCard, target.card.nextSibling);
+        }
+        updateRanks();
+      }
+    }, { passive: false });
+
+    function endTouch() {
+      if (touchCard) {
+        touchCard.classList.remove('ballot-card--dragging');
+        touchCard = null;
+      }
+      if (ghost) {
+        ghost.remove();
+        ghost = null;
       }
       updateRanks();
+      syncHiddenInput();
     }
-  }, { passive: false });
 
-  function endTouch() {
-    if (touchCard) {
-      touchCard.classList.remove('ballot-card--dragging');
-      touchCard = null;
-    }
-    if (ghost) {
-      ghost.remove();
-      ghost = null;
-    }
-    updateRanks();
-    syncHiddenInput();
+    list.addEventListener('touchend', endTouch);
+    list.addEventListener('touchcancel', endTouch);
   }
 
-  list.addEventListener('touchend', endTouch);
-  list.addEventListener('touchcancel', endTouch);
+  // -----------------------------------------------------------------------
+  // Book details dialog (bottom sheet on mobile, modal on desktop)
+  // -----------------------------------------------------------------------
+
+  var detailsDialog = document.getElementById('book-details-dialog');
+  var detailsBody = document.getElementById('book-details-dialog-body');
+
+  function openDetailsDialog(card) {
+    if (!detailsDialog || !detailsBody) return;
+    var template = card.querySelector('.ballot-card__details-template');
+    if (!template) return;
+    detailsBody.innerHTML = '';
+    detailsBody.appendChild(template.content.cloneNode(true));
+    if (typeof detailsDialog.showModal === 'function') {
+      detailsDialog.showModal();
+    } else {
+      detailsDialog.setAttribute('open', '');
+    }
+    document.body.classList.add('has-open-dialog');
+  }
+
+  function closeDetailsDialog() {
+    if (!detailsDialog) return;
+    detailsDialog.classList.add('is-closing');
+    setTimeout(function () {
+      detailsDialog.classList.remove('is-closing');
+      if (typeof detailsDialog.close === 'function') {
+        detailsDialog.close();
+      } else {
+        detailsDialog.removeAttribute('open');
+      }
+      detailsBody.innerHTML = '';
+      document.body.classList.remove('has-open-dialog');
+    }, 180);
+  }
+
+  if (detailsDialog) {
+    // Close on backdrop click
+    detailsDialog.addEventListener('click', function (e) {
+      if (e.target === detailsDialog) closeDetailsDialog();
+    });
+    // Close on Escape (native cancel event)
+    detailsDialog.addEventListener('cancel', function (e) {
+      e.preventDefault();
+      closeDetailsDialog();
+    });
+    // Close button
+    var closeBtn = detailsDialog.querySelector('.book-details-dialog__close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeDetailsDialog);
+    }
+  }
 
   // -----------------------------------------------------------------------
-  // Details toggle (collapsible card details)
+  // Card click delegation: details link + up/down arrows
   // -----------------------------------------------------------------------
 
   list.addEventListener('click', function (e) {
-    var toggle = e.target.closest('.ballot-card__details-toggle');
-    if (toggle) {
-      var details = toggle.nextElementSibling;
-      if (!details) return;
-      var expanded = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', !expanded);
-      details.hidden = expanded;
-      return; // Don't fall through to move handler
+    var detailsLink = e.target.closest('.ballot-card__details-link');
+    if (detailsLink) {
+      var card = detailsLink.closest('.ballot-card');
+      if (card) openDetailsDialog(card);
+      return;
     }
 
     // -----------------------------------------------------------------------
@@ -256,6 +310,13 @@
     messageEl.hidden = false;
     messageEl.className = 'nom-message nom-message--error';
     messageEl.textContent = msg;
+  }
+
+  // On mobile, remove draggable attribute to prevent native drag interference
+  if (isMobile) {
+    getCards().forEach(function (card) {
+      card.removeAttribute('draggable');
+    });
   }
 
   // Initial sync

@@ -2527,66 +2527,39 @@ textarea.form-input {
   overflow: hidden;
 }
 
-/* Details toggle */
-.ballot-card__details-toggle {
+/* "View details" link button */
+.ballot-card__details-link {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 0;
+  padding: 4px 0;
+  margin-top: 2px;
   border: 0;
   background: none;
   cursor: pointer;
-  color: var(--text3);
+  color: var(--accent);
   font-family: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  align-self: flex-start;
   transition: color 120ms ease;
-  margin-top: 2px;
 }
 
-.ballot-card__details-toggle:hover {
+.ballot-card__details-link:hover {
   color: var(--text);
 }
 
-.ballot-card__details-chevron {
-  transition: transform 200ms ease;
+.ballot-card__details-link svg {
+  transition: transform 150ms ease;
 }
 
-.ballot-card__details-toggle[aria-expanded="true"] .ballot-card__details-chevron {
-  transform: rotate(180deg);
+.ballot-card__details-link:hover svg {
+  transform: translateX(2px);
 }
 
-/* Collapsible detail section */
-.ballot-card__details[hidden] {
+/* The <template> element renders nothing — but make sure */
+.ballot-card__details-template {
   display: none !important;
-}
-
-.ballot-card__details {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px solid var(--border);
-}
-
-.ballot-card__reason {
-  font-style: italic;
-  color: var(--text2);
-  margin: 2px 0 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.ballot-card__links {
-  display: flex;
-  gap: var(--s-2);
-  margin-top: 2px;
-}
-
-.ballot-card__link {
-  color: var(--accent);
-  text-decoration: underline;
 }
 
 /* Controls column (up/down + drag handle) */
@@ -2637,6 +2610,62 @@ textarea.form-input {
   cursor: grabbing;
 }
 
+/* Hint text: show/hide per breakpoint */
+.ballot-hint--mobile { display: none; }
+
+/* ---- Mobile ballot simplification (≤640px) ---- */
+@media (max-width: 640px) {
+  .ballot-list {
+    padding: 0 var(--s-3);
+  }
+
+  .ballot-card {
+    grid-template-columns: 72px 1fr 44px;
+    border-radius: var(--radius-md);
+    cursor: default;
+  }
+
+  .ballot-card:active {
+    cursor: default;
+  }
+
+  /* Hide rank badge on mobile */
+  .ballot-card__rank {
+    display: none;
+  }
+
+  /* Hide drag handle on mobile */
+  .ballot-card__handle {
+    display: none;
+  }
+
+  /* Cover must fit the grid column */
+  .ballot-card .book-cover--sm {
+    width: 72px;
+  }
+
+  /* Enlarge move buttons to 44px touch targets */
+  .ballot-card__move {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ballot-card__move svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Stack controls without grip handle gap */
+  .ballot-card__controls {
+    gap: var(--s-1);
+    justify-content: center;
+  }
+
+  /* Swap hint text */
+  .ballot-hint--desktop { display: none; }
+  .ballot-hint--mobile { display: block; }
+}
+
 /* ---- No-JS Rank Selects ---- */
 .vote-nojs-ranks {
   display: flex;
@@ -2654,23 +2683,241 @@ textarea.form-input {
   display: inline-flex;
 }
 
-/* Mobile: compact ballot card */
+/* Mobile: compact ballot card spacing (≤480px tightens further) */
 @media (max-width: 480px) {
   .ballot-card {
-    grid-template-columns: 32px 56px 1fr 36px;
     gap: var(--s-2);
     padding: var(--s-2) var(--s-3);
   }
+}
 
-  .ballot-card__cover {
-    width: 56px;
+/* ---- Book Details Dialog (bottom sheet on mobile, modal on desktop) ---- */
+.book-details-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0;
+  max-width: 520px;
+  width: calc(100% - var(--s-6));
+  max-height: 85vh;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.18),
+    0 32px 64px rgba(0, 0, 0, 0.10);
+  overflow: hidden;
+  animation: dialog-enter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.book-details-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: backdrop-enter 0.22s ease-out;
+}
+
+.book-details-dialog.is-closing {
+  animation: dialog-exit 0.16s ease-in forwards;
+}
+
+.book-details-dialog.is-closing::backdrop {
+  animation: backdrop-exit 0.16s ease-in forwards;
+}
+
+.book-details-dialog__close {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 120ms ease;
+}
+
+.book-details-dialog__close:hover {
+  background: var(--surface2);
+}
+
+.book-details-dialog__body {
+  overflow-y: auto;
+  max-height: 85vh;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---- Book details content (rendered inside the dialog) ---- */
+.book-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.book-details__header {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  align-items: flex-start;
+}
+
+.book-details__cover {
+  flex-shrink: 0;
+}
+
+.book-details .book-cover--md {
+  width: 110px;
+}
+
+.book-details__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.book-details__title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+.book-details__author {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--text2);
+}
+
+.book-details__inline-meta {
+  margin: var(--s-1) 0 0;
+}
+
+.book-details__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: var(--s-2);
+}
+
+.book-details__section {
+  padding: var(--s-3) var(--s-4);
+  border-top: 1px solid var(--border);
+}
+
+.book-details__description {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-details__nomination .t-label {
+  margin: 0 0 var(--s-1);
+  color: var(--text2);
+}
+
+.book-details__reason {
+  margin: 0;
+  font-style: italic;
+  color: var(--text);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+
+.book-details__footer {
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  border-top: 1px solid var(--border);
+}
+
+.book-details__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+
+.book-details__link:hover {
+  text-decoration: underline;
+}
+
+/* Bottom-sheet variant on mobile */
+@media (max-width: 640px) {
+  .book-details-dialog {
+    /* Anchor to bottom of viewport. Setting inset: 0 + margin-top: auto
+       pins the dialog to the bottom edge regardless of content height. */
+    inset: 0;
+    margin: auto auto 0 auto;
+    max-width: 100%;
+    width: 100%;
+    max-height: 88vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    animation: bottom-sheet-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .ballot-card__rank {
-    width: 30px;
-    height: 30px;
-    font-size: var(--t-sm);
+  .book-details-dialog.is-closing {
+    animation: bottom-sheet-exit 0.18s ease-in forwards;
   }
+
+  .book-details-dialog__body {
+    max-height: 88vh;
+    /* Visual grab handle hint */
+    padding-top: var(--s-3);
+  }
+
+  .book-details-dialog__body::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+    margin: 0 auto var(--s-2);
+  }
+
+  .book-details__header {
+    padding-top: var(--s-2);
+  }
+
+  .book-details .book-cover--md {
+    width: 88px;
+  }
+
+  .book-details__title {
+    font-size: 1.25rem;
+  }
+}
+
+@keyframes bottom-sheet-enter {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@keyframes bottom-sheet-exit {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(100%); opacity: 0.5; }
+}
+
+/* Lock body scroll while dialog is open */
+body.has-open-dialog {
+  overflow: hidden;
 }
 
 

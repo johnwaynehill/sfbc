@@ -4,6 +4,7 @@ const router = require('express').Router();
 const db = require('../db');
 const { getFingerprint } = require('../services/fingerprint');
 const picksService = require('../services/monthly-picks');
+const { enrichBookMetadata } = require('../services/books');
 const {
   getNomineesForBallot,
   seededShuffle,
@@ -29,7 +30,7 @@ router.get('/vote', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /vote/:slug
 // ---------------------------------------------------------------------------
-router.get('/vote/:slug', (req, res) => {
+router.get('/vote/:slug', async (req, res) => {
   const resolved = resolveMonth(req.params.slug);
   if (!resolved) return res.redirect('/');
 
@@ -58,9 +59,31 @@ router.get('/vote/:slug', (req, res) => {
     return res.redirect('/results/' + slug);
   }
 
-  // Load nominees and shuffle them deterministically per visitor
+  // Load nominees
+  let rawNominees = getNomineesForBallot(meeting.id);
+
+  // Lazy-enrich any nominees with missing metadata (description, publisher, page_count)
+  // so the ballot "View details" dialog has rich content on first visit.
+  // Runs in parallel and is non-fatal on failure.
+  const needsEnrich = rawNominees.filter(
+    (n) => n.description == null || n.publisher == null || n.page_count == null
+  );
+  if (needsEnrich.length > 0) {
+    try {
+      await Promise.all(
+        needsEnrich.map((n) => enrichBookMetadata(n.book_id).catch(() => null))
+      );
+      // Re-fetch nominees to pick up the newly written fields
+      rawNominees = getNomineesForBallot(meeting.id);
+    } catch (err) {
+      // Non-fatal — render with whatever data we have
+      console.error('Ballot enrichment error:', err.message);
+    }
+  }
+
+  // Shuffle deterministically per visitor
   const clientId = req.cookies._client_id;
-  const nominees = seededShuffle(getNomineesForBallot(meeting.id), clientId);
+  const nominees = seededShuffle(rawNominees, clientId);
 
   const voteCount = getVoteCount(meeting.id);
 
