@@ -68,6 +68,10 @@ const updateStatusStmt = db.prepare(`
   UPDATE meetings SET status = ?, updated_at = datetime('now') WHERE id = ?
 `);
 
+const updateTopicStmt = db.prepare(
+  "UPDATE meetings SET topic = ?, updated_at = datetime('now') WHERE id = ?"
+);
+
 const getNomineesStmt = db.prepare(`
   SELECT mn.id AS nominee_id, mn.book_id, mn.source,
          b.title, b.author, b.cover_url, b.author_slug, b.title_slug,
@@ -155,6 +159,11 @@ function update(id, { month_year, meetup_event_url, meeting_time, location_text 
   return getByIdStmt.get(id);
 }
 
+function updateTopic(id, topic) {
+  updateTopicStmt.run(topic || null, id);
+  return getByIdStmt.get(id);
+}
+
 function getNominees(meetingId) {
   return getNomineesStmt.all(meetingId);
 }
@@ -212,6 +221,7 @@ module.exports = {
   getAll,
   create,
   update,
+  updateTopic,
   getNominees,
   addNominee,
   removeNominee,

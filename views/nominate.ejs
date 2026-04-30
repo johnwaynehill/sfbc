@@ -1,8 +1,8 @@
 <section class="nom-page">
   <h1 class="t-section nom-page__heading"><%= pageTitle %></h1>
   <p class="t-body text-secondary nom-page__subheading">for <%= formatMonthYear(meeting.month_year) %></p>
-  <% if (pick && pick.topic) { %>
-    <p class="nom-topic t-label"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Theme: <%= pick.topic %></p>
+  <% if (meeting.topic) { %>
+    <p class="nom-topic t-label"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Theme: <%= meeting.topic %></p>
   <% } %>
   <% if (user) { %>
     <p class="t-caption text-secondary mb-3">Nominating as <strong><%= user.display_name %></strong></p>

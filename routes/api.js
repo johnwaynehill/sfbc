@@ -340,12 +340,16 @@ router.put('/admin/meetings/:id', requireAdmin, ...meetingChain, handleValidatio
     location_text: req.body.location_text || null,
   });
 
-  // Save topic to the linked pick if one exists
-  if (typeof req.body.topic !== 'undefined' && meeting.monthly_pick_id) {
-    picksService.updateTopic(meeting.monthly_pick_id, req.body.topic);
+  // Topic lives on the meeting (always available, even before a pick exists).
+  // Mirror to the linked pick when one exists so book-detail views stay in sync.
+  if (typeof req.body.topic !== 'undefined') {
+    const updated = meetings.updateTopic(id, req.body.topic);
+    if (updated.monthly_pick_id) {
+      picksService.updateTopic(updated.monthly_pick_id, req.body.topic);
+    }
   }
 
-  res.json({ success: true, meeting });
+  res.json({ success: true, meeting: meetings.getById(id) });
 });
 
 // ---------------------------------------------------------------------------
