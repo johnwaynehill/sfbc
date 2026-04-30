@@ -41,8 +41,8 @@
       <h1 class="t-section"><%= formatMonthYear(meeting.month_year) %></h1>
       <span class="status-pill status-pill--<%= meeting.status %>"><%= formatStatus(meeting.status) %></span>
     </div>
-    <% if (pick && pick.topic) { %>
-      <p class="t-caption text-secondary" style="margin-top: var(--s-1);">Theme: <strong><%= pick.topic %></strong></p>
+    <% if (meeting.topic) { %>
+      <p class="t-caption text-secondary" style="margin-top: var(--s-1);">Theme: <strong><%= meeting.topic %></strong></p>
     <% } %>
 
     <!-- Lifecycle stepper -->
@@ -351,7 +351,7 @@
         <label class="form-label">
           Topic / Theme <span class="text-secondary">(optional)</span>
           <input type="text" name="topic" class="form-input" maxlength="100"
-                 value="<%= pick && pick.topic ? pick.topic : '' %>"
+                 value="<%= meeting.topic || '' %>"
                  placeholder="e.g. Time Travel, Female Authors, Debut Novels">
         </label>
 
