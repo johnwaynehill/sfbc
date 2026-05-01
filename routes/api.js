@@ -34,14 +34,14 @@ const {
 } = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
-// Submission rate limiter — 10 per 15 min per device (nominations + votes).
+// Submission rate limiter — 60 per 15 min per device (nominations + votes).
 // Keyed by the _client_id cookie so members sharing a WiFi at an in-person
 // meeting each get their own bucket. Falls back to IP subnet for first-time
 // visitors before the cookie is set, and to deter bots that ignore cookies.
 // ---------------------------------------------------------------------------
 const submissionLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 60,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many submissions. Please try again in a few minutes.' },
