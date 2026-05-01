@@ -57,6 +57,21 @@ const submissionLimiter = rateLimit({
 });
 
 // ---------------------------------------------------------------------------
+// IP backstop — catches scripts that rotate cookies to bypass the per-device
+// limiter. 500 / 15 min per IP subnet is well above a venue-meeting's
+// realistic ceiling (e.g. 50 attendees × 10 submissions each) but well below
+// any cookie-rotation attack rate.
+// ---------------------------------------------------------------------------
+const submissionIpBackstop = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many submissions from this network. Please try again in a few minutes.' },
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
+});
+
+// ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
 router.get('/health', (req, res) => {
@@ -1320,7 +1335,7 @@ const insertNominee = db.prepare(`
   VALUES (?, ?, 'nomination')
 `);
 
-router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nominationChain, (req, res, next) => {
+router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submissionLimiter, ...nominationChain, (req, res, next) => {
   // Custom validation handler — redirects for form submissions, JSON for API
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1543,7 +1558,7 @@ const insertVote = db.prepare(`
   VALUES (?, ?, ?)
 `);
 
-router.post('/meetings/:meetingId/votes', submissionLimiter, (req, res) => {
+router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimiter, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
   if (isNaN(meetingId)) {
     return res.status(400).json({ error: 'Invalid meeting ID.' });
