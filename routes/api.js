@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
+const Sentry = require('@sentry/node');
 const db = require('../db');
 const config = require('../config');
 const analytics = require('../services/analytics');
@@ -34,6 +35,40 @@ const {
 } = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
+// Rate-limit telemetry — every 429 ships a PostHog event for analytics, and
+// the IP backstop additionally captures a Sentry warning since hitting it is
+// rare and suggests either an unusually large gathering or abuse.
+// ---------------------------------------------------------------------------
+function rateLimitHandler({ scope, alertSentry }) {
+  return (req, res, next, options) => {
+    const distinctId = (req.session && req.session.userId)
+      ? String(req.session.userId)
+      : (req.cookies && req.cookies._client_id) || 'anonymous';
+    const meetingId = req.params && req.params.meetingId
+      ? parseInt(req.params.meetingId, 10)
+      : null;
+    const properties = {
+      scope,
+      endpoint: `${req.method} ${req.baseUrl || ''}${req.route ? req.route.path : req.path}`,
+      meeting_id: Number.isFinite(meetingId) ? meetingId : null,
+      authenticated: !!(req.session && req.session.userId),
+      limit_max: options.max,
+      window_ms: options.windowMs,
+    };
+    analytics.track(distinctId, 'rate_limit_hit', properties);
+
+    if (alertSentry && config.sentry && config.sentry.dsn) {
+      Sentry.captureMessage(`Rate limit IP backstop tripped on ${properties.endpoint}`, {
+        level: 'warning',
+        extra: properties,
+      });
+    }
+
+    res.status(options.statusCode).send(options.message);
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Submission rate limiter — 60 per 15 min per device (nominations + votes).
 // Keyed by the _client_id cookie so members sharing a WiFi at an in-person
 // meeting each get their own bucket. Falls back to IP subnet for first-time
@@ -54,6 +89,7 @@ const submissionLimiter = rateLimit({
     }
     return ipKeyGenerator(req.ip);
   },
+  handler: rateLimitHandler({ scope: 'device', alertSentry: false }),
 });
 
 // ---------------------------------------------------------------------------
@@ -69,6 +105,7 @@ const submissionIpBackstop = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many submissions from this network. Please try again in a few minutes.' },
   keyGenerator: (req) => ipKeyGenerator(req.ip),
+  handler: rateLimitHandler({ scope: 'ip_backstop', alertSentry: true }),
 });
 
 // ---------------------------------------------------------------------------
