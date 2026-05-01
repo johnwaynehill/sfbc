@@ -415,6 +415,9 @@ function advanceMeetingStatus(meetingId, newStatus) {
         if (updated.vote_results_json) {
           setPickResultsJsonStmt.run(updated.vote_results_json, existing.id);
         }
+        if (updated.topic) {
+          updateTopicStmt.run(updated.topic, existing.id);
+        }
       } else {
         // Create new pick
         const nom = db.prepare(
@@ -425,7 +428,7 @@ function advanceMeetingStatus(meetingId, newStatus) {
           updated.month_year,
           'upcoming',
           nom ? nom.user_id : null,
-          null
+          updated.topic || null
         );
         const newPick = getByBookAndMonthStmt.get(updated.winning_book_id, updated.month_year);
         if (newPick) {

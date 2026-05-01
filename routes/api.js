@@ -318,7 +318,11 @@ router.post('/admin/meetings', requireAdmin, ...meetingChain, handleValidationEr
     location_text: req.body.location_text || null,
   });
 
-  res.status(201).json({ success: true, meeting });
+  if (req.body.topic) {
+    meetings.updateTopic(meeting.id, req.body.topic);
+  }
+
+  res.status(201).json({ success: true, meeting: meetings.getById(meeting.id) });
 });
 
 // ---------------------------------------------------------------------------

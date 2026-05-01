@@ -130,6 +130,10 @@ const meetingChain = [
     .optional({ values: 'falsy' })
     .trim()
     .isLength({ max: 300 }).withMessage('Location text is too long (max 300 characters).'),
+  body('topic')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ max: 100 }).withMessage('Topic is too long (max 100 characters).'),
 ];
 
 const meetingStatusChain = [
