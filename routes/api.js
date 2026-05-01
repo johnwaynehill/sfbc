@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
-const rateLimit = require('express-rate-limit');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const db = require('../db');
 const config = require('../config');
 const analytics = require('../services/analytics');
@@ -34,14 +34,41 @@ const {
 } = require('../middleware/validate');
 
 // ---------------------------------------------------------------------------
-// Submission rate limiter — 10 per 15 min per IP (nominations + votes)
+// Submission rate limiter — 60 per 15 min per device (nominations + votes).
+// Keyed by the _client_id cookie so members sharing a WiFi at an in-person
+// meeting each get their own bucket. Falls back to IP subnet for first-time
+// visitors before the cookie is set, and to deter bots that ignore cookies.
 // ---------------------------------------------------------------------------
 const submissionLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 60,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many submissions. Please try again in a few minutes.' },
+  keyGenerator: (req) => {
+    if (req.session && req.session.userId) {
+      return `user-${req.session.userId}`;
+    }
+    if (req.cookies && req.cookies._client_id) {
+      return `client-${req.cookies._client_id}`;
+    }
+    return ipKeyGenerator(req.ip);
+  },
+});
+
+// ---------------------------------------------------------------------------
+// IP backstop — catches scripts that rotate cookies to bypass the per-device
+// limiter. 500 / 15 min per IP subnet is well above a venue-meeting's
+// realistic ceiling (e.g. 50 attendees × 10 submissions each) but well below
+// any cookie-rotation attack rate.
+// ---------------------------------------------------------------------------
+const submissionIpBackstop = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many submissions from this network. Please try again in a few minutes.' },
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
 });
 
 // ---------------------------------------------------------------------------
@@ -1308,7 +1335,7 @@ const insertNominee = db.prepare(`
   VALUES (?, ?, 'nomination')
 `);
 
-router.post('/meetings/:meetingId/nominations', submissionLimiter, ...nominationChain, (req, res, next) => {
+router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submissionLimiter, ...nominationChain, (req, res, next) => {
   // Custom validation handler — redirects for form submissions, JSON for API
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1531,7 +1558,7 @@ const insertVote = db.prepare(`
   VALUES (?, ?, ?)
 `);
 
-router.post('/meetings/:meetingId/votes', submissionLimiter, (req, res) => {
+router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimiter, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
   if (isNaN(meetingId)) {
     return res.status(400).json({ error: 'Invalid meeting ID.' });
