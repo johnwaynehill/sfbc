@@ -424,7 +424,8 @@ function advanceMeetingStatus(meetingId, newStatus) {
           updated.winning_book_id,
           updated.month_year,
           'upcoming',
-          nom ? nom.user_id : null
+          nom ? nom.user_id : null,
+          null
         );
         const newPick = getByBookAndMonthStmt.get(updated.winning_book_id, updated.month_year);
         if (newPick) {
