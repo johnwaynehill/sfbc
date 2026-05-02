@@ -64,6 +64,11 @@ app.use(helmet({
       frameSrc: ["'self'", 'https://tally.so'],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
+      // Helmet adds upgrade-insecure-requests by default, which forces every
+      // subresource to https. That breaks LAN dev testing (e.g. accessing
+      // the dev server from a phone on the same WiFi) since there's no TLS.
+      // Keep the upgrade behavior in production; turn it off in dev.
+      upgradeInsecureRequests: config.nodeEnv === 'production' ? [] : null,
     },
   },
 }));
@@ -250,7 +255,9 @@ app.use((err, req, res, _next) => {
 // ---------------------------------------------------------------------------
 // Start
 // ---------------------------------------------------------------------------
-const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+// HOST env override lets you bind to 0.0.0.0 in dev so you can hit the
+// server from another device on the LAN (e.g. testing on a real phone).
+const host = process.env.HOST || (process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost');
 const server = app.listen(config.port, host, () => {
   console.log(`\n  GatherBound running at http://${host}:${config.port}\n`);
 });
