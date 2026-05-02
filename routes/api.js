@@ -1185,6 +1185,11 @@ router.post('/books/:bookId/reviews', requireMember, ...reviewChain, handleValid
   reviewsService.create(bookId, req.user.id, grade, body, hasSpoilers, didFinish);
   broadcastHomeActivity();
   analytics.track(req.user.id, 'review_submitted', { bookId, grade, hasSpoiler: hasSpoilers, didFinish });
+  // Activation milestone: fire once when the user posts their very first review.
+  const reviewCount = db.prepare('SELECT count(*) AS n FROM reviews WHERE user_id = ?').get(req.user.id).n;
+  if (reviewCount === 1) {
+    analytics.track(req.user.id, 'first_review_submitted', { bookId, grade });
+  }
   res.status(201).json({ success: true });
 });
 
@@ -1484,6 +1489,17 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
   broadcastPublicNominees(meetingId);
   broadcastHomeActivity();
   analytics.track(req.session?.userId || fingerprint, 'nomination_created', { meetingId, bookTitle: book.title });
+  // Activation milestone: only meaningful for logged-in users (anon nominators
+  // have no stable identity across meetings). Excludes the current meeting so
+  // re-nominating doesn't re-fire the milestone.
+  if (userId) {
+    const priorOther = db.prepare(
+      'SELECT count(*) AS n FROM nominations WHERE user_id = ? AND meeting_id != ?'
+    ).get(userId, meetingId).n;
+    if (priorOther === 0) {
+      analytics.track(userId, 'first_nomination_created', { meetingId, bookTitle: book.title });
+    }
+  }
 
   const slug = monthYearSlug(meeting.month_year);
   const wantsJson = req.get('Accept')?.includes('application/json');
