@@ -1314,6 +1314,7 @@ router.delete('/replies/:replyId', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/books/search', async (req, res) => {
   const { title, author } = req.query;
+  const searcherId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
 
   if (!title || !author || title.length < 2 || author.length < 2) {
     return res.json({ found: false });
@@ -1322,6 +1323,7 @@ router.get('/books/search', async (req, res) => {
   try {
     const result = await searchGoogleBooks(title, author);
     if (!result) {
+      analytics.track(searcherId, 'book_search_no_results', { kind: 'title_author', titleLen: title.length, authorLen: author.length });
       return res.json({ found: false });
     }
 
@@ -1345,6 +1347,7 @@ router.get('/books/search', async (req, res) => {
 router.get('/books/search-multi', async (req, res) => {
   const q = (req.query.q || '').trim();
   const max = Math.min(parseInt(req.query.maxResults, 10) || 5, 10);
+  const searcherId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
 
   if (q.length < 3) {
     return res.json({ results: [] });
@@ -1352,6 +1355,9 @@ router.get('/books/search-multi', async (req, res) => {
 
   try {
     const results = await searchGoogleBooksMulti(q, max);
+    if (results.length === 0) {
+      analytics.track(searcherId, 'book_search_no_results', { kind: 'multi', q_length: q.length });
+    }
     res.json({ results });
   } catch {
     res.json({ results: [] });

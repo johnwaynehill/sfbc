@@ -93,12 +93,17 @@ router.post('/auth/send-link', authLimiter, ...emailChain, async (req, res) => {
 
   // Find or create the user (auto-register on first login)
   let user = findUserByEmail.get(email);
+  let isNewUser = false;
   if (!user) {
     const displayName = email.split('@')[0];
     createUser.run(email, displayName);
     user = findUserByEmail.get(email);
+    isNewUser = true;
   }
 
+  if (isNewUser) {
+    analytics.track(user.id, 'account_created', { email, method: 'magic_link', invited: !!req.session.inviteCode });
+  }
   analytics.track(user.id, 'magic_link_requested', { email });
 
   // Generate a token
@@ -169,6 +174,7 @@ router.get('/auth/callback', (req, res) => {
   // Attribute invite if present
   if (req.session.inviteCode) {
     db.prepare('UPDATE invites SET use_count = use_count + 1 WHERE code = ?').run(req.session.inviteCode);
+    analytics.track(row.uid, 'invite_redeemed', { code: req.session.inviteCode, method: 'magic_link' });
     delete req.session.inviteCode;
   }
 
@@ -198,6 +204,7 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
   }
 
   let user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+  let isNewUser = false;
 
   if (!user) {
     // New user — create account with hashed password (mirrors magic-link auto-registration)
@@ -205,17 +212,22 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
     const displayName = email.split('@')[0];
     db.prepare("INSERT INTO users (email, display_name, password_hash, role) VALUES (?, ?, ?, 'member')").run(email, displayName, hash);
     user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+    isNewUser = true;
   } else if (!user.password_hash || !bcrypt.compareSync(password, user.password_hash)) {
     analytics.track(email, 'login_failed', { method: 'password', reason: 'invalid_credentials', userExists: true, hasPasswordHash: !!user.password_hash });
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 
   req.session.userId = user.id;
+  if (isNewUser) {
+    analytics.track(user.id, 'account_created', { email, method: 'password', invited: !!req.session.inviteCode });
+  }
   analytics.track(user.id, 'user_login', { method: 'password' });
 
   // Attribute invite if present
   if (req.session.inviteCode) {
     db.prepare('UPDATE invites SET use_count = use_count + 1 WHERE code = ?').run(req.session.inviteCode);
+    analytics.track(user.id, 'invite_redeemed', { code: req.session.inviteCode, method: 'password' });
     delete req.session.inviteCode;
   }
 
