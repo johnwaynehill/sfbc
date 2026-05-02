@@ -1,11 +1,14 @@
 /**
  * vote-ballot.js — Progressive enhancement for the ranked-choice ballot.
  *
- * 1. Desktop drag & drop reordering
- * 2. Mobile touch reordering (with floating ghost)
- * 3. Rank number updates after each reorder
- * 4. Hidden ranking input kept in sync with DOM order
- * 5. Fetch-based form submission with redirect to results
+ * 1. Desktop drag & drop reordering (HTML5 native)
+ * 2. Mobile touch reordering via long-press anywhere on a card (~250ms hold)
+ *    with haptic feedback and a floating ghost that follows the finger
+ * 3. Up/down arrow buttons as accessibility fallback (keyboard, screen
+ *    reader, motor-impairment users)
+ * 4. Rank number updates after each reorder
+ * 5. Hidden ranking input kept in sync with DOM order
+ * 6. Fetch-based form submission with redirect to results
  */
 (function () {
   'use strict';
@@ -23,14 +26,21 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // -----------------------------------------------------------------------
+  // Haptic helper — short tactile blip on supported devices.
+  // Wrap in a try/catch since some browsers throw on unsupported patterns.
+  // -----------------------------------------------------------------------
+  function haptic(ms) {
+    if (!('vibrate' in navigator)) return;
+    try { navigator.vibrate(ms); } catch (_) { /* no-op */ }
+  }
+
+  // -----------------------------------------------------------------------
   // Helpers
   // -----------------------------------------------------------------------
 
   function getCards() {
     return Array.from(list.querySelectorAll('.ballot-card'));
   }
-
-  var isMobile = window.matchMedia('(max-width: 640px)').matches;
 
   function updateRanks() {
     var cards = getCards();
@@ -111,72 +121,116 @@
   });
 
   // -----------------------------------------------------------------------
-  // Mobile touch reordering (desktop only — mobile uses arrow buttons)
+  // Touch reordering — long-press (~250ms still) anywhere on a card to enter
+  // drag mode. Lets us avoid the "touch-anywhere = drag-anywhere" conflict
+  // that broke iPhone 13 (taps and scroll attempts hijacked into drags),
+  // while still giving members a real D&D experience without arrow tedium.
   // -----------------------------------------------------------------------
+  var LONG_PRESS_MS = 250;
+  var MOVE_CANCEL_PX = 10;
 
-  if (!isMobile) {
-    var touchCard = null;
-    var ghost = null;
-    var touchStartY = 0;
-    var touchOffsetY = 0;
+  var touchCard = null;     // the card currently being dragged
+  var pressTimer = null;    // long-press timer (null when inactive)
+  var pressCard = null;     // card the user is pressing (pre-drag-mode)
+  var pressStartX = 0;
+  var pressStartY = 0;
+  var ghost = null;
+  var touchOffsetY = 0;
 
-    list.addEventListener('touchstart', function (e) {
-      var card = e.target.closest('.ballot-card');
-      if (!card) return;
+  function clearPressTimer() {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+    pressCard = null;
+  }
 
-      touchCard = card;
-      var rect = card.getBoundingClientRect();
-      touchStartY = e.touches[0].clientY;
-      touchOffsetY = touchStartY - rect.top;
+  function activateDrag(card, startX, startY) {
+    touchCard = card;
+    var rect = card.getBoundingClientRect();
+    touchOffsetY = startY - rect.top;
 
-      // Create floating ghost clone
-      ghost = card.cloneNode(true);
-      ghost.classList.add('ballot-card--ghost');
-      ghost.style.width = rect.width + 'px';
-      ghost.style.position = 'fixed';
-      ghost.style.left = rect.left + 'px';
-      ghost.style.top = rect.top + 'px';
-      ghost.style.zIndex = '1000';
-      ghost.style.pointerEvents = 'none';
-      document.body.appendChild(ghost);
+    // Floating ghost that follows the finger
+    ghost = card.cloneNode(true);
+    ghost.classList.add('ballot-card--ghost');
+    ghost.style.width = rect.width + 'px';
+    ghost.style.position = 'fixed';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.zIndex = '1000';
+    ghost.style.pointerEvents = 'none';
+    document.body.appendChild(ghost);
 
-      card.classList.add('ballot-card--dragging');
-    }, { passive: true });
+    card.classList.add('ballot-card--dragging');
+    haptic(15);  // short blip — drag mode confirmed
+  }
 
-    list.addEventListener('touchmove', function (e) {
-      if (!touchCard || !ghost) return;
-      e.preventDefault();
+  list.addEventListener('touchstart', function (e) {
+    // Don't intercept taps on interactive children (arrows, details link)
+    if (e.target.closest('.ballot-card__move, .ballot-card__details-link')) {
+      return;
+    }
+    var card = e.target.closest('.ballot-card');
+    if (!card) return;
 
-      var y = e.touches[0].clientY;
-      ghost.style.top = (y - touchOffsetY) + 'px';
+    pressCard = card;
+    pressStartX = e.touches[0].clientX;
+    pressStartY = e.touches[0].clientY;
 
-      var target = getCardFromPoint(e.touches[0].clientX, y, touchCard);
-      if (target) {
-        if (target.before) {
-          list.insertBefore(touchCard, target.card);
-        } else {
-          list.insertBefore(touchCard, target.card.nextSibling);
-        }
-        updateRanks();
+    pressTimer = setTimeout(function () {
+      pressTimer = null;
+      activateDrag(pressCard, pressStartX, pressStartY);
+    }, LONG_PRESS_MS);
+  }, { passive: true });
+
+  list.addEventListener('touchmove', function (e) {
+    var t = e.touches[0];
+
+    // Pre-drag-mode: cancel the long-press if the finger moves significantly
+    // (the user is scrolling or sliding, not pressing-and-holding).
+    if (pressTimer) {
+      var dx = t.clientX - pressStartX;
+      var dy = t.clientY - pressStartY;
+      if (Math.abs(dx) > MOVE_CANCEL_PX || Math.abs(dy) > MOVE_CANCEL_PX) {
+        clearPressTimer();
       }
-    }, { passive: false });
-
-    function endTouch() {
-      if (touchCard) {
-        touchCard.classList.remove('ballot-card--dragging');
-        touchCard = null;
-      }
-      if (ghost) {
-        ghost.remove();
-        ghost = null;
-      }
-      updateRanks();
-      syncHiddenInput();
+      return;
     }
 
-    list.addEventListener('touchend', endTouch);
-    list.addEventListener('touchcancel', endTouch);
+    // Drag mode: take over scroll, follow the finger, reorder cards
+    if (!touchCard || !ghost) return;
+    e.preventDefault();
+
+    var y = t.clientY;
+    ghost.style.top = (y - touchOffsetY) + 'px';
+
+    var target = getCardFromPoint(t.clientX, y, touchCard);
+    if (target) {
+      if (target.before) {
+        list.insertBefore(touchCard, target.card);
+      } else {
+        list.insertBefore(touchCard, target.card.nextSibling);
+      }
+      updateRanks();
+    }
+  }, { passive: false });
+
+  function endTouch() {
+    clearPressTimer();
+    if (touchCard) {
+      touchCard.classList.remove('ballot-card--dragging');
+      touchCard = null;
+    }
+    if (ghost) {
+      ghost.remove();
+      ghost = null;
+    }
+    updateRanks();
+    syncHiddenInput();
   }
+
+  list.addEventListener('touchend', endTouch);
+  list.addEventListener('touchcancel', endTouch);
 
   // -----------------------------------------------------------------------
   // Book details dialog (bottom sheet on mobile, modal on desktop)
@@ -312,8 +366,10 @@
     messageEl.textContent = msg;
   }
 
-  // On mobile, remove draggable attribute to prevent native drag interference
-  if (isMobile) {
+  // On touch-primary devices, remove the HTML5 draggable attribute so native
+  // drag doesn't fight with our long-press touch handler. Desktop with mouse
+  // keeps native drag; touch users get long-press + ghost.
+  if (window.matchMedia('(pointer: coarse)').matches) {
     getCards().forEach(function (card) {
       card.removeAttribute('draggable');
     });

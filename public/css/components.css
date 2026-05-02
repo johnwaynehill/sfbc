@@ -2472,8 +2472,10 @@ textarea.form-input {
 }
 
 .ballot-card--ghost {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
   border-color: var(--text);
+  transform: scale(1.02);
+  transition: transform 100ms ease;
 }
 
 /* Rank badge */
@@ -2595,19 +2597,16 @@ textarea.form-input {
   cursor: default;
 }
 
-/* Drag handle */
-.ballot-card__handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text3);
-  cursor: grab;
-  padding: 2px 0;
-  touch-action: none;
-}
-
-.ballot-card__handle:active {
-  cursor: grabbing;
+/* On touch-primary devices (phones, tablets, touchscreen laptops) we own the
+ * touch sequence ourselves so the long-press-to-drag gesture works reliably.
+ * Without this, the browser's gesture recognizer commits to a scroll as soon
+ * as the finger moves and our preventDefault() in touchmove is ignored.
+ * Page scroll is preserved because it's only the cards (small targets) that
+ * are non-pannable — header, gaps, and submit button still scroll normally. */
+@media (pointer: coarse) {
+  .ballot-card {
+    touch-action: none;
+  }
 }
 
 /* Hint text: show/hide per breakpoint */
@@ -2634,11 +2633,6 @@ textarea.form-input {
     display: none;
   }
 
-  /* Hide drag handle on mobile */
-  .ballot-card__handle {
-    display: none;
-  }
-
   /* Cover must fit the grid column */
   .ballot-card .book-cover--sm {
     width: 72px;
@@ -2655,7 +2649,7 @@ textarea.form-input {
     height: 18px;
   }
 
-  /* Stack controls without grip handle gap */
+  /* Stack arrow controls compactly */
   .ballot-card__controls {
     gap: var(--s-1);
     justify-content: center;
