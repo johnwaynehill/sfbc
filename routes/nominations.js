@@ -4,6 +4,8 @@ const router = require('express').Router();
 const db = require('../db');
 const meetings = require('../services/meetings');
 const picksService = require('../services/monthly-picks');
+const analytics = require('../services/analytics');
+const { getFingerprint } = require('../services/fingerprint');
 const { monthYearSlug } = require('../utils/format');
 const { resolveMonth } = require('../utils/resolve-month');
 
@@ -49,6 +51,14 @@ router.get('/nominations/:slug', (req, res) => {
   }
 
   res.locals.layout = 'layouts/focus-shell';
+
+  const fingerprint = getFingerprint(req, res, meeting.id);
+  analytics.track(req.session?.userId || fingerprint, 'meeting_viewed', {
+    kind: 'nominations_live',
+    meetingId: meeting.id,
+    monthYear: meeting.month_year,
+    nomineeCount: nominees.length,
+  });
 
   res.render('nominations', {
     pageTitle: 'Nominations',

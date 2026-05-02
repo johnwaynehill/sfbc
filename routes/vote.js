@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const db = require('../db');
 const { getFingerprint } = require('../services/fingerprint');
+const analytics = require('../services/analytics');
 const picksService = require('../services/monthly-picks');
 const { enrichBookMetadata } = require('../services/books');
 const {
@@ -95,6 +96,13 @@ router.get('/vote/:slug', async (req, res) => {
   }
 
   res.locals.layout = 'layouts/focus-shell';
+
+  // Track ballot view with the same distinct-id pattern as vote_cast so funnels link.
+  analytics.track(req.session?.userId || fingerprint, 'meeting_viewed', {
+    kind: 'vote',
+    meetingId: meeting.id,
+    monthYear: meeting.month_year,
+  });
 
   res.render('vote', {
     pageTitle: 'Cast Your Vote',

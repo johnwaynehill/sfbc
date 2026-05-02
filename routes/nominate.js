@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const db = require('../db');
 const { getFingerprint } = require('../services/fingerprint');
+const analytics = require('../services/analytics');
 const { monthYearSlug } = require('../utils/format');
 const { resolveMonth } = require('../utils/resolve-month');
 
@@ -54,6 +55,15 @@ router.get('/nominate/:slug', (req, res) => {
 
   // ?edit=1 lets a user re-submit (change their nomination)
   const wantsEdit = req.query.edit === '1' && existing;
+
+  // Track nomination form view with the same distinct-id pattern as nomination_created.
+  analytics.track(req.session?.userId || fingerprint, 'meeting_viewed', {
+    kind: 'nominate',
+    meetingId: meeting.id,
+    monthYear: meeting.month_year,
+    editMode: !!wantsEdit,
+    alreadyNominated: !wantsEdit && !!existing,
+  });
 
   res.render('nominate', {
     pageTitle: wantsEdit ? 'Edit Nomination' : 'Nominate a Book',

@@ -13,6 +13,7 @@ const meetingsService = require('../services/meetings');
 const picksService = require('../services/monthly-picks');
 const reactionsService = require('../services/reactions');
 const repliesService = require('../services/replies');
+const analytics = require('../services/analytics');
 const announcementsService = require('../services/announcements');
 const activityService = require('../services/activity');
 
@@ -455,6 +456,17 @@ router.get('/books/:authorSlug/:titleSlug', async (req, res) => {
 
   // Site settings
   const libraryRow = db.prepare("SELECT value FROM site_settings WHERE key = 'library_url'").get();
+
+  // Track the view with the user's distinct id (or _client_id cookie for anon).
+  // Use a non-meeting-scoped id so book funnels work across visits.
+  const viewerId = req.session?.userId || req.cookies?._client_id || 'anonymous';
+  analytics.track(viewerId, 'book_viewed', {
+    bookId: book.id,
+    title: book.title,
+    author: book.author,
+    monthYear: book.month_year,
+    isClubPick: !!book.month_year,
+  });
 
   res.render('book-detail', {
     pageTitle: `${book.title} by ${book.author}`,
