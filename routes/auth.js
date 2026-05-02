@@ -93,12 +93,17 @@ router.post('/auth/send-link', authLimiter, ...emailChain, async (req, res) => {
 
   // Find or create the user (auto-register on first login)
   let user = findUserByEmail.get(email);
+  let isNewUser = false;
   if (!user) {
     const displayName = email.split('@')[0];
     createUser.run(email, displayName);
     user = findUserByEmail.get(email);
+    isNewUser = true;
   }
 
+  if (isNewUser) {
+    analytics.track(user.id, 'account_created', { email, method: 'magic_link', invited: !!req.session.inviteCode });
+  }
   analytics.track(user.id, 'magic_link_requested', { email });
 
   // Generate a token
@@ -134,6 +139,7 @@ router.get('/auth/callback', (req, res) => {
   const { token } = req.query;
 
   if (!token) {
+    analytics.track('anonymous', 'magic_link_failed', { reason: 'missing_token' });
     res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Invalid Link',
@@ -146,6 +152,7 @@ router.get('/auth/callback', (req, res) => {
 
   const row = findValidToken.get(token);
   if (!row) {
+    analytics.track('anonymous', 'magic_link_failed', { reason: 'invalid_or_expired' });
     res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Link Expired',
@@ -161,11 +168,13 @@ router.get('/auth/callback', (req, res) => {
 
   // Set session
   req.session.userId = row.uid;
+  analytics.track(row.uid, 'magic_link_consumed', { email: row.email });
   analytics.track(row.uid, 'user_login', { method: 'magic_link' });
 
   // Attribute invite if present
   if (req.session.inviteCode) {
     db.prepare('UPDATE invites SET use_count = use_count + 1 WHERE code = ?').run(req.session.inviteCode);
+    analytics.track(row.uid, 'invite_redeemed', { code: req.session.inviteCode, method: 'magic_link' });
     delete req.session.inviteCode;
   }
 
@@ -185,14 +194,17 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
   const password = req.body.password || '';
 
   if (!password) {
+    analytics.track(email, 'login_failed', { method: 'password', reason: 'missing_password' });
     return res.status(400).json({ error: 'Password is required.' });
   }
 
   if (password.length < 8) {
+    analytics.track(email, 'login_failed', { method: 'password', reason: 'password_too_short' });
     return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   }
 
   let user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+  let isNewUser = false;
 
   if (!user) {
     // New user — create account with hashed password (mirrors magic-link auto-registration)
@@ -200,16 +212,22 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
     const displayName = email.split('@')[0];
     db.prepare("INSERT INTO users (email, display_name, password_hash, role) VALUES (?, ?, ?, 'member')").run(email, displayName, hash);
     user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
+    isNewUser = true;
   } else if (!user.password_hash || !bcrypt.compareSync(password, user.password_hash)) {
+    analytics.track(email, 'login_failed', { method: 'password', reason: 'invalid_credentials', userExists: true, hasPasswordHash: !!user.password_hash });
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 
   req.session.userId = user.id;
+  if (isNewUser) {
+    analytics.track(user.id, 'account_created', { email, method: 'password', invited: !!req.session.inviteCode });
+  }
   analytics.track(user.id, 'user_login', { method: 'password' });
 
   // Attribute invite if present
   if (req.session.inviteCode) {
     db.prepare('UPDATE invites SET use_count = use_count + 1 WHERE code = ?').run(req.session.inviteCode);
+    analytics.track(user.id, 'invite_redeemed', { code: req.session.inviteCode, method: 'password' });
     delete req.session.inviteCode;
   }
 

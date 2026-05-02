@@ -1314,6 +1314,7 @@ router.delete('/replies/:replyId', requireMember, (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/books/search', async (req, res) => {
   const { title, author } = req.query;
+  const searcherId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
 
   if (!title || !author || title.length < 2 || author.length < 2) {
     return res.json({ found: false });
@@ -1322,6 +1323,7 @@ router.get('/books/search', async (req, res) => {
   try {
     const result = await searchGoogleBooks(title, author);
     if (!result) {
+      analytics.track(searcherId, 'book_search_no_results', { kind: 'title_author', titleLen: title.length, authorLen: author.length });
       return res.json({ found: false });
     }
 
@@ -1345,6 +1347,7 @@ router.get('/books/search', async (req, res) => {
 router.get('/books/search-multi', async (req, res) => {
   const q = (req.query.q || '').trim();
   const max = Math.min(parseInt(req.query.maxResults, 10) || 5, 10);
+  const searcherId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
 
   if (q.length < 3) {
     return res.json({ results: [] });
@@ -1352,6 +1355,9 @@ router.get('/books/search-multi', async (req, res) => {
 
   try {
     const results = await searchGoogleBooksMulti(q, max);
+    if (results.length === 0) {
+      analytics.track(searcherId, 'book_search_no_results', { kind: 'multi', q_length: q.length });
+    }
     res.json({ results });
   } catch {
     res.json({ results: [] });
@@ -1377,6 +1383,8 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const firstError = errors.array()[0].msg;
+    const nominatorId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
+    analytics.track(nominatorId, 'nomination_rejected', { reason: 'validation_failure', validation: errors.array()[0].path });
     const wantsJson = req.get('Accept')?.includes('application/json');
     if (wantsJson) {
       return res.status(400).json({ error: firstError });
@@ -1394,16 +1402,20 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
   next();
 }, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
+  const nominatorId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
   if (isNaN(meetingId)) {
+    analytics.track(nominatorId, 'nomination_rejected', { reason: 'invalid_meeting_id' });
     return res.status(400).json({ error: 'Invalid meeting ID.' });
   }
 
   const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId);
   if (!meeting) {
+    analytics.track(nominatorId, 'nomination_rejected', { reason: 'meeting_not_found', meetingId });
     return res.status(404).json({ error: 'Meeting not found.' });
   }
 
   if (meeting.status !== 'nominations') {
+    analytics.track(nominatorId, 'nomination_rejected', { reason: 'not_nominating_status', meetingId, meetingStatus: meeting.status });
     return res.status(403).json({ error: 'Nominations are not open for this meeting.' });
   }
 
@@ -1431,6 +1443,7 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
   `).get(book.id);
 
   if (alreadyRead) {
+    analytics.track(nominatorId, 'nomination_rejected', { reason: 'already_read', meetingId, bookId: book.id, bookTitle: book.title });
     const wantsJson = req.get('Accept')?.includes('application/json');
     const msg = 'The club has already read this book! Try nominating something new.';
     if (wantsJson) {
@@ -1597,16 +1610,22 @@ const insertVote = db.prepare(`
 
 router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimiter, (req, res) => {
   const meetingId = parseInt(req.params.meetingId, 10);
+  const voterId = req.session?.userId
+    || (req.cookies && req.cookies._client_id)
+    || 'anonymous';
   if (isNaN(meetingId)) {
+    analytics.track(voterId, 'vote_rejected', { reason: 'invalid_meeting_id' });
     return res.status(400).json({ error: 'Invalid meeting ID.' });
   }
 
   const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId);
   if (!meeting) {
+    analytics.track(voterId, 'vote_rejected', { reason: 'meeting_not_found', meetingId });
     return res.status(404).json({ error: 'Meeting not found.' });
   }
 
   if (meeting.status !== 'voting') {
+    analytics.track(voterId, 'vote_rejected', { reason: 'not_voting_status', meetingId, meetingStatus: meeting.status });
     return res.status(403).json({ error: 'Voting is not open for this meeting.' });
   }
 
@@ -1617,6 +1636,7 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
 
   // Already voted?
   if (hasVoted(meetingId, fingerprint)) {
+    analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'already_voted', meetingId });
     const wantsJson = req.get('Accept')?.includes('application/json');
     if (wantsJson) {
       return res.status(409).json({ error: 'You have already voted in this meeting.' });
@@ -1656,6 +1676,7 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
 
   // Validate ranking
   if (!ranking || !Array.isArray(ranking) || ranking.length !== validBookIds.size) {
+    analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'invalid_ranking_count', meetingId, expected: validBookIds.size, got: ranking?.length ?? 0 });
     const wantsJson = req.get('Accept')?.includes('application/json');
     if (wantsJson) {
       return res.status(400).json({ error: 'Ranking must include all nominees exactly once.' });
@@ -1667,6 +1688,7 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
   const seen = new Set();
   for (const id of ranking) {
     if (!validBookIds.has(id) || seen.has(id)) {
+      analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'invalid_book_ids', meetingId });
       const wantsJson = req.get('Accept')?.includes('application/json');
       if (wantsJson) {
         return res.status(400).json({ error: 'Ranking contains invalid or duplicate book IDs.' });
