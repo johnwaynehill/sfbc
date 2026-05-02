@@ -195,6 +195,31 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Pick topic/theme** — New `topic` column on `monthly_picks` (migration 022); editable on admin pick detail; displayed as themed banner on nominate and nominations pages
 - **Voting "About this book" link** — Replaced Google Books + Open Library links on ballot cards with single "About this book →" link to in-app book detail page; opens in new tab to preserve ballot order
 
+## Voting Reliability & Mobile UX (May 2026)
+
+- **Close-voting RangeError fix** — `createStmt` for `monthly_picks` was missing the `topic` parameter, throwing `Too few parameter values were provided` whenever close-voting created a new pick (no pre-linked pick on the meeting). Caused the "network error" popup admins saw closing the July session
+- **Topic propagation across voting close** — When voting close creates or links a monthly pick, the meeting's topic is now copied onto the pick (was lost as `null`); server-side validation added to `meetingChain`; `POST /admin/meetings` now accepts `topic` at creation
+- **Submission rate limiter re-keyed by device** — Was IP-keyed at 10/15min, so 17 members on shared venue WiFi exhausted the bucket and ~5 couldn't submit votes. Now keys by `session.userId → _client_id cookie → IP subnet` with a 60/15min cap per device
+- **IP backstop limiter** — 500/15min per IP subnet catches cookie-rotation scripts that would otherwise bypass the per-device cap; trips fire a Sentry warning since rare = high signal
+- **Mobile drag-and-drop voting restored** — Long-press (~250ms still) on any card activates drag mode with a `navigator.vibrate(15)` haptic blip; 10px movement threshold cancels (treated as scroll); arrows preserved as accessibility fallback. Replaces the previous "arrows-only" workaround that members found tedious. `touch-action: none` scoped to cards under `(pointer: coarse)` so iOS Safari hands the touch sequence to JS
+- **Grip handle removed** — Long-press affordance replaces the visual clutter; kicks off the haptics backlog item (BACKLOG.md:109)
+- **Duplicate June 2026 meeting cleanup** — One-off prod fix: removed an empty stale meeting that was rendering "To Be Decided" alongside the real Piranesi pick on the homepage
+
+## Analytics Expansion & Dashboards (May 2026)
+
+- **11 new server-side events** — `vote_rejected`, `nomination_rejected`, `login_failed`, `magic_link_failed`, `magic_link_consumed`, `account_created` (split from `user_login`), `invite_redeemed` (closes the invite funnel with `invite_created`), `book_search_no_results` (only fires on empty results — no keystroke firehose), `meeting_viewed` (kind: `vote | nominate | nominations_live`), `book_viewed`
+- **3 activation milestones** — `first_review_submitted`, `first_nomination_created`, `first_vote_cast` fire exactly once per user, alongside the regular event; race-free via post-insert count or "exclude current meeting" detection
+- **`votes.user_id` migration (024)** — Added nullable `user_id` so first-vote detection works for logged-in voters; anonymous votes leave it `NULL`
+- **`meetings.topic` migration (023)** — Topic moved off `monthly_picks` (which doesn't exist until voting closes) onto `meetings`, with backfill from any linked pick. Mirrored to pick on update
+- **Distinct-ID standardization** — `nomination_created` was using literal `'anonymous'` (collapsing all anon nominators into one PostHog person); now uses the per-meeting fingerprint to match `vote_cast`
+- **Two PostHog dashboards** — *Engagement & Health* (rate-limit hits, vote/nomination rejections, login failures, DAU, success ratios, search dead-ends) and *Funnels & Growth* (signup, invites, nomination/voting flows, club-pick → review, three activation funnels)
+- **`docs/Analytics.md`** — Full catalog of events, distinct-ID strategy, dashboard contents, "adding a new event" patterns, HogQL verification snippets, known limitations
+
+## Dev Workflow (May 2026)
+
+- **HOST env override** — Dev binds to `localhost` by default; `HOST=0.0.0.0` makes the server reachable from another device on the LAN (e.g. testing the voting page on a real phone)
+- **Dev CSP `upgrade-insecure-requests` disabled** — Helmet's default would force every CSS/image/font subresource to https when accessed from a LAN IP, breaking on-device dev testing. Disabled in dev only; production behavior unchanged
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background
