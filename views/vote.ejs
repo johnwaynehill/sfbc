@@ -116,13 +116,6 @@
                 <path d="M7 11V3M3 6l4-4 4 4"/>
               </svg>
             </button>
-            <div class="ballot-card__handle" aria-label="Drag to reorder">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <circle cx="5" cy="3" r="1.5"/><circle cx="11" cy="3" r="1.5"/>
-                <circle cx="5" cy="8" r="1.5"/><circle cx="11" cy="8" r="1.5"/>
-                <circle cx="5" cy="13" r="1.5"/><circle cx="11" cy="13" r="1.5"/>
-              </svg>
-            </div>
             <button type="button" class="ballot-card__move ballot-card__move--down"
                     aria-label="Move down"<%= i === nominees.length - 1 ? ' disabled' : '' %>>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -135,7 +128,7 @@
     </ol>
 
     <p class="t-caption text-tertiary ballot-hint ballot-hint--desktop">Drag cards or use the arrows to rank your picks</p>
-    <p class="t-caption text-tertiary ballot-hint ballot-hint--mobile">Use the arrows to rank your picks</p>
+    <p class="t-caption text-tertiary ballot-hint ballot-hint--mobile">Press &amp; hold a card to drag, or use the arrows</p>
 
     <!-- Hidden field keeps ranking in sync for no-JS form POST fallback -->
     <input type="hidden" name="ranking" id="ranking-input"
