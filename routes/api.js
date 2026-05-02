@@ -1483,7 +1483,7 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
   broadcastAdminMeetingNominees(meetingId);
   broadcastPublicNominees(meetingId);
   broadcastHomeActivity();
-  analytics.track(req.session?.userId || 'anonymous', 'nomination_created', { meetingId, bookTitle: book.title });
+  analytics.track(req.session?.userId || fingerprint, 'nomination_created', { meetingId, bookTitle: book.title });
 
   const slug = monthYearSlug(meeting.month_year);
   const wantsJson = req.get('Accept')?.includes('application/json');
