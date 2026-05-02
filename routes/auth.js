@@ -134,6 +134,7 @@ router.get('/auth/callback', (req, res) => {
   const { token } = req.query;
 
   if (!token) {
+    analytics.track('anonymous', 'magic_link_failed', { reason: 'missing_token' });
     res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Invalid Link',
@@ -146,6 +147,7 @@ router.get('/auth/callback', (req, res) => {
 
   const row = findValidToken.get(token);
   if (!row) {
+    analytics.track('anonymous', 'magic_link_failed', { reason: 'invalid_or_expired' });
     res.locals.layout = 'layouts/app-shell';
     return res.render('login', {
       pageTitle: 'Link Expired',
@@ -161,6 +163,7 @@ router.get('/auth/callback', (req, res) => {
 
   // Set session
   req.session.userId = row.uid;
+  analytics.track(row.uid, 'magic_link_consumed', { email: row.email });
   analytics.track(row.uid, 'user_login', { method: 'magic_link' });
 
   // Attribute invite if present
@@ -185,10 +188,12 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
   const password = req.body.password || '';
 
   if (!password) {
+    analytics.track(email, 'login_failed', { method: 'password', reason: 'missing_password' });
     return res.status(400).json({ error: 'Password is required.' });
   }
 
   if (password.length < 8) {
+    analytics.track(email, 'login_failed', { method: 'password', reason: 'password_too_short' });
     return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   }
 
@@ -201,6 +206,7 @@ router.post('/auth/password-login', authLimiter, ...emailChain, handleValidation
     db.prepare("INSERT INTO users (email, display_name, password_hash, role) VALUES (?, ?, ?, 'member')").run(email, displayName, hash);
     user = db.prepare('SELECT id, email, password_hash, role FROM users WHERE email = ?').get(email);
   } else if (!user.password_hash || !bcrypt.compareSync(password, user.password_hash)) {
+    analytics.track(email, 'login_failed', { method: 'password', reason: 'invalid_credentials', userExists: true, hasPasswordHash: !!user.password_hash });
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
 
