@@ -1620,8 +1620,8 @@ function broadcastStatusChange(meetingId, status) {
 // POST /api/meetings/:meetingId/votes
 // ---------------------------------------------------------------------------
 const insertVote = db.prepare(`
-  INSERT INTO votes (meeting_id, ranking_json, submitted_fingerprint)
-  VALUES (?, ?, ?)
+  INSERT INTO votes (meeting_id, ranking_json, submitted_fingerprint, user_id)
+  VALUES (?, ?, ?, ?)
 `);
 
 router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimiter, (req, res) => {
@@ -1715,12 +1715,25 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
   }
 
   // Store the vote
-  insertVote.run(meetingId, JSON.stringify(ranking), fingerprint);
+  const userId = req.session?.userId || null;
+  insertVote.run(meetingId, JSON.stringify(ranking), fingerprint, userId);
 
   // Broadcast updated results to SSE clients
   broadcastResults(meetingId);
   broadcastAdminMeetingVoteCount(meetingId);
   analytics.track(req.session?.userId || fingerprint, 'vote_cast', { meetingId });
+  // Activation milestone: only meaningful for logged-in voters (anon voters
+  // have no stable identity across meetings). Excludes the current meeting
+  // so a re-cast in the same meeting doesn't re-fire (though the unique
+  // constraint already blocks re-cast — defensive).
+  if (userId) {
+    const priorOther = db.prepare(
+      'SELECT count(*) AS n FROM votes WHERE user_id = ? AND meeting_id != ?'
+    ).get(userId, meetingId).n;
+    if (priorOther === 0) {
+      analytics.track(userId, 'first_vote_cast', { meetingId });
+    }
+  }
 
   const wantsJson = req.get('Accept')?.includes('application/json');
   if (wantsJson) {
