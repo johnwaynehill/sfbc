@@ -1,0 +1,11 @@
+-- Add user_id to votes so we can detect first-time-ever vote per user.
+--
+-- Until now, votes were keyed by submitted_fingerprint (HMAC of _client_id +
+-- meeting_id) — distinct per meeting, so we couldn't tell whether a vote was
+-- the user's first ever or their tenth. Adding user_id lets us track
+-- activation milestones (first_vote_cast) and, longer-term, link vote
+-- history to user profiles.
+--
+-- Anonymous votes leave user_id NULL. ON DELETE SET NULL preserves the vote
+-- if the user is later removed (we still want it counted in tallies).
+ALTER TABLE votes ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
