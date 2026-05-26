@@ -166,8 +166,8 @@
   }
 
   list.addEventListener('touchstart', function (e) {
-    // Don't intercept taps on interactive children (arrows, details link)
-    if (e.target.closest('.ballot-card__move, .ballot-card__details-link')) {
+    // Don't intercept taps on interactive children (arrows, details link, cover)
+    if (e.target.closest('.ballot-card__move, .ballot-card__details-link, .ballot-card__cover-btn')) {
       return;
     }
     var card = e.target.closest('.ballot-card');
@@ -290,9 +290,9 @@
   // -----------------------------------------------------------------------
 
   list.addEventListener('click', function (e) {
-    var detailsLink = e.target.closest('.ballot-card__details-link');
-    if (detailsLink) {
-      var card = detailsLink.closest('.ballot-card');
+    var detailsTrigger = e.target.closest('.ballot-card__details-link, .ballot-card__cover-btn');
+    if (detailsTrigger) {
+      var card = detailsTrigger.closest('.ballot-card');
       if (card) openDetailsDialog(card);
       return;
     }

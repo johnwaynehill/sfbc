@@ -108,16 +108,16 @@ The SDK loaded in shell layouts captures `$pageview`, `$autocapture` (clicks, fo
 
 ## 4. Rate Limiting & Friction Telemetry
 
-Two stacked rate limiters protect submission endpoints (`POST /api/meetings/:id/nominations`, `POST /api/meetings/:id/votes`):
+Meeting participation paths (`/nominate/*`, `/vote/*`, `/results/*`, and their API endpoints) are exempt from the global rate limiter so large in-person meetings on shared WiFi don't pool page loads into one bucket. Two stacked rate limiters protect submission endpoints (`POST /api/meetings/:id/nominations`, `POST /api/meetings/:id/votes`):
 
 | Limiter | Cap | Key | Purpose |
 |---|---|---|---|
-| `submissionLimiter` | 60 / 15 min | `session.userId → _client_id → IP subnet` | Per-device cap. Generous for normal use. |
-| `submissionIpBackstop` | 500 / 15 min | IP subnet (`ipKeyGenerator`) | Catches cookie-rotation scripts. Above any realistic gathering (50 attendees × 10 actions each). |
+| `submissionLimiter` | 120 / 15 min | `session.userId → _client_id → IP subnet` | Per-device cap. Generous for normal use. |
+| `submissionIpBackstop` | 1,500 / 15 min | IP subnet (`ipKeyGenerator`) | Catches cookie-rotation scripts. Above any realistic gathering (150 attendees × 10 actions each). |
 
 Each 429 fires `rate_limit_hit` (see catalog). The IP backstop additionally pages Sentry.
 
-**Why this matters:** the original "Too many submissions" production incident happened because the limiter was IP-keyed and 17 members shared the venue WiFi. With device keying, a single venue can sustain hundreds of legitimate submissions while still blocking abuse.
+**Why this matters:** the original "Too many submissions" production incident happened because the limiter was IP-keyed and 17 members shared the venue WiFi. With device keying and global-limiter exemption, a single venue can sustain hundreds of legitimate submissions while still blocking abuse.
 
 ---
 

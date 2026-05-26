@@ -69,14 +69,14 @@ function rateLimitHandler({ scope, alertSentry }) {
 }
 
 // ---------------------------------------------------------------------------
-// Submission rate limiter — 60 per 15 min per device (nominations + votes).
+// Submission rate limiter — 120 per 15 min per device (nominations + votes).
 // Keyed by the _client_id cookie so members sharing a WiFi at an in-person
 // meeting each get their own bucket. Falls back to IP subnet for first-time
 // visitors before the cookie is set, and to deter bots that ignore cookies.
 // ---------------------------------------------------------------------------
 const submissionLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 60,
+  max: 120,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many submissions. Please try again in a few minutes.' },
@@ -94,13 +94,13 @@ const submissionLimiter = rateLimit({
 
 // ---------------------------------------------------------------------------
 // IP backstop — catches scripts that rotate cookies to bypass the per-device
-// limiter. 500 / 15 min per IP subnet is well above a venue-meeting's
-// realistic ceiling (e.g. 50 attendees × 10 submissions each) but well below
-// any cookie-rotation attack rate.
+// limiter. 1500 / 15 min per IP subnet accommodates large in-person meetings
+// (e.g. 150 attendees × 10 submissions each) while staying well below any
+// cookie-rotation attack rate.
 // ---------------------------------------------------------------------------
 const submissionIpBackstop = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: 1500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many submissions from this network. Please try again in a few minutes.' },

@@ -102,7 +102,7 @@ SF-Book-Club-v3/
 `server.js` initializes the app in this order:
 
 1. **Database + migrations** - Opens SQLite, runs pending `.sql` files, applies post-migration hooks (slug backfill, pick seeding, lifecycle sync)
-2. **Security** - Helmet CSP, rate limiting (300 req/15 min)
+2. **Security** - Helmet CSP, rate limiting (1,000 req/15 min; meeting participation paths exempt)
 3. **View engine** - EJS with `app-shell` as default layout
 4. **Compression** - gzip, with SSE streams excluded
 5. **Static files** - `/public` with 7-day cache in production
@@ -204,9 +204,9 @@ Two gate functions in `middleware/auth.js`:
 
 ### Rate Limiting
 
-- Global: 300 requests per 15 minutes per IP
+- Global: 1,000 requests per 15 minutes per user (logged in) or IP subnet (anonymous). Meeting participation paths (`/nominate/*`, `/vote/*`, `/results/*`, and their API endpoints) are exempt — they have their own per-device limiters.
 - Auth endpoints: 5 attempts per 15 minutes per IP (separate limiter in `routes/auth.js`)
-- Form submissions: 10 per 15 minutes per IP
+- Submissions (nominations + votes): 120 per 15 min per device (`_client_id` cookie), plus a 1,500 per 15 min IP-subnet backstop
 
 ---
 
@@ -430,7 +430,7 @@ Avatars use the [DiceBear](https://www.dicebear.com/) API — an external servic
 | XSS | Helmet CSP headers, EJS auto-escaping, DOMPurify sanitization on markdown |
 | SQL injection | Prepared statements on all queries |
 | CSRF | SameSite `lax` cookies + session validation |
-| Rate limiting | express-rate-limit on all routes (300/15min), tighter limits on auth (5/15min) |
+| Rate limiting | express-rate-limit global (1,000/15min, meeting paths exempt), per-device submission limiter (120/15min), IP backstop (1,500/15min), auth limiter (5/15min) |
 | Password storage | bcryptjs with cost factor 12 |
 | Session security | httpOnly, secure (production), 30-day expiry, SQLite-backed |
 | Input validation | express-validator chains with centralized error handling |
