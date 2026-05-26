@@ -151,13 +151,19 @@ app.use((req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
-// Rate limiting — after session so we can key by user instead of IP
+// Rate limiting — after session so we can key by user instead of IP.
+// Meeting participation paths (/nominate, /vote, /results, and their API
+// endpoints) are exempt — they're designed for many users on the same WiFi
+// and have their own per-device limiters in routes/api.js.
 // ---------------------------------------------------------------------------
+const meetingPathRe = /^\/(nominate|vote|results)(\/|$)|^\/api\/(meetings\/\d+\/(nominations|votes)|books\/search)/;
+
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => meetingPathRe.test(req.path),
   keyGenerator: (req) => {
     if (req.session && req.session.userId) {
       return `user-${req.session.userId}`;

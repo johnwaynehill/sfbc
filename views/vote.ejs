@@ -8,6 +8,9 @@
     <% if (user) { %>
       <p class="t-caption text-secondary">Voting as <strong><%= user.display_name %></strong></p>
     <% } %>
+    <% if (meeting.topic) { %>
+      <p class="nom-topic t-label"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Theme: <%= meeting.topic %></p>
+    <% } %>
   </header>
 
   <%- include('partials/meeting-details-bar', { barMeeting: barMeeting }) %>
@@ -29,13 +32,13 @@
         <li class="ballot-card" data-book-id="<%= nom.book_id %>" draggable="true">
           <span class="ballot-card__rank" aria-label="Rank <%= i + 1 %>"><%= i + 1 %></span>
 
-          <div class="book-cover book-cover--sm ballot-card__cover">
+          <button type="button" class="book-cover book-cover--sm ballot-card__cover ballot-card__cover-btn" aria-label="View details for <%= nom.title %>" data-book-id="<%= nom.book_id %>">
             <% if (nom.cover_url) { %>
               <img src="<%= nom.cover_url %>" alt="<%= nom.title %> cover" loading="lazy">
             <% } else { %>
               <%- include('partials/placeholder-cover', { phTitle: nom.title, phSize: 'sm' }) %>
             <% } %>
-          </div>
+          </button>
 
           <div class="ballot-card__body">
             <span class="ballot-card__title t-body-bold"><%= nom.title %></span>
@@ -160,7 +163,7 @@
 
   <dialog id="book-details-dialog" class="book-details-dialog" aria-labelledby="book-details-dialog-title">
     <button type="button" class="book-details-dialog__close" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div class="book-details-dialog__body" id="book-details-dialog-body"></div>
   </dialog>
