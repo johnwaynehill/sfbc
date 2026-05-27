@@ -2440,7 +2440,7 @@ textarea.form-input {
 /* ---- Ballot Card ---- */
 .ballot-card {
   display: grid;
-  grid-template-columns: 36px 80px 1fr 40px;
+  grid-template-columns: 80px 1fr 40px;
   gap: var(--s-3);
   align-items: start;
   padding: var(--s-3);
@@ -2476,35 +2476,9 @@ textarea.form-input {
   transition: transform 100ms ease;
 }
 
-/* Rank badge */
+/* Rank badge — hidden; visual order is sufficient */
 .ballot-card__rank {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--surface);
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: var(--t-base);
-  color: var(--text);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-/* Top-3 rank accent colors */
-.ballot-card:nth-child(1) .ballot-card__rank {
-  background: #D4A017;
-  color: #fff;
-}
-.ballot-card:nth-child(2) .ballot-card__rank {
-  background: #94A3B8;
-  color: #fff;
-}
-.ballot-card:nth-child(3) .ballot-card__rank {
-  background: #CD7F32;
-  color: #fff;
+  display: none;
 }
 
 /* Cover */
@@ -2636,11 +2610,6 @@ textarea.form-input {
 
   .ballot-card:active {
     cursor: default;
-  }
-
-  /* Hide rank badge on mobile */
-  .ballot-card__rank {
-    display: none;
   }
 
   /* Cover must fit the grid column */
@@ -2814,7 +2783,7 @@ textarea.form-input {
 .vote-form[data-vote-mode="drag"] .ballot-card__controls { display: none; }
 .vote-form[data-vote-mode="drag"] .ballot-card__drag-handle { display: flex; }
 .vote-form[data-vote-mode="drag"] .ballot-card {
-  grid-template-columns: 36px 80px 1fr 24px;
+  grid-template-columns: 80px 1fr 24px;
 }
 
 /* Arrows mode: rank badge visible, arrows visible, numbers hidden, drag disabled */
@@ -2822,20 +2791,18 @@ textarea.form-input {
 .vote-form[data-vote-mode="arrows"] .ballot-card:active { cursor: default; }
 .vote-form[data-vote-mode="arrows"] .ballot-card__number-input { display: none; }
 
-/* Numbers mode: rank badge hidden, arrows hidden, numbers visible, drag disabled */
+/* Numbers mode: arrows hidden, number input in last column, drag disabled */
 .vote-form[data-vote-mode="numbers"] .ballot-card { cursor: default; }
 .vote-form[data-vote-mode="numbers"] .ballot-card:active { cursor: default; }
-.vote-form[data-vote-mode="numbers"] .ballot-card__rank { display: none; }
 .vote-form[data-vote-mode="numbers"] .ballot-card__controls { display: none; }
-.vote-form[data-vote-mode="numbers"] .ballot-card {
-  grid-template-columns: 40px 80px 1fr;
+.vote-form[data-vote-mode="numbers"] .ballot-card__number-input {
+  grid-column: -2 / -1;
+  grid-row: 1;
+  align-self: center;
 }
 
 @media (max-width: 640px) {
-  /* Numbers mode mobile: no rank column (handled by number input taking its place) */
-  .vote-form[data-vote-mode="numbers"] .ballot-card {
-    grid-template-columns: 44px 72px 1fr;
-  }
+  /* Numbers mode mobile: enlarge input for touch */
   .vote-form[data-vote-mode="numbers"] .ballot-card__number-input {
     width: 44px;
     height: 44px;
@@ -2845,11 +2812,6 @@ textarea.form-input {
   /* Drag mode mobile: adjust grid for handle instead of arrows */
   .vote-form[data-vote-mode="drag"] .ballot-card {
     grid-template-columns: 72px 1fr 24px;
-  }
-
-  /* Arrows mode mobile: hide rank (same as default mobile) */
-  .vote-form[data-vote-mode="arrows"] .ballot-card__rank {
-    display: none;
   }
 }
 
