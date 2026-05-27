@@ -58,6 +58,11 @@
                 data-reviewer="<%= reviewer.toLowerCase() %>"
                 data-grade="<%= r.grade %>"
                 data-date="<%= r.created_at %>"
+                data-body="<%= r.body_markdown ? r.body_markdown.replace(/"/g, '&quot;') : '' %>"
+                data-book-title="<%= r.book_title %>"
+                data-book-author="<%= r.book_author %>"
+                data-reviewer-name="<%= reviewer %>"
+                data-date-display="<%= dateStr %>"
                 class="js-review-row">
               <td data-label="Grade">
                 <span class="grade-badge grade-badge--sm <%= gradeTier(r.grade) %>"><%= r.grade %></span>
@@ -73,28 +78,11 @@
                 <%= dateStr %>
               </td>
               <td>
-                <div class="user-actions">
-                  <% if (r.body_markdown) { %>
-                    <button type="button" class="btn btn--secondary btn--sm js-toggle-review"
-                            aria-expanded="false">
-                      View
-                    </button>
-                  <% } %>
-                  <button type="button" class="btn btn--danger btn--sm js-delete-review"
-                          data-review-id="<%= r.id %>"
-                          data-name="<%= reviewer + ' on ' + r.book_title %>">
-                    Delete
-                  </button>
-                </div>
+                <button type="button" class="btn btn--ghost btn--sm js-view-review">
+                  View
+                </button>
               </td>
             </tr>
-            <% if (r.body_markdown) { %>
-              <tr class="review-expand-row">
-                <td colspan="5">
-                  <div class="review-expand-body t-body text-secondary"><%= r.body_markdown %></div>
-                </td>
-              </tr>
-            <% } %>
           <% }); %>
         </tbody>
       </table>
