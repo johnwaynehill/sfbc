@@ -5638,6 +5638,10 @@ body.has-open-dialog {
   font-size: var(--t-xs);
   color: var(--text3);
 }
+.edit-modal__show-more {
+  align-self: center;
+  margin-top: var(--s-2);
+}
 
 /* ---- Admin Events ---- */
 .admin-events {

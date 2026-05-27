@@ -1352,6 +1352,7 @@ router.get('/books/search', async (req, res) => {
 router.get('/books/search-multi', async (req, res) => {
   const q = (req.query.q || '').trim();
   const max = Math.min(parseInt(req.query.maxResults, 10) || 5, 10);
+  const startIndex = Math.max(parseInt(req.query.startIndex, 10) || 0, 0);
   const searcherId = req.session?.userId || (req.cookies && req.cookies._client_id) || 'anonymous';
 
   if (q.length < 3) {
@@ -1359,8 +1360,8 @@ router.get('/books/search-multi', async (req, res) => {
   }
 
   try {
-    const results = await searchGoogleBooksMulti(q, max);
-    if (results.length === 0) {
+    const results = await searchGoogleBooksMulti(q, max, startIndex);
+    if (results.length === 0 && startIndex === 0) {
       analytics.track(searcherId, 'book_search_no_results', { kind: 'multi', q_length: q.length });
     }
     res.json({ results });

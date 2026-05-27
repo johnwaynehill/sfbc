@@ -394,18 +394,34 @@
     }
   }
 
-  function doModalCoverSearch(container, statusEl, bookId, query) {
+  var _coverPageSize = 5;
+
+  function doModalCoverSearch(container, statusEl, bookId, query, startIndex) {
+    var isAppend = startIndex > 0;
     statusEl.textContent = 'Searching\u2026';
-    container.innerHTML = '';
-    fetch('/api/books/search-multi?q=' + encodeURIComponent(query))
+
+    if (!isAppend) {
+      container.innerHTML = '';
+      container._totalShown = 0;
+    }
+
+    // Remove existing Show More button before fetching
+    var existingMore = container.parentNode.querySelector('.edit-modal__show-more');
+    if (existingMore) existingMore.remove();
+
+    fetch('/api/books/search-multi?q=' + encodeURIComponent(query) + '&maxResults=' + _coverPageSize + '&startIndex=' + (startIndex || 0))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!data.results || data.results.length === 0) {
-          statusEl.textContent = 'No covers found';
-          container.innerHTML = '';
+          if (!isAppend) {
+            statusEl.textContent = 'No covers found';
+            container.innerHTML = '';
+          } else {
+            statusEl.textContent = container._totalShown + ' covers found';
+          }
           return;
         }
-        statusEl.textContent = data.results.length + ' covers found';
+
         var html = '';
         for (var i = 0; i < data.results.length; i++) {
           var r = data.results[i];
@@ -413,11 +429,34 @@
             + '<img src="' + esc(r.coverUrl) + '" alt="' + esc(r.title) + '" loading="lazy">'
             + '</div>';
         }
-        container.innerHTML = html;
+
+        if (isAppend) {
+          container.insertAdjacentHTML('beforeend', html);
+        } else {
+          container.innerHTML = html;
+        }
+
+        container._totalShown = (container._totalShown || 0) + data.results.length;
+        statusEl.textContent = container._totalShown + ' covers found';
+
+        // Add "Show More" button if we got a full page of results
+        if (data.results.length >= _coverPageSize) {
+          var nextIndex = (startIndex || 0) + _coverPageSize;
+          var moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'btn btn--ghost btn--xs edit-modal__show-more';
+          moreBtn.textContent = 'Show More';
+          moreBtn.addEventListener('click', function () {
+            moreBtn.disabled = true;
+            moreBtn.textContent = 'Loading\u2026';
+            doModalCoverSearch(container, statusEl, bookId, query, nextIndex);
+          });
+          container.parentNode.appendChild(moreBtn);
+        }
       })
       .catch(function () {
-        statusEl.textContent = 'Search failed';
-        container.innerHTML = '';
+        statusEl.textContent = isAppend ? 'Load more failed' : 'Search failed';
+        if (!isAppend) container.innerHTML = '';
       });
   }
 
