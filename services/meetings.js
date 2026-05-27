@@ -76,7 +76,7 @@ const getNomineesStmt = db.prepare(`
   SELECT mn.id AS nominee_id, mn.book_id, mn.source,
          b.title, b.author, b.cover_url, b.author_slug, b.title_slug,
          b.description, b.publication_year, b.page_count, b.publisher, b.language, b.subjects,
-         n.reason, u.display_name AS nominator_name
+         n.reason, COALESCE(n.nominator_name, u.display_name) AS nominator_name
   FROM meeting_nominees mn
   JOIN books b ON b.id = mn.book_id
   LEFT JOIN nominations n ON n.meeting_id = mn.meeting_id AND n.book_id = mn.book_id

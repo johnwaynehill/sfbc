@@ -59,7 +59,7 @@ const nomineesQuery = db.prepare(`
     b.publisher,
     b.language,
     n.reason,
-    u.display_name AS nominator_name
+    COALESCE(n.nominator_name, u.display_name) AS nominator_name
   FROM meeting_nominees mn
   JOIN books b ON b.id = mn.book_id
   LEFT JOIN nominations n

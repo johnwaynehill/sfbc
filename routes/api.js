@@ -1374,8 +1374,8 @@ router.get('/books/search-multi', async (req, res) => {
 // POST /api/meetings/:meetingId/nominations
 // ---------------------------------------------------------------------------
 const insertNomination = db.prepare(`
-  INSERT INTO nominations (meeting_id, book_id, submitted_fingerprint, reason, user_id)
-  VALUES (?, ?, ?, ?, ?)
+  INSERT INTO nominations (meeting_id, book_id, submitted_fingerprint, reason, user_id, nominator_name)
+  VALUES (?, ?, ?, ?, ?, ?)
 `);
 
 const insertNominee = db.prepare(`
@@ -1427,6 +1427,7 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
   const title = req.body.title; // already trimmed + length-checked by chain
   const author = req.body.author;
   const reason = req.body.reason || null;
+  const nominatorName = req.body.nominator_name || null;
 
   // Derive fingerprint for this browser + meeting
   const fingerprint = getFingerprint(req, res, meetingId);
@@ -1481,7 +1482,7 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
         }
       }
     }
-    insertNomination.run(meetingId, book.id, fingerprint, reason, userId);
+    insertNomination.run(meetingId, book.id, fingerprint, reason, userId, nominatorName);
     insertNominee.run(meetingId, book.id);
   })();
 

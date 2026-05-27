@@ -99,6 +99,18 @@
                     placeholder="A quick pitch for why the club should read this&hellip;"><%= editMode && existingNomination && existingNomination.reason ? existingNomination.reason : '' %></textarea>
           <span class="char-counter" id="reason-counter">0 / 280</span>
         </div>
+
+        <% if (!user) { %>
+          <div class="form-group">
+            <label class="form-label" for="nom-name">Your name <span class="form-hint">(optional)</span></label>
+            <input type="text"
+                   name="nominator_name"
+                   id="nom-name"
+                   maxlength="100"
+                   class="form-input"
+                   placeholder="So others know who nominated this">
+          </div>
+        <% } %>
       </div>
 
       <!-- Live cover preview (populated by JS, tappable to fill form) -->
