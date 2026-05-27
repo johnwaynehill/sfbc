@@ -1,5 +1,5 @@
 /**
- * admin-reviews.js — Search, sort, view toggle, delete for admin reviews.
+ * admin-reviews.js — Search, sort, view dialog, delete for admin reviews.
  */
 (function () {
   'use strict';
@@ -143,11 +143,6 @@
         || grade.indexOf(query) !== -1;
 
       row.style.display = match ? '' : 'none';
-      // Also hide/show the expand row immediately following
-      var next = row.nextElementSibling;
-      if (next && next.classList.contains('review-expand-row')) {
-        next.style.display = match ? '' : 'none';
-      }
       if (match) visible++;
     });
 
@@ -163,13 +158,10 @@
   function sortRows() {
     if (!tbody) return;
 
-    // Collect row pairs (main row + optional expand row)
     var pairs = [];
     var rows = tbody.querySelectorAll('.js-review-row');
     rows.forEach(function (row) {
-      var expand = row.nextElementSibling;
-      var hasExpand = expand && expand.classList.contains('review-expand-row');
-      pairs.push({ main: row, expand: hasExpand ? expand : null });
+      pairs.push({ main: row });
     });
 
     pairs.sort(function (a, b) {
@@ -200,41 +192,147 @@
 
     pairs.forEach(function (pair) {
       tbody.appendChild(pair.main);
-      if (pair.expand) tbody.appendChild(pair.expand);
     });
   }
 
   // ===========================================================================
-  // Toggle expand review body
+  // Review detail dialog (modal on desktop, bottom sheet on mobile)
+  // ===========================================================================
+  var _reviewDialog = null;
+
+  function getReviewDialog() {
+    if (_reviewDialog) return _reviewDialog;
+
+    _reviewDialog = document.createElement('dialog');
+    _reviewDialog.className = 'review-detail-dialog';
+    _reviewDialog.setAttribute('aria-modal', 'true');
+    _reviewDialog.setAttribute('aria-label', 'Review detail');
+    _reviewDialog.innerHTML =
+      '<div class="review-detail-dialog__body">' +
+        '<div class="review-detail-dialog__header">' +
+          '<div class="review-detail-dialog__meta">' +
+            '<span class="grade-badge grade-badge--sm" id="rd-grade"></span>' +
+            '<div class="review-detail-dialog__info">' +
+              '<span class="t-body-bold" id="rd-book"></span>' +
+              '<span class="t-caption text-secondary" id="rd-author"></span>' +
+            '</div>' +
+          '</div>' +
+          '<button type="button" class="review-detail-dialog__close" aria-label="Close">' +
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="review-detail-dialog__reviewer">' +
+          '<span class="t-caption text-secondary" id="rd-reviewer"></span>' +
+          '<span class="t-caption text-secondary">&middot;</span>' +
+          '<span class="t-caption text-secondary" id="rd-date"></span>' +
+        '</div>' +
+        '<div class="review-detail-dialog__content t-body" id="rd-content"></div>' +
+        '<div class="review-detail-dialog__actions">' +
+          '<button type="button" class="btn btn--danger btn--sm" id="rd-delete">Delete Review</button>' +
+        '</div>' +
+      '</div>';
+
+    // Close on backdrop click
+    _reviewDialog.addEventListener('click', function (e) {
+      if (e.target === _reviewDialog) closeReviewDialog();
+    });
+
+    // Close on Escape
+    _reviewDialog.addEventListener('cancel', function (e) {
+      e.preventDefault();
+      closeReviewDialog();
+    });
+
+    // Close button
+    _reviewDialog.querySelector('.review-detail-dialog__close').addEventListener('click', function () {
+      closeReviewDialog();
+    });
+
+    document.body.appendChild(_reviewDialog);
+    return _reviewDialog;
+  }
+
+  function closeReviewDialog() {
+    var dialog = getReviewDialog();
+    dialog.classList.add('is-closing');
+    setTimeout(function () {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+    }, 180);
+  }
+
+  function openReviewDialog(row) {
+    var dialog = getReviewDialog();
+
+    var grade = row.getAttribute('data-grade') || '';
+    var bookTitle = row.getAttribute('data-book-title') || '';
+    var bookAuthor = row.getAttribute('data-book-author') || '';
+    var reviewer = row.getAttribute('data-reviewer-name') || '';
+    var dateStr = row.getAttribute('data-date-display') || '';
+    var body = row.getAttribute('data-body') || '';
+    var reviewId = row.getAttribute('data-review-id') || '';
+
+    // Grade badge
+    var gradeEl = dialog.querySelector('#rd-grade');
+    gradeEl.textContent = grade;
+    var tierLetter = grade ? grade.charAt(0).toLowerCase() : '';
+    var tierClass = tierLetter ? 'grade-badge--' + tierLetter : '';
+    gradeEl.className = 'grade-badge grade-badge--sm' + (tierClass ? ' ' + tierClass : '');
+
+    dialog.querySelector('#rd-book').textContent = bookTitle;
+    dialog.querySelector('#rd-author').textContent = bookAuthor;
+    dialog.querySelector('#rd-reviewer').textContent = reviewer;
+    dialog.querySelector('#rd-date').textContent = dateStr;
+
+    // Review body
+    var contentEl = dialog.querySelector('#rd-content');
+    if (body) {
+      contentEl.textContent = body;
+      contentEl.hidden = false;
+    } else {
+      contentEl.textContent = '';
+      contentEl.hidden = true;
+    }
+
+    // Wire up delete button
+    var deleteBtn = dialog.querySelector('#rd-delete');
+    deleteBtn.disabled = false;
+    deleteBtn.textContent = 'Delete Review';
+    deleteBtn._reviewId = reviewId;
+    deleteBtn._reviewerName = reviewer;
+    deleteBtn._bookTitle = bookTitle;
+    deleteBtn._sourceRow = row;
+
+    dialog.showModal();
+  }
+
+  // ===========================================================================
+  // View review — open dialog
   // ===========================================================================
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.js-toggle-review');
+    var btn = e.target.closest('.js-view-review');
     if (!btn) return;
 
-    var mainRow = btn.closest('tr');
-    var expandRow = mainRow.nextElementSibling;
-    if (!expandRow || !expandRow.classList.contains('review-expand-row')) return;
+    var row = btn.closest('tr');
+    if (!row) return;
 
-    expandRow.classList.toggle('is-open');
-    var isOpen = expandRow.classList.contains('is-open');
-    btn.textContent = isOpen ? 'Hide' : 'View';
-    btn.setAttribute('aria-expanded', String(isOpen));
+    openReviewDialog(row);
   });
 
   // ===========================================================================
-  // Delete review
+  // Delete review (from inside dialog)
   // ===========================================================================
   document.addEventListener('click', async function (e) {
-    var btn = e.target.closest('.js-delete-review');
-    if (!btn) return;
+    var btn = e.target.closest('#rd-delete');
+    if (!btn || !btn._reviewId) return;
 
-    var reviewId = btn.dataset.reviewId;
-    var name = btn.dataset.name;
+    var reviewId = btn._reviewId;
+    var name = btn._reviewerName + ' on ' + btn._bookTitle;
 
     if (!await showConfirm('Delete this review by ' + name + '? This cannot be undone.', { danger: true })) return;
 
     btn.disabled = true;
-    btn.textContent = 'Deleting\u2026';
+    btn.textContent = 'Deleting…';
 
     try {
       var res = await fetch('/api/admin/reviews/' + reviewId, {
@@ -244,26 +342,18 @@
       var data = await res.json();
 
       if (res.ok && data.success) {
-        var row = btn.closest('tr');
+        var row = btn._sourceRow;
+        closeReviewDialog();
+
         if (row) {
-          var expandRow = row.nextElementSibling;
-          var hasExpand = expandRow && expandRow.classList.contains('review-expand-row');
-          // Find next visible review row for focus (skip expand rows)
-          var nextFocus = hasExpand ? expandRow.nextElementSibling : row.nextElementSibling;
+          var nextFocus = row.nextElementSibling;
           if (!nextFocus || !nextFocus.classList.contains('js-review-row')) {
             nextFocus = row.previousElementSibling;
-            // Skip expand rows when going backwards
-            if (nextFocus && nextFocus.classList.contains('review-expand-row')) {
-              nextFocus = nextFocus.previousElementSibling;
-            }
           }
           if (nextFocus) nextFocus.setAttribute('tabindex', '-1');
-          if (hasExpand) {
-            expandRow.remove();
-          }
+
           animateRowOut(row, function () {
             showToast('Review deleted', 'success');
-            // Update count
             if (countEl) {
               var current = parseInt(countEl.textContent, 10) || 0;
               countEl.textContent = Math.max(0, current - 1);
@@ -285,6 +375,6 @@
     }
 
     btn.disabled = false;
-    btn.textContent = 'Delete';
+    btn.textContent = 'Delete Review';
   });
 })();

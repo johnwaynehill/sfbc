@@ -4220,29 +4220,99 @@ body.has-open-dialog {
   gap: 2px;
 }
 
-.review-expand-row {
-  display: none;
-}
-.review-expand-row.is-open {
-  display: table-row;
+.js-review-row {
+  cursor: default;
 }
 
-.review-expand-row td {
-  padding-top: 0 !important;
-  border-bottom: 1px solid var(--border);
+/* ---- Review detail dialog (modal / bottom sheet) ---- */
+.review-detail-dialog {
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0;
+  max-width: 520px;
+  width: calc(100% - var(--s-5) * 2);
+  margin: auto;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  animation: review-dialog-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.review-detail-dialog.is-closing {
+  animation: review-dialog-out 0.15s ease-in forwards;
+}
+.review-detail-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  animation: backdrop-enter 0.2s ease-out;
+}
+.review-detail-dialog.is-closing::backdrop {
+  animation: backdrop-exit 0.15s ease-in forwards;
 }
 
-.review-expand-body {
+@keyframes review-dialog-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes review-dialog-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
+
+.review-detail-dialog__body {
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.review-detail-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.review-detail-dialog__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.review-detail-dialog__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.review-detail-dialog__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  padding: var(--s-1);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+}
+.review-detail-dialog__close:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+.review-detail-dialog__reviewer {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+.review-detail-dialog__content {
   background: var(--surface);
   border-radius: var(--radius-sm);
   padding: var(--s-3);
-  margin-bottom: var(--s-2);
-  line-height: 1.6;
+  line-height: 1.65;
   white-space: pre-wrap;
+  max-height: 50vh;
+  overflow-y: auto;
 }
-
-.js-review-row {
-  cursor: default;
+.review-detail-dialog__content[hidden] {
+  display: none;
+}
+.review-detail-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* ---- Admin: Nominees ---- */
@@ -4930,17 +5000,35 @@ body.has-open-dialog {
     flex-shrink: 0;
   }
 
-  /* Review expand row: full-width on mobile */
-  .review-expand-row.is-open {
-    display: block;
+  /* Review detail dialog: bottom sheet on mobile */
+  .review-detail-dialog {
+    inset: 0;
+    margin: auto auto 0 auto;
+    max-width: 100%;
+    width: 100%;
+    max-height: 88vh;
+    border-radius: 0;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    animation: bottom-sheet-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
-
-  .review-expand-row td {
-    display: block;
+  .review-detail-dialog.is-closing {
+    animation: bottom-sheet-exit 0.18s ease-in forwards;
   }
-
-  .review-expand-row td::before {
-    display: none;
+  .review-detail-dialog__body {
+    padding-top: var(--s-3);
+  }
+  .review-detail-dialog__body::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+    margin: 0 auto var(--s-2);
+  }
+  .review-detail-dialog__content {
+    max-height: 45vh;
   }
 
   /* ---- Lifecycle stepper: vertical on mobile ---- */
