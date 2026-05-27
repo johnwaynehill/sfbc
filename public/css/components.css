@@ -2401,7 +2401,6 @@ textarea.form-input {
 }
 
 .vote-page__header {
-  text-align: center;
   margin-bottom: var(--s-3);
 }
 
@@ -2414,7 +2413,6 @@ textarea.form-input {
 }
 
 .vote-page__instructions {
-  text-align: center;
   margin-bottom: var(--s-4);
 }
 
@@ -2442,7 +2440,7 @@ textarea.form-input {
 /* ---- Ballot Card ---- */
 .ballot-card {
   display: grid;
-  grid-template-columns: 36px 80px 1fr 40px;
+  grid-template-columns: 80px 1fr 40px;
   gap: var(--s-3);
   align-items: start;
   padding: var(--s-3);
@@ -2478,35 +2476,9 @@ textarea.form-input {
   transition: transform 100ms ease;
 }
 
-/* Rank badge */
+/* Rank badge — hidden; visual order is sufficient */
 .ballot-card__rank {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--surface);
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: var(--t-base);
-  color: var(--text);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-/* Top-3 rank accent colors */
-.ballot-card:nth-child(1) .ballot-card__rank {
-  background: #D4A017;
-  color: #fff;
-}
-.ballot-card:nth-child(2) .ballot-card__rank {
-  background: #94A3B8;
-  color: #fff;
-}
-.ballot-card:nth-child(3) .ballot-card__rank {
-  background: #CD7F32;
-  color: #fff;
+  display: none;
 }
 
 /* Cover */
@@ -2640,11 +2612,6 @@ textarea.form-input {
     cursor: default;
   }
 
-  /* Hide rank badge on mobile */
-  .ballot-card__rank {
-    display: none;
-  }
-
   /* Cover must fit the grid column */
   .ballot-card .book-cover--sm {
     width: 72px;
@@ -2670,6 +2637,182 @@ textarea.form-input {
   /* Swap hint text */
   .ballot-hint--desktop { display: none; }
   .ballot-hint--mobile { display: block; }
+}
+
+/* ---- Vote Mode Toolbar ---- */
+.vote-page__toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--s-2);
+  margin-bottom: var(--s-4);
+}
+
+.vote-page__toolbar .vote-page__instructions {
+  margin-bottom: 0;
+}
+
+/* ---- Vote Mode Menu (three-dot overflow) ---- */
+.vote-mode-menu {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vote-mode-menu__trigger {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms, color 150ms;
+}
+
+.vote-mode-menu__trigger:hover,
+.vote-mode-menu__trigger[aria-expanded="true"] {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.vote-mode-menu__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--s-1);
+  min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  z-index: 20;
+}
+
+.vote-mode-menu__header {
+  padding: 6px 10px 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+}
+
+.vote-mode-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) 10px;
+  border: none;
+  background: none;
+  color: var(--text2);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  width: 100%;
+  text-align: left;
+  transition: background 120ms, color 120ms;
+}
+
+.vote-mode-menu__item:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.vote-mode-menu__item.is-active {
+  color: var(--accent);
+}
+
+.vote-mode-menu__check {
+  margin-left: auto;
+  color: var(--accent);
+  display: none;
+}
+
+.vote-mode-menu__item.is-active .vote-mode-menu__check {
+  display: block;
+}
+
+/* ---- Drag Handle (for drag mode) ---- */
+.ballot-card__drag-handle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  align-self: center;
+  grid-column: -2 / -1;
+  grid-row: 1;
+}
+
+/* ---- Number Input (for numbers mode) ---- */
+.ballot-card__number-input {
+  width: 40px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--t-base);
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+  flex-shrink: 0;
+}
+
+.ballot-card__number-input::-webkit-inner-spin-button,
+.ballot-card__number-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ballot-card__number-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+/* ---- Vote Mode States ---- */
+
+/* Drag mode (default): rank badge visible, arrows hidden, drag handle shown, numbers hidden */
+.vote-form[data-vote-mode="drag"] .ballot-card__number-input { display: none; }
+.vote-form[data-vote-mode="drag"] .ballot-card__controls { display: none; }
+.vote-form[data-vote-mode="drag"] .ballot-card__drag-handle { display: flex; }
+.vote-form[data-vote-mode="drag"] .ballot-card {
+  grid-template-columns: 80px 1fr 24px;
+}
+
+/* Arrows mode: rank badge visible, arrows visible, numbers hidden, drag disabled */
+.vote-form[data-vote-mode="arrows"] .ballot-card { cursor: default; }
+.vote-form[data-vote-mode="arrows"] .ballot-card:active { cursor: default; }
+.vote-form[data-vote-mode="arrows"] .ballot-card__number-input { display: none; }
+
+/* Numbers mode: arrows hidden, number input in last column, drag disabled */
+.vote-form[data-vote-mode="numbers"] .ballot-card { cursor: default; }
+.vote-form[data-vote-mode="numbers"] .ballot-card:active { cursor: default; }
+.vote-form[data-vote-mode="numbers"] .ballot-card__controls { display: none; }
+.vote-form[data-vote-mode="numbers"] .ballot-card__number-input {
+  grid-column: -2 / -1;
+  grid-row: 1;
+  align-self: center;
+}
+
+@media (max-width: 640px) {
+  /* Numbers mode mobile: enlarge input for touch */
+  .vote-form[data-vote-mode="numbers"] .ballot-card__number-input {
+    width: 44px;
+    height: 44px;
+    font-size: var(--t-lg);
+  }
+
+  /* Drag mode mobile: adjust grid for handle instead of arrows */
+  .vote-form[data-vote-mode="drag"] .ballot-card {
+    grid-template-columns: 72px 1fr 24px;
+  }
 }
 
 /* ---- No-JS Rank Selects ---- */

@@ -16,12 +16,20 @@
   var form = document.getElementById('vote-form');
   if (!form) return;
 
-  var list      = document.getElementById('ballot-list');
-  var rankInput = document.getElementById('ranking-input');
-  var submitBtn = document.getElementById('vote-submit');
-  var messageEl = document.getElementById('vote-message');
-  var meetingId = form.dataset.meetingId;
+  var list        = document.getElementById('ballot-list');
+  var rankInput   = document.getElementById('ranking-input');
+  var submitBtn   = document.getElementById('vote-submit');
+  var messageEl   = document.getElementById('vote-message');
+  var meetingId   = form.dataset.meetingId;
   var meetingSlug = form.dataset.meetingSlug;
+
+  // Mode menu elements
+  var modeTrigger  = document.getElementById('vote-mode-trigger');
+  var modeDropdown = document.getElementById('vote-mode-dropdown');
+  var hintDesktop  = document.getElementById('ballot-hint-desktop');
+  var hintMobile   = document.getElementById('ballot-hint-mobile');
+
+  var currentMode  = 'drag';
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -57,6 +65,10 @@
   }
 
   function syncHiddenInput() {
+    if (currentMode === 'numbers') {
+      syncNumbersRanking();
+      return;
+    }
     rankInput.value = getCards().map(function (card) {
       return card.dataset.bookId;
     }).join(',');
@@ -83,6 +95,7 @@
   var dragCard = null;
 
   list.addEventListener('dragstart', function (e) {
+    if (currentMode !== 'drag') { e.preventDefault(); return; }
     var card = e.target.closest('.ballot-card');
     if (!card) return;
     dragCard = card;
@@ -166,8 +179,9 @@
   }
 
   list.addEventListener('touchstart', function (e) {
+    if (currentMode !== 'drag') return;
     // Don't intercept taps on interactive children (arrows, details link, cover)
-    if (e.target.closest('.ballot-card__move, .ballot-card__details-link, .ballot-card__cover-btn')) {
+    if (e.target.closest('.ballot-card__move, .ballot-card__details-link, .ballot-card__cover-btn, .ballot-card__number-input')) {
       return;
     }
     var card = e.target.closest('.ballot-card');
@@ -322,6 +336,141 @@
   });
 
   // -----------------------------------------------------------------------
+  // Vote mode menu (three-dot overflow)
+  // -----------------------------------------------------------------------
+
+  var HINT_TEXT = {
+    drag:    { desktop: 'Drag cards or use the arrows to rank your picks',
+               mobile:  'Press & hold a card to drag, or use the arrows' },
+    arrows:  { desktop: 'Use the arrows to reorder your picks',
+               mobile:  'Tap the arrows to reorder your picks' },
+    numbers: { desktop: 'Type a number (1 = top pick) to set each rank',
+               mobile:  'Type a number (1 = top pick) to set each rank' },
+  };
+
+  function setMode(mode) {
+    if (mode === currentMode) return;
+    currentMode = mode;
+    form.dataset.voteMode = mode;
+
+    // Update menu active state
+    var items = modeDropdown.querySelectorAll('.vote-mode-menu__item');
+    for (var i = 0; i < items.length; i++) {
+      items[i].classList.toggle('is-active', items[i].dataset.mode === mode);
+    }
+
+    // Update hint text
+    if (hintDesktop) hintDesktop.textContent = HINT_TEXT[mode].desktop;
+    if (hintMobile)  hintMobile.textContent  = HINT_TEXT[mode].mobile;
+
+    // Toggle number inputs vs rank badges
+    var cards = getCards();
+    cards.forEach(function (card, idx) {
+      var numInput = card.querySelector('.ballot-card__number-input');
+      var rankEl   = card.querySelector('.ballot-card__rank');
+
+      if (mode === 'numbers') {
+        if (numInput) {
+          numInput.hidden = false;
+          numInput.value  = idx + 1;
+        }
+      } else {
+        if (numInput) numInput.hidden = true;
+      }
+
+      // Toggle draggable attribute
+      if (mode === 'drag') {
+        // Only set draggable on non-touch devices (touch uses long-press)
+        if (!window.matchMedia('(pointer: coarse)').matches) {
+          card.setAttribute('draggable', 'true');
+        }
+      } else {
+        card.removeAttribute('draggable');
+      }
+    });
+
+    // Persist preference
+    try { localStorage.setItem('vote-mode', mode); } catch (_) {}
+  }
+
+  // Toggle dropdown open/close
+  function toggleModeMenu() {
+    var isOpen = modeDropdown.hidden;
+    modeDropdown.hidden = !isOpen;
+    modeTrigger.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  function closeModeMenu() {
+    modeDropdown.hidden = true;
+    modeTrigger.setAttribute('aria-expanded', 'false');
+  }
+
+  if (modeTrigger && modeDropdown) {
+    modeTrigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleModeMenu();
+    });
+
+    modeDropdown.addEventListener('click', function (e) {
+      var item = e.target.closest('.vote-mode-menu__item');
+      if (!item) return;
+      setMode(item.dataset.mode);
+      closeModeMenu();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.vote-mode-menu')) {
+        closeModeMenu();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !modeDropdown.hidden) {
+        closeModeMenu();
+        modeTrigger.focus();
+      }
+    });
+  }
+
+  // -----------------------------------------------------------------------
+  // Numbers mode: sync ranking from number inputs (no reordering)
+  // The user types a rank (1–N) into each card. On submit we read
+  // the inputs to build the ranking order rather than relying on DOM order.
+  // -----------------------------------------------------------------------
+
+  function syncNumbersRanking() {
+    var cards  = getCards();
+    var total  = cards.length;
+    // Build array of { bookId, rank } from the number inputs
+    var ranked = [];
+    cards.forEach(function (card) {
+      var input = card.querySelector('.ballot-card__number-input');
+      var val   = input ? parseInt(input.value, 10) : 0;
+      ranked.push({ bookId: card.dataset.bookId, rank: val });
+    });
+    // Sort by the user-assigned rank (stable sort preserves DOM order for ties)
+    ranked.sort(function (a, b) { return a.rank - b.rank; });
+    rankInput.value = ranked.map(function (r) { return r.bookId; }).join(',');
+  }
+
+  list.addEventListener('input', function (e) {
+    if (currentMode !== 'numbers') return;
+    var input = e.target.closest('.ballot-card__number-input');
+    if (!input) return;
+
+    var total = getCards().length;
+    var val   = parseInt(input.value, 10);
+
+    // Clamp to valid range
+    if (isNaN(val) || val < 1) return;
+    if (val > total) { input.value = total; }
+
+    syncNumbersRanking();
+  });
+
+  // -----------------------------------------------------------------------
   // Fetch-based form submission
   // -----------------------------------------------------------------------
   form.addEventListener('submit', async function (e) {
@@ -373,6 +522,15 @@
     getCards().forEach(function (card) {
       card.removeAttribute('draggable');
     });
+  }
+
+  // -----------------------------------------------------------------------
+  // Restore saved mode preference
+  // -----------------------------------------------------------------------
+  var savedMode = null;
+  try { savedMode = localStorage.getItem('vote-mode'); } catch (_) {}
+  if (savedMode && savedMode !== 'drag' && (savedMode === 'arrows' || savedMode === 'numbers')) {
+    setMode(savedMode);
   }
 
   // Initial sync
