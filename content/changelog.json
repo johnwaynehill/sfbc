@@ -1,5 +1,61 @@
 [
   {
+    "version": "0.14",
+    "date": "2026-05-27",
+    "title": "Voting & Nominations Overhaul",
+    "intro": "The two most-used flows in the app — nominating and voting — got a ground-up redesign with better mobile support, more flexibility, and a much cleaner look.",
+    "entries": [
+      {
+        "icon": "magic",
+        "text": "Voting mode chooser — pick how you rank your ballot: drag to reorder, tap arrows, or type numbers. Your preference sticks between sessions."
+      },
+      {
+        "icon": "book",
+        "text": "Nomination page redesign — a search-first flow with an inline magnifying glass, live cover preview with book details, and a collapsible manual-entry fallback."
+      },
+      {
+        "icon": "user",
+        "text": "Guest nominator names — if you’re not signed in, you can now add your name to your nomination so the club knows who pitched it."
+      },
+      {
+        "icon": "calendar",
+        "text": "View Details drawer — tap any nomination on the nominations page to see the cover, page count, publication year, and who nominated it."
+      },
+      {
+        "icon": "qr",
+        "text": "Mobile drag-and-drop voting — long-press a ballot card on your phone to drag it into position, with haptic feedback on reorder."
+      },
+      {
+        "icon": "moon",
+        "text": "Polish everywhere — pill-shaped topic badges, animated confirmation cards, smoother search dropdowns, and better dark-mode contrast across the board."
+      }
+    ]
+  },
+  {
+    "version": "0.13",
+    "date": "2026-04-15",
+    "title": "Accessibility & Mobile Polish",
+    "intro": "A focused sprint on making the app work better on phones, fixing accessibility gaps, and squashing bugs.",
+    "entries": [
+      {
+        "icon": "user",
+        "text": "Mobile-friendly admin — meeting cards, user management, and review lists are now fully responsive with better touch targets."
+      },
+      {
+        "icon": "book",
+        "text": "Meeting topics — admins can set an optional theme for each meeting. It shows on the nomination page and voting ballot so everyone knows the vibe."
+      },
+      {
+        "icon": "magic",
+        "text": "Simplified mobile ballot — book details now open in a rich dialog instead of expanding inline, keeping the voting list compact on small screens."
+      },
+      {
+        "icon": "moon",
+        "text": "Design token normalization — hunted down every hardcoded color and spacing value and replaced them with proper tokens. Dark mode is more consistent as a result."
+      }
+    ]
+  },
+  {
     "version": "0.12",
     "date": "2026-03-22",
     "title": "Bolder Book Pages",
