@@ -79,10 +79,10 @@ async function searchGoogleBooks(title, author) {
 /**
  * Search Google Books API with a general query and return up to `max` results.
  */
-async function searchGoogleBooksMulti(query, max = 5) {
+async function searchGoogleBooksMulti(query, max = 5, startIndex = 0) {
   if (!API_KEY || !query || query.length < 3) return [];
 
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=${max}&key=${API_KEY}`;
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=${max}&startIndex=${startIndex}&key=${API_KEY}`;
 
   try {
     const res = await fetch(url);
