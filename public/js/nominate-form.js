@@ -28,9 +28,33 @@
 
   var meetingId = form.dataset.meetingId;
   var meetingSlug = form.dataset.meetingSlug;
+  var nominatorInput = document.getElementById('nom-name');
 
   // Stores the last Google Books result so we can send metadata on submit
   var lastPreviewData = null;
+
+  // -----------------------------------------------------------------------
+  // Manual entry toggle (title + author fields only)
+  // -----------------------------------------------------------------------
+  var manualToggle = document.getElementById('nom-manual-toggle');
+  var manualFields = document.getElementById('nom-manual-fields');
+
+  if (manualToggle && manualFields) {
+    manualToggle.addEventListener('click', function () {
+      var isOpen = manualFields.hidden === false;
+      manualFields.hidden = isOpen;
+      manualToggle.classList.toggle('is-open', !isOpen);
+      if (!isOpen) {
+        manualFields.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        titleInput.focus();
+      }
+    });
+  }
+
+  function showManualFields() {
+    if (manualFields) manualFields.hidden = false;
+    if (manualToggle) manualToggle.classList.add('is-open');
+  }
 
   // -----------------------------------------------------------------------
   // Search-first nomination flow
@@ -120,7 +144,8 @@
       searchResults.hidden = true;
       searchInput.value = '';
 
-      // Scroll form into view and focus reason
+      // Reveal manual fields, scroll into view, and focus reason
+      showManualFields();
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
       if (reasonInput) setTimeout(function () { reasonInput.focus(); }, 300);
     });
@@ -146,7 +171,8 @@
     function updateCounter() {
       var len = reasonInput.value.length;
       counter.textContent = len + ' / ' + MAX;
-      counter.classList.toggle('char-counter--warn', len >= MAX - 20);
+      counter.classList.toggle('char-counter--near', len >= MAX - 40 && len < MAX - 10);
+      counter.classList.toggle('char-counter--warn', len >= MAX - 10);
     }
 
     reasonInput.addEventListener('input', updateCounter);
@@ -240,7 +266,13 @@
     var author = (authorInput.value || '').trim();
     var reason = (reasonInput ? reasonInput.value : '').trim();
 
-    if (!title || !author) return;
+    if (!title || !author) {
+      // If fields are hidden, reveal them so the user can fill in
+      showManualFields();
+      if (!title) titleInput.focus();
+      else if (!author) authorInput.focus();
+      return;
+    }
 
     // Disable button to prevent double-submit
     submitBtn.disabled = true;
@@ -264,6 +296,7 @@
         title: title,
         author: author,
         reason: reason,
+        nominator_name: nominatorInput ? nominatorInput.value.trim() || undefined : undefined,
         _metadata: metadata,
       }),
     })
@@ -277,9 +310,9 @@
           // Show confirmation card and hide the form + search
           form.hidden = true;
           var searchSection = document.getElementById('nom-search');
-          var dividerEl = document.getElementById('nom-divider');
           if (searchSection) searchSection.hidden = true;
-          if (dividerEl) dividerEl.hidden = true;
+          if (manualToggle) manualToggle.hidden = true;
+          if (manualFields) manualFields.hidden = true;
           messageEl.hidden = false;
           messageEl.className = '';
 

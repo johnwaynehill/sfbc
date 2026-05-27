@@ -2053,15 +2053,22 @@ textarea.form-input {
 }
 
 .char-counter {
-  font-family: var(--font-body);
-  font-size: var(--t-xs);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
   color: var(--text3);
   text-align: right;
-  margin-top: 2px;
+  margin-top: 4px;
+  transition: color 300ms ease;
+}
+
+.char-counter--near {
+  color: var(--amber);
 }
 
 .char-counter--warn {
   color: var(--danger);
+  font-weight: 500;
 }
 
 /* ---- Buttons (reusable) ---- */
@@ -2112,20 +2119,60 @@ textarea.form-input {
 }
 
 .nom-page__subheading {
-  margin-bottom: var(--s-2);
+  margin-bottom: var(--s-3);
 }
+
 .nom-topic {
   display: inline-flex;
   align-items: center;
-  gap: var(--s-1);
+  gap: var(--s-2);
   color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--s-1) var(--s-3);
   margin-bottom: var(--s-5);
+  font-size: var(--t-xs);
+  letter-spacing: 0.02em;
 }
 
 /* ---- Nomination Search ---- */
 .nom-search {
   position: relative;
   margin-bottom: var(--s-3);
+}
+.nom-search__wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.nom-search__icon {
+  position: absolute;
+  left: var(--s-3);
+  color: var(--text3);
+  pointer-events: none;
+  transition: color 200ms ease;
+}
+.nom-search__wrap:focus-within .nom-search__icon {
+  color: var(--accent);
+}
+.nom-search__input {
+  display: block;
+  width: 100%;
+  font-size: var(--t-lg);
+  padding: 14px var(--s-3) 14px 44px; /* left padding for icon */
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-md);
+  transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+.nom-search__input:focus {
+  background: var(--bg);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.nom-search__input::placeholder {
+  color: var(--text3);
 }
 .nom-search__results {
   position: absolute;
@@ -2135,11 +2182,16 @@ textarea.form-input {
   z-index: 10;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   max-height: 360px;
   overflow-y: auto;
   margin-top: var(--s-1);
+  animation: nom-dropdown 150ms ease;
+}
+@keyframes nom-dropdown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .nom-search__item {
   display: flex;
@@ -2147,8 +2199,8 @@ textarea.form-input {
   gap: var(--s-3);
   padding: var(--s-2) var(--s-3);
   cursor: pointer;
-  transition: background 100ms;
-  border-bottom: 1px solid var(--border);
+  transition: background 100ms ease;
+  border-bottom: 1px solid var(--border2);
 }
 .nom-search__item:last-child {
   border-bottom: none;
@@ -2160,13 +2212,14 @@ textarea.form-input {
   width: 40px;
   height: 60px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 3px;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .nom-search__item-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   min-width: 0;
 }
 .nom-search__item-title {
@@ -2184,32 +2237,45 @@ textarea.form-input {
   color: var(--text2);
 }
 .nom-search__empty {
-  padding: var(--s-3);
+  padding: var(--s-4);
   text-align: center;
   font-size: var(--t-sm);
   color: var(--text3);
 }
 
-.nom-divider {
-  display: flex;
+/* ---- Manual Entry Toggle ---- */
+.nom-manual-toggle {
+  display: inline-flex;
   align-items: center;
-  gap: var(--s-3);
-  margin: var(--s-2) 0 var(--s-3);
-}
-.nom-divider::before,
-.nom-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-.nom-divider__text {
-  font-family: var(--font-ui);
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-secondary);
   font-size: var(--t-xs);
+  font-weight: 500;
   color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
+  cursor: pointer;
+  transition: color 150ms ease;
+  margin-bottom: var(--s-5);
+  letter-spacing: 0.01em;
+}
+.nom-manual-toggle:hover {
+  color: var(--text2);
+}
+.nom-manual-toggle.is-open svg {
+  transform: rotate(180deg);
+}
+.nom-manual-toggle svg {
+  transition: transform 200ms ease;
+  opacity: 0.7;
+}
+
+/* ---- Section divider between search and form ---- */
+.nom-divider {
+  border: none;
+  border-top: 1px solid var(--border2);
+  margin: 0 0 var(--s-4);
 }
 
 .nom-form[hidden] { display: none; }
@@ -2217,6 +2283,18 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
+}
+
+.nom-form__manual[hidden] { display: none; }
+.nom-form__manual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  animation: nom-expand 250ms ease;
+}
+@keyframes nom-expand {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .nom-form__fields {
@@ -2229,24 +2307,33 @@ textarea.form-input {
 .nom-preview[hidden] { display: none; }
 .nom-preview {
   display: flex;
-  gap: var(--s-3);
+  gap: var(--s-4);
   align-items: flex-start;
   width: 100%;
   padding: var(--s-3);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 3%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border2));
+  border-radius: var(--radius-md);
   cursor: pointer;
   text-align: left;
   font: inherit;
-  animation: fadeIn 200ms ease;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  animation: nom-preview-in 300ms ease;
+  transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+@keyframes nom-preview-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .nom-preview:hover,
 .nom-preview:focus-visible {
   border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.nom-preview .book-cover--sm img {
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.15);
 }
 
 .nom-preview__info {
@@ -2259,15 +2346,16 @@ textarea.form-input {
 
 .nom-preview__title {
   font-family: var(--font-brand);
-  font-size: var(--t-sm);
+  font-size: var(--t-base);
   font-weight: 400;
   color: var(--text);
+  line-height: 1.3;
 }
 
 .nom-preview__author {
   font-family: var(--font-reading);
   font-style: italic;
-  font-size: var(--t-xs);
+  font-size: var(--t-sm);
   color: var(--text2);
 }
 
@@ -2280,8 +2368,11 @@ textarea.form-input {
 
 .nom-preview__hint {
   color: var(--accent);
-  font-style: italic;
-  margin-top: var(--s-1);
+  font-family: var(--font-secondary);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  margin-top: var(--s-2);
+  letter-spacing: 0.01em;
 }
 
 /* ---- Nomination Confirmed ---- */
@@ -2289,6 +2380,7 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
+  animation: fadeIn 300ms ease;
 }
 
 .nom-confirmed__badge {
@@ -2299,11 +2391,20 @@ textarea.form-input {
   font-size: var(--t-sm);
   font-weight: 600;
   color: var(--success);
-  background: rgba(22, 163, 74, 0.08);
-  border: 1px solid rgba(22, 163, 74, 0.2);
-  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--success) 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);
+  border-radius: var(--radius-lg);
   padding: var(--s-2) var(--s-3);
   align-self: flex-start;
+}
+
+.nom-confirmed__badge svg {
+  animation: nom-check 400ms ease 100ms both;
+}
+@keyframes nom-check {
+  0%   { opacity: 0; transform: scale(0.5); }
+  60%  { transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .nom-confirmed__card {
@@ -2313,7 +2414,11 @@ textarea.form-input {
   padding: var(--s-4);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
+}
+
+.nom-confirmed__card .book-cover--sm img {
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.12);
 }
 
 .nom-confirmed__details {
@@ -2381,6 +2486,40 @@ textarea.form-input {
   background: color-mix(in srgb, var(--danger) 12%, transparent);
   color: var(--danger);
   border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+}
+
+/* ---- Nomination Submit Button ---- */
+.nom-form .btn--primary {
+  border-radius: var(--radius-md);
+  padding: 14px var(--s-4);
+  font-size: var(--t-sm);
+  margin-top: var(--s-2);
+  max-width: 280px;
+  transition: background 150ms ease, transform 100ms ease;
+}
+.nom-form .btn--primary:active {
+  transform: scale(0.98);
+}
+
+/* ---- Nomination Mobile Polish ---- */
+@media (max-width: 640px) {
+  .nom-page {
+    padding: var(--s-5) 0;
+  }
+  .nom-form .btn--primary {
+    max-width: 100%;
+  }
+  .nom-confirmed__card {
+    padding: var(--s-3);
+    gap: var(--s-3);
+  }
+  .nom-confirmed__actions {
+    flex-direction: column;
+  }
+  .nom-confirmed__actions .btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 @keyframes fadeIn {

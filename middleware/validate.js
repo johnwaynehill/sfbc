@@ -111,6 +111,10 @@ const nominationChain = [
     .optional({ values: 'falsy' })
     .trim()
     .isLength({ max: 280 }).withMessage('Nomination reason is too long (max 280 characters).'),
+  body('nominator_name')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ max: 100 }).withMessage('Name is too long (max 100 characters).'),
 ];
 
 const meetingChain = [
