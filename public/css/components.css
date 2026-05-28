@@ -3557,6 +3557,24 @@ body.has-open-dialog {
   margin-bottom: var(--s-5);
 }
 
+button.results-bar {
+  appearance: none;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  padding: var(--s-2);
+  margin: calc(-1 * var(--s-2));
+  margin-bottom: 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.results-bar:hover {
+  background: var(--surface);
+}
 .results-bar {
   display: grid;
   grid-template-columns: 48px 1fr 64px;

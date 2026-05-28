@@ -46,8 +46,13 @@
 
   <!-- Horizontal bar chart -->
   <div class="results-chart" id="results-chart">
-    <% results.rankings.forEach(function(r) { %>
-      <div class="results-bar" data-book-id="<%= r.book_id %>">
+    <% results.rankings.forEach(function(r) {
+         var subjectList = [];
+         if (r.subjects) {
+           try { subjectList = JSON.parse(r.subjects); } catch (e) { subjectList = []; }
+         }
+    %>
+      <button type="button" class="results-bar js-results-detail" data-book-id="<%= r.book_id %>">
         <div class="book-cover book-cover--xs results-bar__cover">
           <% if (r.cover_url) { %>
             <img src="<%= r.cover_url %>" alt="<%= r.title %> cover" loading="lazy">
@@ -72,7 +77,61 @@
         <span class="results-bar__points t-caption" data-points="<%= r.points %>">
           <%= r.points %> pt<%= r.points === 1 ? '' : 's' %>
         </span>
-      </div>
+        <template class="results-bar__details-template">
+          <div class="book-details">
+            <div class="book-details__header">
+              <div class="book-cover book-cover--md book-details__cover">
+                <% if (r.cover_url) { %>
+                  <img src="<%= r.cover_url %>" alt="<%= r.title %> cover" loading="lazy">
+                <% } else { %>
+                  <%- include('partials/placeholder-cover', { phTitle: r.title, phSize: 'md' }) %>
+                <% } %>
+              </div>
+              <div class="book-details__meta">
+                <h2 class="book-details__title t-display"><%= r.title %></h2>
+                <p class="book-details__author t-author">by <%= r.author %></p>
+                <% var metaParts = []; %>
+                <% if (r.publication_year) metaParts.push(r.publication_year); %>
+                <% if (r.page_count) metaParts.push(r.page_count + ' pages'); %>
+                <% if (r.publisher) metaParts.push(r.publisher); %>
+                <% if (r.language && r.language !== 'en') metaParts.push(r.language.toUpperCase()); %>
+                <% if (metaParts.length > 0) { %>
+                  <p class="book-details__inline-meta t-caption text-secondary"><%= metaParts.join(' · ') %></p>
+                <% } %>
+                <% if (subjectList.length > 0) { %>
+                  <div class="book-details__tags">
+                    <% subjectList.slice(0, 4).forEach(function(tag) { %>
+                      <span class="book-tag"><%= tag %></span>
+                    <% }); %>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+            <% if (r.description) { %>
+              <div class="book-details__section">
+                <p class="book-details__description t-body"><%= r.description %></p>
+              </div>
+            <% } %>
+            <% if (r.reason || r.nominator_name) { %>
+              <div class="book-details__section book-details__nomination">
+                <% if (r.nominator_name) { %>
+                  <p class="t-label">Nominated by <%= r.nominator_name %></p>
+                <% } %>
+                <% if (r.reason) { %>
+                  <p class="book-details__reason t-body">&ldquo;<%= r.reason %>&rdquo;</p>
+                <% } %>
+              </div>
+            <% } %>
+            <div class="book-details__footer">
+              <a href="/books/<%= r.author_slug %>/<%= r.title_slug %>"
+                 class="book-details__link">
+                View Details
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+        </template>
+      </button>
     <% }); %>
   </div>
 
@@ -81,7 +140,65 @@
       Last updated just now
     </p>
   <% } %>
+
+  <dialog id="book-details-dialog" class="book-details-dialog" aria-labelledby="book-details-dialog-title">
+    <button type="button" class="book-details-dialog__close" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="book-details-dialog__body" id="book-details-dialog-body"></div>
+  </dialog>
 </section>
+
+<script>
+(function () {
+  'use strict';
+  var dialog = document.getElementById('book-details-dialog');
+  var body   = document.getElementById('book-details-dialog-body');
+  if (!dialog || !body) return;
+
+  function openDialog(btn) {
+    var template = btn.querySelector('.results-bar__details-template');
+    if (!template) return;
+    body.innerHTML = '';
+    body.appendChild(template.content.cloneNode(true));
+    if (typeof dialog.showModal === 'function') {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute('open', '');
+    }
+    document.body.classList.add('has-open-dialog');
+  }
+
+  function closeDialog() {
+    dialog.classList.add('is-closing');
+    setTimeout(function () {
+      dialog.classList.remove('is-closing');
+      if (typeof dialog.close === 'function') {
+        dialog.close();
+      } else {
+        dialog.removeAttribute('open');
+      }
+      body.innerHTML = '';
+      document.body.classList.remove('has-open-dialog');
+    }, 180);
+  }
+
+  document.getElementById('results-chart').addEventListener('click', function (e) {
+    var btn = e.target.closest('.js-results-detail');
+    if (btn) openDialog(btn);
+  });
+
+  dialog.addEventListener('click', function (e) {
+    if (e.target === dialog) closeDialog();
+  });
+  dialog.addEventListener('cancel', function (e) {
+    e.preventDefault();
+    closeDialog();
+  });
+  var closeBtn = dialog.querySelector('.book-details-dialog__close');
+  if (closeBtn) closeBtn.addEventListener('click', closeDialog);
+})();
+</script>
 
 <script>
   // Config for SSE client
