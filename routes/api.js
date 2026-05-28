@@ -1444,8 +1444,8 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
 
   // Block nominations for books the club has already read
   const alreadyRead = db.prepare(`
-    SELECT m.month_year FROM meetings m
-    WHERE m.winning_book_id = ? AND m.status IN ('reading', 'results')
+    SELECT mp.month_year FROM monthly_picks mp
+    WHERE mp.book_id = ? AND mp.status IN ('reading', 'results')
     LIMIT 1
   `).get(book.id);
 
