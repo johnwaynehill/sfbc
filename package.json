@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test test/*.test.js",
-    "test:watch": "node --test --watch test/*.test.js"
+    "test": "node --test --test-force-exit test/*.test.js",
+    "test:watch": "node --test --watch --test-force-exit test/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.7.10",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "supertest": "^7.2.2"
   }
 }
