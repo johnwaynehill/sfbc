@@ -1695,28 +1695,30 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
     }
   }
 
-  // Validate ranking
-  if (!ranking || !Array.isArray(ranking) || ranking.length !== validBookIds.size) {
-    analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'invalid_ranking_count', meetingId, expected: validBookIds.size, got: ranking?.length ?? 0 });
-    const wantsJson = req.get('Accept')?.includes('application/json');
-    if (wantsJson) {
-      return res.status(400).json({ error: 'Ranking must include all nominees exactly once.' });
+  // Strip out book IDs that are no longer nominees (admin may have removed one
+  // while the voter's ballot was still open) and deduplicate.
+  if (ranking && Array.isArray(ranking)) {
+    const seen = new Set();
+    ranking = ranking.filter(id => {
+      if (!validBookIds.has(id) || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
+    // Append any nominees the voter's stale ballot was missing
+    for (const id of validBookIds) {
+      if (!seen.has(id)) ranking.push(id);
     }
-    return res.redirect('/vote/' + slug);
   }
 
-  // Check all IDs are valid and no duplicates
-  const seen = new Set();
-  for (const id of ranking) {
-    if (!validBookIds.has(id) || seen.has(id)) {
-      analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'invalid_book_ids', meetingId });
-      const wantsJson = req.get('Accept')?.includes('application/json');
-      if (wantsJson) {
-        return res.status(400).json({ error: 'Ranking contains invalid or duplicate book IDs.' });
-      }
-      return res.redirect('/vote/' + slug);
+  // Guard: ranking must be a non-empty array after reconciliation
+  if (!ranking || !Array.isArray(ranking) || ranking.length === 0) {
+    analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'empty_ranking', meetingId });
+    const wantsJson = req.get('Accept')?.includes('application/json');
+    if (wantsJson) {
+      return res.status(400).json({ error: 'Something went wrong. Please refresh and try again.' });
     }
-    seen.add(id);
+    return res.redirect('/vote/' + slug);
   }
 
   // Store the vote
