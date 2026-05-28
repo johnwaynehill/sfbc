@@ -1,5 +1,37 @@
 [
   {
+    "version": "0.15",
+    "date": "2026-05-28",
+    "title": "Bug Fixes & Quality of Life",
+    "intro": "A batch of fixes from last night's book club meeting, plus admin and results page improvements.",
+    "entries": [
+      {
+        "icon": "fix",
+        "text": "Fixed a bug where nominating a book with different capitalization could bypass the already-read check or create duplicate records."
+      },
+      {
+        "icon": "fix",
+        "text": "Fixed inconsistent member counts across the site — About, Admin, and Members pages now all show the same number."
+      },
+      {
+        "icon": "fix",
+        "text": "Voting no longer fails when an admin removes a nominee while ballots are open. Stale ballots are reconciled automatically."
+      },
+      {
+        "icon": "book",
+        "text": "Results page — tap any book in the results chart to open a detail view with the cover, description, and nomination reason."
+      },
+      {
+        "icon": "magic",
+        "text": "Admin cover search now paginates with a Show More button, so you can browse beyond the first 5 results from Google Books."
+      },
+      {
+        "icon": "calendar",
+        "text": "Admin reviews redesigned — reviews are collapsed by default and open in a modal (desktop) or bottom sheet (mobile) with the delete action inside."
+      }
+    ]
+  },
+  {
     "version": "0.14",
     "date": "2026-05-27",
     "title": "Voting & Nominations Overhaul",
