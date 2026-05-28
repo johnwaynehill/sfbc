@@ -99,7 +99,7 @@ const removeNominationStmt = db.prepare(
 );
 
 const countBooksStmt = db.prepare("SELECT COUNT(*) AS cnt FROM monthly_picks WHERE status = 'results'");
-const countMembersStmt = db.prepare("SELECT COUNT(*) AS cnt FROM users WHERE role = 'member'");
+const countMembersStmt = db.prepare("SELECT COUNT(*) AS cnt FROM users");
 const countReviewsStmt = db.prepare('SELECT COUNT(*) AS cnt FROM reviews');
 
 /* ------------------------------------------------------------------ */

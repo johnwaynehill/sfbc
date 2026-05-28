@@ -219,7 +219,6 @@ router.get('/members', requireMember, (req, res) => {
            COUNT(r.id) AS review_count
     FROM users u
     LEFT JOIN reviews r ON r.user_id = u.id
-    WHERE u.display_name IS NOT NULL AND (u.username IS NOT NULL OR u.user_slug IS NOT NULL)
     GROUP BY u.id
     ORDER BY u.display_name COLLATE NOCASE ASC
   `).all();

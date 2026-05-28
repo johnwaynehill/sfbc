@@ -2459,6 +2459,7 @@ textarea.form-input {
 /* ---- Inline Messages ---- */
 .nom-message {
   padding: var(--s-3);
+  margin-bottom: var(--s-3);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: var(--t-sm);

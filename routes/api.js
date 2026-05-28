@@ -1444,15 +1444,18 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
 
   // Block nominations for books the club has already read
   const alreadyRead = db.prepare(`
-    SELECT m.month_year FROM meetings m
-    WHERE m.winning_book_id = ? AND m.status IN ('reading', 'results')
+    SELECT mp.month_year FROM monthly_picks mp
+    WHERE mp.book_id = ? AND mp.status IN ('reading', 'results')
     LIMIT 1
   `).get(book.id);
 
   if (alreadyRead) {
     analytics.track(nominatorId, 'nomination_rejected', { reason: 'already_read', meetingId, bookId: book.id, bookTitle: book.title });
     const wantsJson = req.get('Accept')?.includes('application/json');
-    const msg = 'The club has already read this book! Try nominating something new.';
+    const [yr, mo] = alreadyRead.month_year.split('-');
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const readWhen = monthNames[parseInt(mo, 10) - 1] + ' ' + yr;
+    const msg = `The club already read this book in ${readWhen}! Try nominating something new.`;
     if (wantsJson) {
       return res.status(409).json({ error: msg });
     }
