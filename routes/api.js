@@ -1711,12 +1711,12 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
     }
   }
 
-  // Validate ranking
-  if (!ranking || !Array.isArray(ranking) || ranking.length !== validBookIds.size) {
-    analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'invalid_ranking_count', meetingId, expected: validBookIds.size, got: ranking?.length ?? 0 });
+  // Guard: ranking must be a non-empty array after reconciliation
+  if (!ranking || !Array.isArray(ranking) || ranking.length === 0) {
+    analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'empty_ranking', meetingId });
     const wantsJson = req.get('Accept')?.includes('application/json');
     if (wantsJson) {
-      return res.status(400).json({ error: 'Ranking must include all nominees exactly once.' });
+      return res.status(400).json({ error: 'Something went wrong. Please refresh and try again.' });
     }
     return res.redirect('/vote/' + slug);
   }
