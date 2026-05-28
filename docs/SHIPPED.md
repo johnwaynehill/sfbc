@@ -220,6 +220,16 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **HOST env override** — Dev binds to `localhost` by default; `HOST=0.0.0.0` makes the server reachable from another device on the LAN (e.g. testing the voting page on a real phone)
 - **Dev CSP `upgrade-insecure-requests` disabled** — Helmet's default would force every CSS/image/font subresource to https when accessed from a LAN IP, breaking on-device dev testing. Disabled in dev only; production behavior unchanged
 
+## Bug Fixes & Quality of Life (May 2026)
+
+- **Case-insensitive book matching** — `findOrCreateBook()` now uses `COLLATE NOCASE` for title + author, plus a Google Books ID fallback, preventing duplicate book records from case variations *(GAT-42, GAT-43)*
+- **Already-read check fixed** — Nomination guard now queries `monthly_picks` instead of the legacy `meetings` table, so only books in the public history are blocked; error message includes when the book was read *(GAT-42)*
+- **Consistent member counts** — Admin dashboard, About page, and Members directory all use the same `COUNT(*) FROM users` query *(GAT-44)*
+- **Stale ballot reconciliation** — When an admin removes a nominee during active voting, the server silently strips removed book IDs and appends any new nominees, so votes go through without a page refresh *(GAT-45)*
+- **Results page book details** — Each results bar is now clickable, opening a book details modal (desktop) or bottom sheet (mobile) with cover, description, subjects, and nomination reason *(GAT-46)*
+- **Admin cover search pagination** — Cover replacement modal loads 5 results at a time with a "Show More" button for browsing beyond the first page *(GAT-11)*
+- **Admin reviews redesign** — Reviews are collapsed by default; clicking "View" opens a centered modal (desktop) or bottom sheet (mobile) with full review content and the delete action *(GAT-31)*
+
 ## Bug Fixes (Sprint 5)
 
 - **`--amber` CSS variable** — Defined in `tokens.css`; fixes admin badge dark mode, char-count warning, and spoiler reveal background
