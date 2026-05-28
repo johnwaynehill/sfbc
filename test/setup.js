@@ -170,6 +170,14 @@ function seedVote(meetingId, rankingBookIds, fingerprint = 'fp-test-' + Math.ran
   `).run(meetingId, JSON.stringify(rankingBookIds), fingerprint);
 }
 
+function seedReview(bookId, userId, { grade = 'A', body = 'A review', has_spoilers = 0, did_finish = 1 } = {}) {
+  const info = testDb.prepare(`
+    INSERT INTO reviews (book_id, user_id, grade, body_markdown, has_spoilers, did_finish, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+  `).run(bookId, userId, grade, body, has_spoilers ? 1 : 0, did_finish ? 1 : 0);
+  return testDb.prepare('SELECT * FROM reviews WHERE id = ?').get(info.lastInsertRowid);
+}
+
 module.exports = {
   get db() { return dbProxy; },
   freshDb,
@@ -178,4 +186,5 @@ module.exports = {
   seedMeeting,
   seedNominee,
   seedVote,
+  seedReview,
 };
