@@ -127,7 +127,11 @@ async function searchGoogleBooksMulti(query, max = 5, startIndex = 0) {
 /* ------------------------------------------------------------------ */
 
 const findBookStmt = db.prepare(
-  'SELECT * FROM books WHERE title = ? AND author = ?'
+  'SELECT * FROM books WHERE title = ? COLLATE NOCASE AND author = ? COLLATE NOCASE'
+);
+
+const findBookByGoogleIdStmt = db.prepare(
+  'SELECT * FROM books WHERE google_books_id = ?'
 );
 
 const insertBookStmt = db.prepare(`
@@ -169,6 +173,12 @@ function uniqueTitleSlug(authorSlug, baseTitleSlug) {
 function findOrCreateBook(title, author, metadata = {}) {
   const trimTitle = title.trim();
   const trimAuthor = author.trim();
+
+  // Try Google Books ID first (most reliable dedup signal)
+  if (metadata.googleBooksId) {
+    const byGoogleId = findBookByGoogleIdStmt.get(metadata.googleBooksId);
+    if (byGoogleId) return byGoogleId;
+  }
 
   let book = findBookStmt.get(trimTitle, trimAuthor);
   if (book) return book;

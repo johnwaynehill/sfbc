@@ -15,18 +15,29 @@
   <% } %>
 
   <div class="members-grid" id="membersGrid">
-    <% for (const m of members) { %>
-      <a href="/members/<%= m.username || m.user_slug %>" class="member-card" data-name="<%= (m.display_name || '').toLowerCase() %>">
+    <% for (const m of members) {
+         const memberName = m.display_name || m.email.split('@')[0];
+         const memberSlug = m.username || m.user_slug;
+    %>
+      <% if (memberSlug) { %>
+        <a href="/members/<%= memberSlug %>" class="member-card" data-name="<%= memberName.toLowerCase() %>">
+      <% } else { %>
+        <div class="member-card" data-name="<%= memberName.toLowerCase() %>">
+      <% } %>
         <%- include('partials/avatar', { avatarUser: m, avatarSize: 'md', avatarClass: '' }) %>
         <div class="member-card__info">
-          <span class="member-card__name t-body-bold"><%= m.display_name %></span>
+          <span class="member-card__name t-body-bold"><%= memberName %></span>
           <span class="member-card__meta t-caption text-secondary">
             <%= m.review_count %> review<%= m.review_count !== 1 ? 's' : '' %>
             &middot;
             Joined <%= new Date(m.created_at + 'Z').toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) %>
           </span>
         </div>
-      </a>
+      <% if (memberSlug) { %>
+        </a>
+      <% } else { %>
+        </div>
+      <% } %>
     <% } %>
   </div>
 
