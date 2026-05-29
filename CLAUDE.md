@@ -7,16 +7,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # Start dev server with --watch (auto-restarts on file changes)
 npm start            # Start production server
+npm test             # Run the test suite (node --test, in-memory SQLite)
+npm run test:watch   # Re-run tests on file changes
 fly deploy           # Deploy to Fly.io (builds Docker image, pushes to sjc region)
 ```
 
-There is no build step, no linter, no test suite. CSS and JS are authored directly and served as static files.
+There is no build step and no linter. CSS and JS are authored directly and served as static files.
+
+Tests use Node's built-in runner (no framework) against an in-memory database — see `Docs/TESTING.md`. When fixing a bug, add a test that reproduces it first.
 
 ## Architecture
 
 **Stack:** Express 5 (CommonJS) + EJS templates + SQLite (better-sqlite3) + vanilla CSS/JS. Zero build step — no bundler, no transpiler, no framework.
 
-**Entry point:** `server.js` bootstraps in order: Sentry → DB + migrations → security (Helmet CSP, rate limiting) → view engine → compression → body parsing → sessions (SQLite-backed) → user injection middleware → global template locals → routes → error handlers.
+**Entry point:** `server.js` handles process concerns (Sentry init, migrations, `app.listen`). The Express app itself is built and exported by `app.js` (no listener) so tests can mount it. `app.js` wires up, in order: security (Helmet CSP, rate limiting) → view engine → compression → body parsing → sessions (SQLite-backed) → user injection middleware → global template locals → routes → error handlers.
 
 **Request flow:** Routes are thin controllers → validate input (via `middleware/validate.js`) → call service functions → render EJS or return JSON. No business logic in route files.
 
