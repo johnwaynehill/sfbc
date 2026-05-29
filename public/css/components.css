@@ -8476,6 +8476,11 @@ a.reply__author-link:hover .reply__author {
   width: 100%;
   display: block;
 }
+/* Strip covers are uniform thumbnails — fill the box at a fixed book ratio */
+.lp-preview-strip__cover img {
+  height: 100%;
+  object-fit: cover;
+}
 
 /* Preview: club home hero */
 .lp-preview-hero {
@@ -8526,10 +8531,12 @@ a.reply__author-link:hover .reply__author {
 }
 .lp-preview-strip {
   display: flex;
+  align-items: flex-start;
   gap: var(--s-2);
 }
 .lp-preview-strip__cover {
   width: 46px;
+  aspect-ratio: 2 / 3;
   flex-shrink: 0;
   border-radius: 3px;
   overflow: hidden;
