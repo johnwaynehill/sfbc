@@ -1,7 +1,11 @@
 'use strict';
 
 const router = require('express').Router();
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const db = require('../db');
+const { emailChain, sanitizeTextChain, handleValidationErrors } = require('../middleware/validate');
+const waitlistService = require('../services/waitlist');
+const emailService = require('../services/email');
 const { slugify, bookPath } = require('../utils/slug');
 const { formatMonthYear } = require('../utils/format');
 const { requireMember } = require('../middleware/auth');
@@ -614,6 +618,60 @@ router.get('/landing', (req, res) => {
     recentBooks,
     showcase,
   });
+});
+
+// ---------------------------------------------------------------------------
+// POST /waitlist — GatherBound waitlist signup (native form on /landing)
+// ---------------------------------------------------------------------------
+const waitlistLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
+  handler: (req, res) =>
+    res.status(429).json({ error: 'Too many signups from this network. Please try again later.' }),
+});
+
+const waitlistValidators = [
+  ...sanitizeTextChain('name', { max: 120, required: true, label: 'Name' }),
+  ...emailChain,
+  ...sanitizeTextChain('clubName', { max: 120, required: false, label: 'Club name' }),
+  ...sanitizeTextChain('cityState', { max: 120, required: false, label: 'Location' }),
+];
+
+router.post('/waitlist', waitlistLimiter, waitlistValidators, handleValidationErrors, async (req, res) => {
+  // Honeypot: bots fill the hidden "website" field. Pretend success, store nothing.
+  if (req.body.website) {
+    return res.json({ success: true });
+  }
+
+  const signup = {
+    name: req.body.name,
+    email: req.body.email, // trimmed + lowercased + validated by emailChain
+    clubName: req.body.clubName || null,
+    cityState: req.body.cityState || null,
+  };
+
+  const { created } = waitlistService.addSignup(signup);
+
+  analytics.track(req.session && req.session.userId ? req.session.userId : 'anonymous', 'waitlist_signup', {
+    isNew: created,
+    hasClub: !!signup.clubName,
+    hasLocation: !!signup.cityState,
+  });
+
+  // Notify the admin, but never fail the request on a mail error — the signup
+  // is already persisted.
+  if (created) {
+    try {
+      await emailService.sendWaitlistNotification(signup);
+    } catch (err) {
+      console.error('Waitlist notification failed:', err.message);
+    }
+  }
+
+  res.json({ success: true });
 });
 
 module.exports = router;

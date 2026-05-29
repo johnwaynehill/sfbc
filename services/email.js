@@ -63,4 +63,38 @@ async function sendMagicLink(email, token) {
   });
 }
 
-module.exports = { sendMagicLink };
+/**
+ * Notify the super admin of a new GatherBound waitlist signup.
+ * Falls back to console logging when SMTP or a recipient isn't configured.
+ * Never throws to the caller's critical path — the signup is already saved.
+ */
+async function sendWaitlistNotification(signup) {
+  const transport = getTransporter();
+  const to = config.superAdminEmail;
+
+  const lines = [
+    'New GatherBound waitlist signup:',
+    '',
+    `Name:     ${signup.name}`,
+    `Email:    ${signup.email}`,
+    `Club:     ${signup.clubName || '—'}`,
+    `Location: ${signup.cityState || '—'}`,
+  ];
+
+  if (!transport || !to) {
+    console.log('');
+    console.log('  [DEV] Waitlist signup: %s', JSON.stringify(signup));
+    console.log('');
+    return;
+  }
+
+  await transport.sendMail({
+    from: config.smtp.from || `"${config.club.name}" <noreply@example.com>`,
+    to,
+    replyTo: signup.email,
+    subject: `New waitlist signup: ${signup.name}`,
+    text: lines.join('\n'),
+  });
+}
+
+module.exports = { sendMagicLink, sendWaitlistNotification };
