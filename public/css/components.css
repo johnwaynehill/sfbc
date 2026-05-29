@@ -8851,3 +8851,15 @@ a.reply__author-link:hover .reply__author {
   }
 }
 
+/* Votes inspector: same-network cluster flag (soft, review-only signal) */
+.vote-network-flag {
+  display: inline-block;
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--amber) 14%, var(--bg));
+  color: var(--amber);
+  font-family: var(--font-ui);
+  font-size: var(--t-xs);
+  white-space: nowrap;
+}
+

@@ -187,6 +187,44 @@ describe('getVoteCount', () => {
   });
 });
 
+describe('getVotesForMeeting — IP clustering', () => {
+  beforeEach(() => {
+    freshDb();
+    voting = require('../services/voting');
+  });
+
+  it('flags votes that share an IP hash with a cluster count > 1', () => {
+    const meeting = seedMeeting({ status: 'voting' });
+    const book = seedBook();
+    seedNominee(meeting.id, book.id);
+    // Two votes from the same network (same ip hash), one from another.
+    seedVote(meeting.id, [book.id], 'fp-1', null, 'aaaaaa0000');
+    seedVote(meeting.id, [book.id], 'fp-2', null, 'aaaaaa0000');
+    seedVote(meeting.id, [book.id], 'fp-3', null, 'bbbbbb1111');
+
+    const votes = voting.getVotesForMeeting(meeting.id);
+    const shared = votes.filter(v => v.submitted_ip_hash === 'aaaaaa0000');
+    const lone = votes.find(v => v.submitted_ip_hash === 'bbbbbb1111');
+
+    assert.equal(shared.length, 2);
+    assert.ok(shared.every(v => v.ip_cluster_count === 2));
+    assert.ok(shared.every(v => v.network_label === 'aaaaaa'));
+    assert.equal(lone.ip_cluster_count, 1);
+    assert.equal(lone.network_label, 'bbbbbb');
+  });
+
+  it('treats a null IP hash (legacy/anonymous) as a lone vote', () => {
+    const meeting = seedMeeting({ status: 'voting' });
+    const book = seedBook();
+    seedNominee(meeting.id, book.id);
+    seedVote(meeting.id, [book.id], 'fp-legacy', null, null);
+
+    const [v] = voting.getVotesForMeeting(meeting.id);
+    assert.equal(v.ip_cluster_count, 1);
+    assert.equal(v.network_label, null);
+  });
+});
+
 describe('calculateResults', () => {
   beforeEach(() => {
     freshDb();

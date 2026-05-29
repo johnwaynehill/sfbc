@@ -88,8 +88,11 @@ This can be derived from Nominations in MVP, but adding it explicitly keeps the 
 * created_at
 * submitted_fingerprint
 * user_id (nullable; set for logged-in voters, NULL for anonymous)
+* submitted_ip_hash (nullable; HMAC(secret, "ip:&lt;ip&gt;:&lt;meeting_id&gt;") — never the raw IP)
 
 Uniqueness: `UNIQUE(meeting_id, submitted_fingerprint)` plus a partial unique index `(meeting_id, user_id) WHERE user_id IS NOT NULL` — so a logged-in member gets exactly one vote per meeting regardless of browser/cookie.
+
+`submitted_ip_hash` is a **soft, review-only** signal for anonymous abuse: the admin votes inspector (`?show-votes=yes`) groups votes sharing an IP hash and flags clusters (`⚠ N from network …`) so an admin can manually delete suspected cookie-reset duplicates. Votes are **never auto-rejected** on this value — in-person meetups share one venue IP, so a hard block would reject legitimate attendees. The hash is salted per-meeting (no cross-meeting correlation) and irreversible without the secret. Gross flooding is bounded separately by the per-IP rate-limit backstop.
 
 ## Review
 
