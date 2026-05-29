@@ -8433,12 +8433,14 @@ a.reply__author-link:hover .reply__author {
 .lp-frame__dot {
   width: 9px;
   height: 9px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: var(--text3);
   opacity: 0.4;
 }
 .lp-frame__url {
   margin-left: var(--s-2);
+  min-width: 0;
   font-family: var(--font-ui);
   font-size: var(--t-xs);
   color: var(--text3);
