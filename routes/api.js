@@ -11,6 +11,7 @@ const { getFingerprint } = require('../services/fingerprint');
 const {
   getNomineesForBallot,
   hasVoted,
+  hasUserVoted,
   calculateResults,
 } = require('../services/voting');
 const meetings = require('../services/meetings');
@@ -1674,8 +1675,11 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
 
   const slug = monthYearSlug(meeting.month_year);
 
-  // Already voted?
-  if (hasVoted(meetingId, fingerprint)) {
+  // Already voted? Check both the per-browser fingerprint and (for logged-in
+  // members) the user_id — the latter catches a repeat vote from a different
+  // browser/cookie, e.g. a fresh private window.
+  const sessionUserId = req.session?.userId || null;
+  if (hasVoted(meetingId, fingerprint) || (sessionUserId && hasUserVoted(meetingId, sessionUserId))) {
     analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'already_voted', meetingId });
     const wantsJson = req.get('Accept')?.includes('application/json');
     if (wantsJson) {
@@ -1740,9 +1744,23 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
     return res.redirect('/vote/' + slug);
   }
 
-  // Store the vote
-  const userId = req.session?.userId || null;
-  insertVote.run(meetingId, JSON.stringify(ranking), fingerprint, userId);
+  // Store the vote. The unique constraints (fingerprint, and the partial
+  // user_id index) are the source of truth — catch a constraint violation from
+  // a race that slipped past the checks above and treat it as already-voted.
+  const userId = sessionUserId;
+  try {
+    insertVote.run(meetingId, JSON.stringify(ranking), fingerprint, userId);
+  } catch (err) {
+    if (err && typeof err.code === 'string' && err.code.startsWith('SQLITE_CONSTRAINT')) {
+      analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'already_voted', meetingId });
+      const wantsJson = req.get('Accept')?.includes('application/json');
+      if (wantsJson) {
+        return res.status(409).json({ error: 'You have already voted in this meeting.' });
+      }
+      return res.redirect('/results/' + slug);
+    }
+    throw err;
+  }
 
   // Broadcast updated results to SSE clients
   broadcastResults(meetingId);

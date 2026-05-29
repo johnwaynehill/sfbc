@@ -120,6 +120,50 @@ describe('hasVoted', () => {
   });
 });
 
+describe('hasUserVoted', () => {
+  beforeEach(() => {
+    freshDb();
+    voting = require('../services/voting');
+  });
+
+  it('returns false when no votes exist', () => {
+    const user = seedUser();
+    const meeting = seedMeeting();
+    assert.equal(voting.hasUserVoted(meeting.id, user.id), false);
+  });
+
+  it('returns true after the user votes (regardless of fingerprint)', () => {
+    const user = seedUser();
+    const meeting = seedMeeting({ status: 'voting' });
+    const book = seedBook();
+    seedNominee(meeting.id, book.id);
+    seedVote(meeting.id, [book.id], 'fp-some-browser', user.id);
+
+    assert.equal(voting.hasUserVoted(meeting.id, user.id), true);
+  });
+
+  it('returns false for a different user', () => {
+    const alice = seedUser({ email: 'alice@test.com', display_name: 'Alice' });
+    const bob = seedUser({ email: 'bob@test.com', display_name: 'Bob' });
+    const meeting = seedMeeting({ status: 'voting' });
+    const book = seedBook();
+    seedNominee(meeting.id, book.id);
+    seedVote(meeting.id, [book.id], 'fp-alice', alice.id);
+
+    assert.equal(voting.hasUserVoted(meeting.id, bob.id), false);
+  });
+
+  it('returns false for a null/anonymous userId', () => {
+    const meeting = seedMeeting({ status: 'voting' });
+    const book = seedBook();
+    seedNominee(meeting.id, book.id);
+    seedVote(meeting.id, [book.id], 'fp-anon', null);
+
+    assert.equal(voting.hasUserVoted(meeting.id, null), false);
+    assert.equal(voting.hasUserVoted(meeting.id, undefined), false);
+  });
+});
+
 describe('getVoteCount', () => {
   beforeEach(() => {
     freshDb();

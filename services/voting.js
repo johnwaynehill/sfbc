@@ -88,6 +88,20 @@ function hasVoted(meetingId, fingerprint) {
   return !!hasVotedStmt.get(meetingId, fingerprint);
 }
 
+const hasUserVotedStmt = db.prepare(
+  'SELECT 1 FROM votes WHERE meeting_id = ? AND user_id = ? LIMIT 1'
+);
+
+/**
+ * Whether a logged-in user has already voted in this meeting. Unlike hasVoted
+ * (keyed by per-browser fingerprint), this catches the same user voting from a
+ * different browser/cookie. Returns false for anonymous voters (no userId).
+ */
+function hasUserVoted(meetingId, userId) {
+  if (!userId) return false;
+  return !!hasUserVotedStmt.get(meetingId, userId);
+}
+
 const voteCountStmt = db.prepare(
   'SELECT COUNT(*) AS cnt FROM votes WHERE meeting_id = ?'
 );
@@ -172,6 +186,7 @@ module.exports = {
   seededShuffle,
   getNomineesForBallot,
   hasVoted,
+  hasUserVoted,
   getVoteCount,
   getVotesForMeeting,
   calculateResults,
