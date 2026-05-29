@@ -163,11 +163,11 @@ function seedNominee(meetingId, bookId, { userId = null, reason = null, nominato
   }
 }
 
-function seedVote(meetingId, rankingBookIds, fingerprint = 'fp-test-' + Math.random()) {
+function seedVote(meetingId, rankingBookIds, fingerprint = 'fp-test-' + Math.random(), userId = null) {
   testDb.prepare(`
-    INSERT INTO votes (meeting_id, ranking_json, submitted_fingerprint, created_at)
-    VALUES (?, ?, ?, datetime('now'))
-  `).run(meetingId, JSON.stringify(rankingBookIds), fingerprint);
+    INSERT INTO votes (meeting_id, ranking_json, submitted_fingerprint, user_id, created_at)
+    VALUES (?, ?, ?, ?, datetime('now'))
+  `).run(meetingId, JSON.stringify(rankingBookIds), fingerprint, userId);
 }
 
 function seedReview(bookId, userId, { grade = 'A', body = 'A review', has_spoilers = 0, did_finish = 1 } = {}) {

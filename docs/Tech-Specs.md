@@ -87,6 +87,9 @@ This can be derived from Nominations in MVP, but adding it explicitly keeps the 
 * ranking_json (ordered list of book ids)
 * created_at
 * submitted_fingerprint
+* user_id (nullable; set for logged-in voters, NULL for anonymous)
+
+Uniqueness: `UNIQUE(meeting_id, submitted_fingerprint)` plus a partial unique index `(meeting_id, user_id) WHERE user_id IS NOT NULL` — so a logged-in member gets exactly one vote per meeting regardless of browser/cookie.
 
 ## Review
 
@@ -151,9 +154,9 @@ Because nominations and votes do not require login, the app enforces "one submis
 * Nominations: 1 per fingerprint per meeting.
 
   * If a fingerprint has already nominated, show: "Looks like you already nominated for this meeting." and provide an **Edit** flow.
-* Votes: 1 per fingerprint per meeting.
+* Votes: 1 per fingerprint per meeting, and additionally 1 per logged-in user per meeting (by `user_id`), so a member cannot re-vote from a different browser/private window.
 
-  * If a fingerprint has already voted, show: "Vote already received." and provide a **View Results** link.
+  * If a fingerprint or the logged-in user has already voted, show: "Vote already received." and provide a **View Results** link.
 
 ## Rate Limiting (Best-Effort)
 

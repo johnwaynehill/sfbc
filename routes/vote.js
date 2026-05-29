@@ -10,6 +10,7 @@ const {
   getNomineesForBallot,
   seededShuffle,
   hasVoted,
+  hasUserVoted,
   getVoteCount,
 } = require('../services/voting');
 const { monthYearSlug } = require('../utils/format');
@@ -55,8 +56,10 @@ router.get('/vote/:slug', async (req, res) => {
   // Set the _client_id cookie and derive this visitor's fingerprint
   const fingerprint = getFingerprint(req, res, meeting.id);
 
-  // Already voted → redirect to results
-  if (hasVoted(meeting.id, fingerprint)) {
+  // Already voted → redirect to results. Check the per-browser fingerprint and
+  // (for logged-in members) the user_id, so a repeat visit from a different
+  // browser/cookie still can't reach the ballot.
+  if (hasVoted(meeting.id, fingerprint) || hasUserVoted(meeting.id, req.session?.userId)) {
     return res.redirect('/results/' + slug);
   }
 

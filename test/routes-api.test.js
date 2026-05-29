@@ -210,6 +210,36 @@ describe('API routes — voting', () => {
     const voteCount = db.prepare('SELECT COUNT(*) AS cnt FROM votes WHERE meeting_id = ?').get(meeting.id).cnt;
     assert.equal(voteCount, 2);
   });
+
+  it('rejects a second vote from the same logged-in user across browsers', async () => {
+    const user = seedUser({ email: 'voter@test.com', display_name: 'Voter' });
+
+    // First browser/session: log in and vote.
+    const browser1 = supertest.agent(app);
+    await loginAs(browser1, user);
+    await browser1
+      .post(`/api/meetings/${meeting.id}/votes`)
+      .set('Accept', 'application/json')
+      .set('Cookie', '_client_id=browser-one')
+      .send({ ranking: [book1.id, book2.id, book3.id] })
+      .expect(201);
+
+    // Second browser (e.g. private window): same user logs in again with a
+    // fresh _client_id cookie → different fingerprint, but same user_id.
+    const browser2 = supertest.agent(app);
+    await loginAs(browser2, user);
+    const res = await browser2
+      .post(`/api/meetings/${meeting.id}/votes`)
+      .set('Accept', 'application/json')
+      .set('Cookie', '_client_id=browser-two')
+      .send({ ranking: [book3.id, book2.id, book1.id] })
+      .expect(409);
+
+    assert.match(res.body.error, /already voted/i);
+
+    const voteCount = db.prepare('SELECT COUNT(*) AS cnt FROM votes WHERE meeting_id = ?').get(meeting.id).cnt;
+    assert.equal(voteCount, 1, 'Only the first vote should be stored');
+  });
 });
 
 describe('API routes — admin meeting lifecycle', () => {
