@@ -221,6 +221,13 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Two PostHog dashboards** — *Engagement & Health* (rate-limit hits, vote/nomination rejections, login failures, DAU, success ratios, search dead-ends) and *Funnels & Growth* (signup, invites, nomination/voting flows, club-pick → review, three activation funnels)
 - **`docs/Analytics.md`** — Full catalog of events, distinct-ID strategy, dashboard contents, "adding a new event" patterns, HogQL verification snippets, known limitations
 
+## Landing Page Redesign (May 2026)
+
+- **Conversion-focused `/landing` rebuild** — Reworked ahead of driving waitlist traffic, guided by a competitive analysis of book-club and community-SaaS landing pages. Concrete outcome-first hero headline ("Give your book club a home between meetings"); dual CTA (primary "Join the waitlist" + secondary "See a live club →"); inline trust line with live stats under the hero; sticky header waitlist CTA; reframed feature heading ("Everything your club needs"); social-proof stats kept as a "By the numbers" block
+- **Live-data product showcase** — New "Take a peek inside" section renders two browser-chrome mockups (`.lp-frame`) built from real DB data via the `showcase` local on the `/landing` route: the club home (currently-reading hero + recent-reads strip) and a book archive page (real club-average letter grade + a real, spoiler-free member review as a pull quote). Both link to the live club, so the showcase is genuinely the running product and never goes stale — no static screenshots to maintain
+- **Placeholder testimonials** — `.lp-voices` section with clearly-marked placeholder quotes to be replaced with real member/organizer quotes before launch
+- CSS: new `lp-showcase`/`lp-frame`/`lp-preview-*`/`lp-voices`/`lp-header__cta`/`lp-hero__actions` blocks in `components.css` (token-only, dark-mode + mobile handled); bumped components cache to `?v=81`
+
 ## Dev Workflow (May 2026)
 
 - **HOST env override** — Dev binds to `localhost` by default; `HOST=0.0.0.0` makes the server reachable from another device on the LAN (e.g. testing the voting page on a real phone)
