@@ -1149,6 +1149,11 @@ Principles:
 
 * Purpose: Displays QR code + short URL for Nominate/Vote/Results for a meeting.
 
+29. **VotesInspector** (Admin)
+
+* Purpose: Hidden per-vote table on the pick detail page, revealed via the `?show-votes=yes` query param (no UI link). Shows voter identity, ranking, submitted time, and a delete control.
+* `.vote-network-flag`: amber chip (`var(--amber)`, `--radius-sm`, `--font-ui`, `--t-xs`) rendered in the Network column when 2+ votes share a privacy-preserving IP hash (`⚠ N · <label>`). A soft, review-only signal — never auto-blocks a vote.
+
 ---
 
 ### Profile & Identity Components

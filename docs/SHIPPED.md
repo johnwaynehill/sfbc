@@ -205,6 +205,12 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Grip handle removed** — Long-press affordance replaces the visual clutter; kicks off the haptics backlog item (BACKLOG.md:109)
 - **Duplicate June 2026 meeting cleanup** — One-off prod fix: removed an empty stale meeting that was rendering "To Be Decided" alongside the real Piranesi pick on the homepage
 
+## Vote Integrity (May 2026)
+
+- **Admin vote inspector + delete** — Hidden per-vote table on the admin pick detail page, revealed via `?show-votes=yes` (no UI link). Shows voter identity, ranking, and submitted time; `DELETE /api/admin/votes/:id` removes an errant/duplicate vote and recalculates + rebroadcasts results over SSE. `getVotesForMeeting()` added to `services/voting.js`. Used to fix a prod incident where an accidental duplicate vote had changed a winner
+- **One vote per logged-in user** — Dedup was previously cookie-fingerprint only, so a member could vote, open a private window, log in again, and vote a second time. Now enforced at the app layer (`hasUserVoted()`) and the database (partial unique index `(meeting_id, user_id) WHERE user_id IS NOT NULL`, migration 026), with a constraint-violation guard on insert. Existing duplicate user votes are deduped in the migration (keeps each user's earliest)
+- **Anonymous IP soft-flag** — `submitted_ip_hash` (migration 029) stores `HMAC(secret, "ip:<ip>:<meeting_id>")` — never the raw IP, salted per-meeting. The vote inspector groups votes sharing a network and flags clusters (`⚠ N · <label>`, `.vote-network-flag`) so admins can spot cookie-reset duplicates. Soft-flag only — **never auto-blocks**, since in-person meetups share one venue IP. Login intentionally not required to vote
+
 ## Analytics Expansion & Dashboards (May 2026)
 
 - **11 new server-side events** — `vote_rejected`, `nomination_rejected`, `login_failed`, `magic_link_failed`, `magic_link_consumed`, `account_created` (split from `user_login`), `invite_redeemed` (closes the invite funnel with `invite_created`), `book_search_no_results` (only fires on empty results — no keystroke firehose), `meeting_viewed` (kind: `vote | nominate | nominations_live`), `book_viewed`
