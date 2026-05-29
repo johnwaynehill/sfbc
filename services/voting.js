@@ -97,6 +97,23 @@ function getVoteCount(meetingId) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Admin: individual votes for a meeting                              */
+/* ------------------------------------------------------------------ */
+
+const votesForMeetingStmt = db.prepare(`
+  SELECT v.id, v.ranking_json, v.submitted_fingerprint, v.created_at,
+         v.user_id, u.display_name, u.email
+  FROM votes v
+  LEFT JOIN users u ON u.id = v.user_id
+  WHERE v.meeting_id = ?
+  ORDER BY v.created_at ASC
+`);
+
+function getVotesForMeeting(meetingId) {
+  return votesForMeetingStmt.all(meetingId);
+}
+
+/* ------------------------------------------------------------------ */
 /*  Results calculation                                                */
 /* ------------------------------------------------------------------ */
 
@@ -156,5 +173,6 @@ module.exports = {
   getNomineesForBallot,
   hasVoted,
   getVoteCount,
+  getVotesForMeeting,
   calculateResults,
 };

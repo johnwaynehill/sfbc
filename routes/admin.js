@@ -7,7 +7,7 @@ const config = require('../config');
 const { requireAdmin } = require('../middleware/auth');
 const meetings = require('../services/meetings');
 const picksService = require('../services/monthly-picks');
-const { calculateResults, getVoteCount } = require('../services/voting');
+const { calculateResults, getVoteCount, getVotesForMeeting, getNomineesForBallot } = require('../services/voting');
 const { formatMonthYear, formatMeetingTime, parseMonthYearSlug, monthYearSlug } = require('../utils/format');
 
 /* ------------------------------------------------------------------ */
@@ -210,6 +210,18 @@ router.get('/picks/:slug', async (req, res) => {
   const pick = picksService.getByMonthYear(meeting.month_year);
   const events = pick ? picksService.getEvents(pick.id) : [];
 
+  // Secret votes inspector: ?show-votes=yes
+  let votes = null;
+  let bookMap = null;
+  if (req.query['show-votes'] === 'yes') {
+    votes = getVotesForMeeting(meeting.id);
+    const allNominees = getNomineesForBallot(meeting.id);
+    bookMap = {};
+    for (const n of allNominees) {
+      bookMap[n.book_id] = n.title;
+    }
+  }
+
   res.render('admin/pick-detail', {
     pageTitle: formatMonthYear(meeting.month_year),
     pageScript: '/js/admin-picks.js',
@@ -221,6 +233,8 @@ router.get('/picks/:slug', async (req, res) => {
     qrCodes,
     events,
     formatMeetingTime,
+    votes,
+    bookMap,
   });
 });
 

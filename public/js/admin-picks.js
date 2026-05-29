@@ -968,4 +968,55 @@
 
     connectMeetingSse();
   }
+
+  /* ------------------------------------------------------------------ */
+  /*  Delete individual vote (?votes=1 inspector)                        */
+  /* ------------------------------------------------------------------ */
+
+  var votesTable = document.getElementById('votes-table');
+  if (votesTable) {
+    document.addEventListener('click', async function (e) {
+      var btn = e.target.closest('.js-delete-vote');
+      if (!btn) return;
+
+      var voteId = btn.dataset.voteId;
+      var voter = btn.dataset.voter;
+
+      if (!await showConfirm('Delete vote from “' + voter + '”? This will recalculate results.', { danger: true, confirmText: 'Delete' })) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting…';
+
+      try {
+        var res = await fetch('/api/admin/votes/' + voteId, {
+          method: 'DELETE',
+          headers: { 'Accept': 'application/json' },
+        });
+        var data = await res.json();
+
+        if (res.ok && data.success) {
+          var row = btn.closest('tr');
+          row.style.transition = 'opacity 0.3s ease';
+          row.style.opacity = '0';
+          setTimeout(function () {
+            row.remove();
+            var countEl = document.getElementById('votes-count');
+            if (countEl) {
+              var current = parseInt(countEl.textContent, 10) || 0;
+              countEl.textContent = Math.max(0, current - 1);
+            }
+          }, 300);
+          return;
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+        alert(data.error || 'Failed to delete vote.');
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+        alert('Network error. Please try again.');
+      }
+    });
+  }
 })();

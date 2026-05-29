@@ -962,6 +962,25 @@ router.delete('/admin/reviews/:id', requireAdmin, (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Delete individual vote (admin only)
+// DELETE /api/admin/votes/:id
+// ---------------------------------------------------------------------------
+router.delete('/admin/votes/:id', requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid vote ID.' });
+
+  const vote = db.prepare('SELECT id, meeting_id FROM votes WHERE id = ?').get(id);
+  if (!vote) return res.status(404).json({ error: 'Vote not found.' });
+
+  db.prepare('DELETE FROM votes WHERE id = ?').run(id);
+
+  broadcastResults(vote.meeting_id);
+  broadcastAdminMeetingVoteCount(vote.meeting_id);
+
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
 // Replace book cover (admin only)
 // PUT /api/admin/books/:id/cover
 // ---------------------------------------------------------------------------

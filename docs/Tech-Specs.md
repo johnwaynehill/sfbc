@@ -213,6 +213,9 @@ Define explicit routes so that implementation remains predictable and consistent
 * POST /api/admin/meetings (create meeting)
 * POST /api/admin/meetings/:meetingId/state (change state)
 * POST /api/admin/export (generate markdown snapshot)
+* DELETE /api/admin/votes/:id (remove an individual vote; recalculates results)
+
+Admins can inspect individual votes (voter identity + ranking) on a pick's detail page via the hidden query param `?show-votes=yes`, which surfaces a per-vote table with delete controls. No UI link points to it.
 
 Implementation Guidance:
 
