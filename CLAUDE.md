@@ -60,6 +60,29 @@ Vanilla JS only. Each file uses an IIFE. DOM lookup by ID (camelCase). Server da
 
 Fly.io app `sf-book-club` in `sjc` region. Single machine (SQLite constraint). Persistent volume at `/data`. CI: GitHub Actions auto-deploys on push to `main`. `trust proxy` is required for secure cookies behind Fly's HTTPS termination.
 
+## Documentation
+
+Project docs live in `Docs/`. Keep them in sync as part of the same change that alters behavior — stale docs mislead future work (and future Claude sessions). Update the relevant doc in the same PR, don't defer it.
+
+Key docs and what they cover:
+- `ARCHITECTURE.md` — stack, bootstrap, services, routing, key decisions
+- `TESTING.md` — test suite structure, harness, how to add tests
+- `Tech-Specs.md` — data model and API contracts
+- `Design-Specs.md` / `Brand-Guidelines.md` — visual system, tokens, components
+- `PRD.md` — product spec, user stories, page definitions
+- `ROADMAP.md` — milestone planning; `SHIPPED.md` — release history
+- `MIGRATION-PLAN.md` — multi-club migration plan
+- `Bugs.md` — known issues
+
+When to update:
+- New/changed routes, services, or bootstrap → `ARCHITECTURE.md` (and `Tech-Specs.md` if the data model or API contract changes)
+- New tests, test patterns, or harness changes → `TESTING.md`
+- New design tokens, components, or CSS conventions → `Design-Specs.md`
+- Shipping a user-facing feature → add an entry to `SHIPPED.md`
+- Keep `CLAUDE.md` itself accurate when commands, structure, or conventions change
+
+If a change makes an existing doc statement false, fix it in the same PR.
+
 ## Workflow
 
 Always branch + PR — never commit directly to main.
