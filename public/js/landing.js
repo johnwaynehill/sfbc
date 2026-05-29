@@ -69,4 +69,52 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }
+
+  /* --- Waitlist form submission --- */
+  var form = document.getElementById('waitlistForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var errorEl = document.getElementById('waitlistError');
+      var successEl = document.getElementById('waitlistSuccess');
+      var btn = form.querySelector('.lp-form__submit');
+      var origText = btn.textContent;
+
+      errorEl.hidden = true;
+      btn.disabled = true;
+      btn.textContent = 'Joining…';
+
+      var payload = {
+        name: form.elements['name'].value,
+        email: form.elements['email'].value,
+        clubName: form.elements['clubName'].value,
+        cityState: form.elements['cityState'].value,
+        website: form.elements['website'].value
+      };
+
+      fetch('/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (r) {
+        return r.json().then(function (data) { return { ok: r.ok, data: data }; });
+      }).then(function (res) {
+        if (res.ok && res.data && res.data.success) {
+          form.hidden = true;
+          successEl.hidden = false;
+          successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          errorEl.textContent = (res.data && res.data.error) || 'Something went wrong. Please try again.';
+          errorEl.hidden = false;
+          btn.disabled = false;
+          btn.textContent = origText;
+        }
+      }).catch(function () {
+        errorEl.textContent = 'Network error. Please check your connection and try again.';
+        errorEl.hidden = false;
+        btn.disabled = false;
+        btn.textContent = origText;
+      });
+    });
+  }
 })();

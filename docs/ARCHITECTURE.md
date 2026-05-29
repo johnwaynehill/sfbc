@@ -66,8 +66,9 @@ SF-Book-Club-v3/
     reactions.js         # Emoji reactions
     announcements.js     # Club announcements
     activity.js          # Activity feed queries
-    email.js             # Nodemailer integration
+    email.js             # Nodemailer integration (magic links, waitlist signup notifications)
     fingerprint.js       # Per-meeting device fingerprint + IP hash (getFingerprint/getIpHash) for vote dedup & abuse review
+    waitlist.js          # GatherBound /landing waitlist signups (addSignup/countSignups/getRecent)
 
   middleware/
     auth.js              # requireMember, requireAdmin
@@ -224,7 +225,7 @@ Routes are organized by concern, mounted in `server.js`:
 
 ### Current structure (single-club)
 ```
-/              → routes/public.js     (home, books, history, members, changelog)
+/              → routes/public.js     (home, books, history, members, changelog, /landing, POST /waitlist)
 /              → routes/nominate.js   (nomination form)
 /              → routes/nominations.js (nomination listing)
 /              → routes/vote.js       (voting UI)

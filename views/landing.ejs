@@ -2,9 +2,18 @@
 <section class="lp-hero">
   <div class="lp-hero__content">
     <p class="lp-hero__eyebrow">GatherBound</p>
-    <h1 class="lp-hero__title">The community is&nbsp;always bigger than&nbsp;the&nbsp;room.</h1>
-    <p class="lp-hero__subtitle">Your book club deserves more than a group chat. Give every member a place to nominate, vote, review, and discuss — whether they made it to the meeting or not.</p>
-    <a href="#waitlist" class="lp-hero__cta">Start Your Club</a>
+    <h1 class="lp-hero__title">Give your book club a home between&nbsp;meetings.</h1>
+    <p class="lp-hero__subtitle">The community is always bigger than the room. Give every member a place to nominate, vote, review, and discuss — whether they made it to the meeting or not.</p>
+    <div class="lp-hero__actions">
+      <a href="#waitlist" class="lp-hero__cta">Join the waitlist</a>
+      <a href="/" class="lp-hero__cta lp-hero__cta--ghost">See a live club&nbsp;&rarr;</a>
+    </div>
+    <% if (totalBooks > 0) { %>
+    <p class="lp-hero__trust">
+      Already running the <strong>SF Fantasy &amp; Sci-Fi Book Club</strong>
+      &middot; <%= totalMembers %> members &middot; <%= totalBooks %> books read &middot; <%= totalReviews %> reviews
+    </p>
+    <% } %>
   </div>
   <% if (recentBooks && recentBooks.length > 0) { %>
   <div class="lp-hero__covers" aria-hidden="true">
@@ -18,6 +27,84 @@
   </div>
   <% } %>
 </section>
+
+<!-- ===== Showcase (Peek inside a real club) ===== -->
+<% if (showcase) { %>
+<section class="lp-showcase">
+  <div class="page-container">
+    <p class="lp-showcase__eyebrow reveal">Take a peek inside</p>
+    <h2 class="lp-showcase__heading reveal">This isn't a mockup. It's a real club, running right now.</h2>
+    <p class="lp-showcase__sub reveal">Everything below is live data from the SF Fantasy &amp; Sci-Fi Book Club. Click through and explore it yourself.</p>
+
+    <div class="lp-showcase__grid">
+      <!-- Preview 1: the club home -->
+      <a class="lp-frame reveal" href="/">
+        <div class="lp-frame__bar" aria-hidden="true">
+          <span class="lp-frame__dot"></span><span class="lp-frame__dot"></span><span class="lp-frame__dot"></span>
+          <span class="lp-frame__url">gatherbound.club</span>
+        </div>
+        <div class="lp-frame__body">
+          <p class="lp-frame__caption">The club's home page</p>
+          <div class="lp-preview-hero">
+            <div class="lp-preview-hero__cover">
+              <img src="<%= showcase.cover_url %>" alt="" loading="lazy">
+            </div>
+            <div class="lp-preview-hero__meta">
+              <span class="lp-preview-pill"><%= showcase.label %></span>
+              <span class="lp-preview-hero__title"><%= showcase.title %></span>
+              <span class="lp-preview-hero__author">by <%= showcase.author %></span>
+            </div>
+          </div>
+          <p class="lp-preview-label">Recent reads</p>
+          <div class="lp-preview-strip">
+            <% for (const c of showcase.recentCovers) { %>
+            <div class="lp-preview-strip__cover"><img src="<%= c.cover_url %>" alt="" loading="lazy"></div>
+            <% } %>
+          </div>
+        </div>
+      </a>
+
+      <!-- Preview 2: a book's archive page -->
+      <a class="lp-frame reveal" href="<%= showcase.href %>">
+        <div class="lp-frame__bar" aria-hidden="true">
+          <span class="lp-frame__dot"></span><span class="lp-frame__dot"></span><span class="lp-frame__dot"></span>
+          <span class="lp-frame__url">gatherbound.club<%= showcase.href %></span>
+        </div>
+        <div class="lp-frame__body">
+          <p class="lp-frame__caption">Every book becomes an archive</p>
+          <div class="lp-preview-book">
+            <div class="lp-preview-book__cover">
+              <img src="<%= showcase.cover_url %>" alt="" loading="lazy">
+            </div>
+            <div class="lp-preview-book__meta">
+              <span class="lp-preview-book__title"><%= showcase.title %></span>
+              <% if (showcase.avgGrade) { %>
+              <div class="lp-preview-grade">
+                <span class="lp-preview-grade__badge"><%= showcase.avgGrade %></span>
+                <span class="lp-preview-grade__label">Club average<br>from <%= showcase.reviewCount %> review<%= showcase.reviewCount === 1 ? '' : 's' %></span>
+              </div>
+              <% } %>
+            </div>
+          </div>
+          <% if (showcase.reviewText) { %>
+          <blockquote class="lp-preview-review">
+            <p class="lp-preview-review__text">&ldquo;<%= showcase.reviewText %>&rdquo;</p>
+            <p class="lp-preview-review__by">
+              <% if (showcase.reviewGrade) { %><span class="lp-preview-review__grade"><%= showcase.reviewGrade %></span><% } %>
+              <%= showcase.reviewer %>
+            </p>
+          </blockquote>
+          <% } %>
+        </div>
+      </a>
+    </div>
+
+    <div class="lp-showcase__cta reveal">
+      <a href="/" class="lp-link-cta">Explore the live club&nbsp;&rarr;</a>
+    </div>
+  </div>
+</section>
+<% } %>
 
 <!-- ===== Manifesto ===== -->
 <section class="lp-manifesto reveal">
@@ -46,14 +133,14 @@
     <div class="lp-ritual__step reveal">
       <span class="lp-ritual__number" aria-hidden="true">01</span>
       <div class="lp-ritual__body">
-        <h2 class="lp-ritual__title">Nominate & Vote</h2>
+        <h2 class="lp-ritual__title">Nominate &amp; Vote</h2>
         <p class="lp-ritual__text">Members scan a QR code and nominate books in seconds. Ranked-choice voting picks the winner — with live results on the big screen.</p>
       </div>
     </div>
     <div class="lp-ritual__step reveal">
       <span class="lp-ritual__number" aria-hidden="true">02</span>
       <div class="lp-ritual__body">
-        <h2 class="lp-ritual__title">Read & Review</h2>
+        <h2 class="lp-ritual__title">Read &amp; Review</h2>
         <p class="lp-ritual__text">Everyone reads on the same timeline. Letter-grade reviews, emoji reactions, threaded discussions — participate from anywhere.</p>
       </div>
     </div>
@@ -67,7 +154,7 @@
   </div>
 </section>
 
-<!-- ===== Proof ===== -->
+<!-- ===== Proof (cover marquee) ===== -->
 <section class="lp-proof">
   <% if (recentBooks && recentBooks.length > 0) { %>
   <div class="lp-proof__marquee" aria-hidden="true">
@@ -83,9 +170,7 @@
   </div>
   <% } %>
   <div class="page-container">
-    <p class="lp-proof__eyebrow reveal">Already powering</p>
-    <h2 class="lp-proof__club reveal">SF Fantasy &amp; Sci-Fi Book Club</h2>
-    <p class="lp-proof__desc reveal">900+ members on Meetup. Running monthly since 2023.</p>
+    <p class="lp-proof__eyebrow reveal">By the numbers</p>
     <div class="lp-proof__stats reveal">
       <div class="lp-proof__stat">
         <span class="lp-proof__stat-num" data-count="<%= totalBooks %>">0</span>
@@ -106,7 +191,7 @@
 <!-- ===== Features ===== -->
 <section class="lp-features">
   <div class="page-container">
-    <h2 class="lp-features__heading reveal">Built for organizers</h2>
+    <h2 class="lp-features__heading reveal">Everything your club needs</h2>
     <div class="lp-features__grid">
       <div class="lp-feature reveal">
         <strong>QR Nominations</strong>
@@ -136,15 +221,67 @@
   </div>
 </section>
 
+<!-- ===== Voices (testimonials) ===== -->
+<!--
+  PLACEHOLDER TESTIMONIALS — replace the quote text and attribution below with
+  real quotes from members/organizers before launch. Remove this whole section
+  if you'd rather ship without testimonials than ship placeholders.
+-->
+<section class="lp-voices">
+  <div class="page-container">
+    <h2 class="lp-voices__heading reveal">What organizers say</h2>
+    <div class="lp-voices__grid">
+      <figure class="lp-voice reveal">
+        <blockquote class="lp-voice__quote">[Placeholder — add a real organizer quote about running their club on GatherBound.]</blockquote>
+        <figcaption class="lp-voice__by">— Organizer name, Club name</figcaption>
+      </figure>
+      <figure class="lp-voice reveal">
+        <blockquote class="lp-voice__quote">[Placeholder — add a real member quote about staying engaged between meetings.]</blockquote>
+        <figcaption class="lp-voice__by">— Member name, Club name</figcaption>
+      </figure>
+      <figure class="lp-voice reveal">
+        <blockquote class="lp-voice__quote">[Placeholder — add a quote about the archive, voting, or reviews.]</blockquote>
+        <figcaption class="lp-voice__by">— Member name, Club name</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
 <!-- ===== CTA ===== -->
 <section class="lp-cta" id="waitlist">
   <div class="page-container">
     <h2 class="lp-cta__heading">Start your club<br>on GatherBound</h2>
     <p class="lp-cta__text">We're onboarding a small group of book clubs for our private beta. Tell us about your club and we'll get you set up.</p>
-    <div class="lp-cta__form">
-      <iframe data-tally-src="https://tally.so/embed/vG2BJg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" width="100%" frameborder="0" marginheight="0" marginwidth="0" title="GatherBound Waitlist"></iframe>
-      <script>var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s)}else v();</script>
+    <form class="lp-form" id="waitlistForm" novalidate>
+      <div class="lp-form__row">
+        <label class="lp-form__field">
+          <span class="lp-form__label">Your name</span>
+          <input class="lp-form__input" type="text" name="name" required autocomplete="name" maxlength="120">
+        </label>
+        <label class="lp-form__field">
+          <span class="lp-form__label">Email</span>
+          <input class="lp-form__input" type="email" name="email" required autocomplete="email" maxlength="254">
+        </label>
+      </div>
+      <div class="lp-form__row">
+        <label class="lp-form__field">
+          <span class="lp-form__label">Club name <span class="lp-form__opt">(optional)</span></span>
+          <input class="lp-form__input" type="text" name="clubName" autocomplete="organization" maxlength="120">
+        </label>
+        <label class="lp-form__field">
+          <span class="lp-form__label">City / State <span class="lp-form__opt">(optional)</span></span>
+          <input class="lp-form__input" type="text" name="cityState" maxlength="120">
+        </label>
+      </div>
+      <!-- Honeypot: hidden from humans, bots fill it -->
+      <input type="text" name="website" class="lp-form__hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit" class="lp-form__submit">Join the waitlist</button>
+      <p class="lp-form__error" id="waitlistError" role="alert" hidden></p>
+      <p class="lp-cta__note">No credit card required. Free during beta.</p>
+    </form>
+    <div class="lp-form__success" id="waitlistSuccess" hidden>
+      <p class="lp-form__success-title">You're on the list&nbsp;🎉</p>
+      <p class="lp-form__success-text">Thanks — we'll be in touch as we onboard clubs into the beta.</p>
     </div>
-    <p class="lp-cta__note">No credit card required. Free during beta.</p>
   </div>
 </section>

@@ -1,7 +1,11 @@
 'use strict';
 
 const router = require('express').Router();
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const db = require('../db');
+const { emailChain, sanitizeTextChain, handleValidationErrors } = require('../middleware/validate');
+const waitlistService = require('../services/waitlist');
+const emailService = require('../services/email');
 const { slugify, bookPath } = require('../utils/slug');
 const { formatMonthYear } = require('../utils/format');
 const { requireMember } = require('../middleware/auth');
@@ -550,6 +554,61 @@ router.get('/landing', (req, res) => {
     LIMIT 8
   `).all();
 
+  // Live-product showcase: a real featured book + its real club grade and a
+  // real member review, rendered inside the "peek inside" mockups. Pulling
+  // this from the DB keeps the showcase truthful and never goes stale.
+  const featured = picksService.getHero();
+  let showcase = null;
+  if (featured && featured.cover_url) {
+    const avgRow = db.prepare(`
+      SELECT AVG(gw.weight) AS avg_weight, COUNT(*) AS cnt
+      FROM reviews r
+      JOIN grade_weights gw ON gw.grade = r.grade
+      WHERE r.book_id = ?
+    `).get(featured.book_id);
+
+    // A clean, positive pull-quote: substantial, no spoiler markup (||…||).
+    const reviewRow = db.prepare(`
+      SELECT r.grade, r.body_markdown, u.display_name AS reviewer
+      FROM reviews r
+      JOIN users u ON u.id = r.user_id
+      JOIN grade_weights gw ON gw.grade = r.grade
+      WHERE r.book_id = ?
+        AND r.body_markdown IS NOT NULL
+        AND length(r.body_markdown) BETWEEN 60 AND 280
+        AND instr(r.body_markdown, '||') = 0
+      ORDER BY gw.weight DESC, length(r.body_markdown) DESC
+      LIMIT 1
+    `).get(featured.book_id);
+
+    let reviewText = null;
+    if (reviewRow && reviewRow.body_markdown) {
+      // Strip light markdown for a plain-text pull quote.
+      reviewText = reviewRow.body_markdown
+        .replace(/\*\*/g, '')
+        .replace(/\*/g, '')
+        .replace(/[_`>#]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (reviewText.length > 160) reviewText = reviewText.slice(0, 157).trimEnd() + '…';
+    }
+
+    showcase = {
+      title: featured.title,
+      author: featured.author,
+      cover_url: featured.cover_url,
+      href: bookPath(featured.title, featured.author),
+      label: featured.status === 'reading' ? 'Currently Reading' : formatMonthYear(featured.month_year),
+      monthYear: formatMonthYear(featured.month_year),
+      avgGrade: avgRow && avgRow.cnt > 0 ? weightToGrade(avgRow.avg_weight) : null,
+      reviewCount: avgRow ? avgRow.cnt : 0,
+      reviewText,
+      reviewGrade: reviewRow ? reviewRow.grade : null,
+      reviewer: reviewRow ? reviewRow.reviewer : null,
+      recentCovers: recentBooks.filter((b) => b.cover_url).slice(0, 5),
+    };
+  }
+
   res.render('landing', {
     layout: 'layouts/landing-shell',
     pageTitle: 'The digital home for in-person book clubs',
@@ -557,7 +616,62 @@ router.get('/landing', (req, res) => {
     totalMembers,
     totalReviews,
     recentBooks,
+    showcase,
   });
+});
+
+// ---------------------------------------------------------------------------
+// POST /waitlist — GatherBound waitlist signup (native form on /landing)
+// ---------------------------------------------------------------------------
+const waitlistLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
+  handler: (req, res) =>
+    res.status(429).json({ error: 'Too many signups from this network. Please try again later.' }),
+});
+
+const waitlistValidators = [
+  ...sanitizeTextChain('name', { max: 120, required: true, label: 'Name' }),
+  ...emailChain,
+  ...sanitizeTextChain('clubName', { max: 120, required: false, label: 'Club name' }),
+  ...sanitizeTextChain('cityState', { max: 120, required: false, label: 'Location' }),
+];
+
+router.post('/waitlist', waitlistLimiter, waitlistValidators, handleValidationErrors, async (req, res) => {
+  // Honeypot: bots fill the hidden "website" field. Pretend success, store nothing.
+  if (req.body.website) {
+    return res.json({ success: true });
+  }
+
+  const signup = {
+    name: req.body.name,
+    email: req.body.email, // trimmed + lowercased + validated by emailChain
+    clubName: req.body.clubName || null,
+    cityState: req.body.cityState || null,
+  };
+
+  const { created } = waitlistService.addSignup(signup);
+
+  analytics.track(req.session && req.session.userId ? req.session.userId : 'anonymous', 'waitlist_signup', {
+    isNew: created,
+    hasClub: !!signup.clubName,
+    hasLocation: !!signup.cityState,
+  });
+
+  // Notify the admin, but never fail the request on a mail error — the signup
+  // is already persisted.
+  if (created) {
+    try {
+      await emailService.sendWaitlistNotification(signup);
+    } catch (err) {
+      console.error('Waitlist notification failed:', err.message);
+    }
+  }
+
+  res.json({ success: true });
 });
 
 module.exports = router;

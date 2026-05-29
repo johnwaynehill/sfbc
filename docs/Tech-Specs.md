@@ -134,6 +134,17 @@ Uniqueness: `UNIQUE(meeting_id, submitted_fingerprint)` plus a partial unique in
 
 Note: 14 grades from F (0.0) to S (4.3). Used for calculating averages and generating grade distribution visualizations. F+ and F- were removed — a failing grade needs no modifiers.
 
+## WaitlistSignup
+
+* id
+* name (required)
+* email (required, UNIQUE — repeat submission is a no-op)
+* club_name (optional)
+* city_state (optional)
+* created_at
+
+Note: Collected from the public GatherBound `/landing` page via a native form (replaced the previous embedded Tally form). Migration `030-waitlist.sql`. `services/waitlist.js` handles inserts (idempotent via `ON CONFLICT(email) DO NOTHING`). On a new signup, `services/email.js#sendWaitlistNotification` emails `superAdminEmail` (console-logs when SMTP is unconfigured).
+
 Implementation Guidance:
 
 * Canonical structured data should live in SQLite.
@@ -182,6 +193,8 @@ Define explicit routes so that implementation remains predictable and consistent
 * GET /about
 * GET /books/:authorSlug/:titleSlug
 * GET /members/:slug (requireMember — public member profile)
+* GET /landing (GatherBound marketing/waitlist page)
+* POST /waitlist (waitlist signup — JSON `{ name, email, clubName?, cityState?, website? }`; `website` is a honeypot. Validated via `sanitizeTextChain` + `emailChain`; rate-limited 10/hr/IP; returns `{ success: true }`, or `{ error }` on validation failure. Duplicate email → success (no-op).)
 
 ## QR Flow Pages
 
