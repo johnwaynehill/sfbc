@@ -116,15 +116,36 @@ function getVoteCount(meetingId) {
 
 const votesForMeetingStmt = db.prepare(`
   SELECT v.id, v.ranking_json, v.submitted_fingerprint, v.created_at,
-         v.user_id, u.display_name, u.email
+         v.user_id, v.submitted_ip_hash, u.display_name, u.email
   FROM votes v
   LEFT JOIN users u ON u.id = v.user_id
   WHERE v.meeting_id = ?
   ORDER BY v.created_at ASC
 `);
 
+/**
+ * Votes for a meeting, enriched for the admin inspector. Each row gains:
+ *   - ip_cluster_count: how many votes in this meeting share its IP hash
+ *     (1 when alone or when the hash is null/legacy)
+ *   - network_label: first 6 hex chars of the IP hash for visual grouping
+ *     (null when no hash). This is a soft, review-only signal — votes are
+ *     never auto-rejected on it.
+ */
 function getVotesForMeeting(meetingId) {
-  return votesForMeetingStmt.all(meetingId);
+  const votes = votesForMeetingStmt.all(meetingId);
+
+  // Tally how many votes share each (non-null) IP hash.
+  const counts = new Map();
+  for (const v of votes) {
+    if (!v.submitted_ip_hash) continue;
+    counts.set(v.submitted_ip_hash, (counts.get(v.submitted_ip_hash) || 0) + 1);
+  }
+
+  return votes.map((v) => ({
+    ...v,
+    ip_cluster_count: v.submitted_ip_hash ? counts.get(v.submitted_ip_hash) : 1,
+    network_label: v.submitted_ip_hash ? v.submitted_ip_hash.slice(0, 6) : null,
+  }));
 }
 
 /* ------------------------------------------------------------------ */

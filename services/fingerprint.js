@@ -35,4 +35,27 @@ function getFingerprint(req, res, meetingId) {
     .digest('hex');
 }
 
-module.exports = { getFingerprint };
+/**
+ * Derive a privacy-preserving per-meeting hash of the requester's IP. Used as a
+ * soft, review-only signal to surface IP clustering in the admin votes
+ * inspector — never to auto-reject a vote. Stores HMAC(secret, "ip:<ip>:<id>"),
+ * never the raw IP; salting by meetingId prevents cross-meeting correlation.
+ *
+ * Relies on `app.set('trust proxy', 1)` so req.ip reflects the real client IP
+ * behind Fly's HTTPS termination. Returns null when no IP is available.
+ *
+ * @param {import('express').Request} req
+ * @param {number|string} meetingId
+ * @returns {string|null} hex hash, or null if no IP
+ */
+function getIpHash(req, meetingId) {
+  const ip = (req && req.ip) || '';
+  if (!ip) return null;
+
+  return crypto
+    .createHmac('sha256', config.sessionSecret)
+    .update(`ip:${ip}:${meetingId}`)
+    .digest('hex');
+}
+
+module.exports = { getFingerprint, getIpHash };

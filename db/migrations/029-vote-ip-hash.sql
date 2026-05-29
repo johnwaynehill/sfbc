@@ -1,0 +1,15 @@
+-- Privacy-preserving per-meeting IP hash for anonymous-vote abuse review.
+--
+-- Anonymous voters are identified only by the _client_id cookie, which they can
+-- reset (incognito / clear cookies) to vote again. This column lets admins see
+-- when multiple votes came from the same network, surfaced in the votes
+-- inspector (?show-votes=yes), so they can manually review/delete duplicates.
+--
+-- Value is HMAC(sessionSecret, "ip:<ip>:<meeting_id>") — never the raw IP.
+-- Salting by meeting_id prevents cross-meeting correlation and the hash is
+-- irreversible without the secret. Nullable; existing rows stay NULL.
+--
+-- Votes are NEVER auto-rejected on this value — it is a soft, review-only
+-- signal. Gross flooding is already bounded by the submissionIpBackstop rate
+-- limiter (1500/IP/15min).
+ALTER TABLE votes ADD COLUMN submitted_ip_hash TEXT;

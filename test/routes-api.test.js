@@ -240,6 +240,45 @@ describe('API routes — voting', () => {
     const voteCount = db.prepare('SELECT COUNT(*) AS cnt FROM votes WHERE meeting_id = ?').get(meeting.id).cnt;
     assert.equal(voteCount, 1, 'Only the first vote should be stored');
   });
+
+  it('stores a privacy-preserving IP hash on each vote', async () => {
+    await request
+      .post(`/api/meetings/${meeting.id}/votes`)
+      .set('Accept', 'application/json')
+      .set('X-Forwarded-For', '203.0.113.7')
+      .set('Cookie', '_client_id=ip-voter-1')
+      .send({ ranking: [book1.id, book2.id, book3.id] })
+      .expect(201);
+
+    const vote = db.prepare('SELECT submitted_ip_hash FROM votes WHERE meeting_id = ?').get(meeting.id);
+    assert.ok(vote.submitted_ip_hash, 'ip hash should be stored');
+    assert.match(vote.submitted_ip_hash, /^[0-9a-f]{64}$/);
+    assert.ok(!vote.submitted_ip_hash.includes('203.0.113.7'), 'must not store the raw IP');
+  });
+
+  it('does NOT auto-block a second anonymous vote from the same IP (soft-flag only)', async () => {
+    // Same network (X-Forwarded-For), different cookie — simulates a private
+    // window on the same WiFi. Both must be accepted; they share an IP hash.
+    await request
+      .post(`/api/meetings/${meeting.id}/votes`)
+      .set('Accept', 'application/json')
+      .set('X-Forwarded-For', '203.0.113.7')
+      .set('Cookie', '_client_id=same-ip-a')
+      .send({ ranking: [book1.id, book2.id, book3.id] })
+      .expect(201);
+
+    await request
+      .post(`/api/meetings/${meeting.id}/votes`)
+      .set('Accept', 'application/json')
+      .set('X-Forwarded-For', '203.0.113.7')
+      .set('Cookie', '_client_id=same-ip-b')
+      .send({ ranking: [book3.id, book2.id, book1.id] })
+      .expect(201);
+
+    const hashes = db.prepare('SELECT submitted_ip_hash FROM votes WHERE meeting_id = ? ORDER BY id').all(meeting.id);
+    assert.equal(hashes.length, 2, 'both votes accepted — no IP auto-block');
+    assert.equal(hashes[0].submitted_ip_hash, hashes[1].submitted_ip_hash, 'same network → same hash');
+  });
 });
 
 describe('API routes — admin meeting lifecycle', () => {

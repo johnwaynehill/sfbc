@@ -7,7 +7,7 @@ const config = require('../config');
 const analytics = require('../services/analytics');
 const { slugify } = require('../utils/slug');
 const { searchGoogleBooks, searchGoogleBooksMulti, findOrCreateBook, downloadCover } = require('../services/books');
-const { getFingerprint } = require('../services/fingerprint');
+const { getFingerprint, getIpHash } = require('../services/fingerprint');
 const {
   getNomineesForBallot,
   hasVoted,
@@ -1645,8 +1645,8 @@ function broadcastStatusChange(meetingId, status) {
 // POST /api/meetings/:meetingId/votes
 // ---------------------------------------------------------------------------
 const insertVote = db.prepare(`
-  INSERT INTO votes (meeting_id, ranking_json, submitted_fingerprint, user_id)
-  VALUES (?, ?, ?, ?)
+  INSERT INTO votes (meeting_id, ranking_json, submitted_fingerprint, user_id, submitted_ip_hash)
+  VALUES (?, ?, ?, ?, ?)
 `);
 
 router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimiter, (req, res) => {
@@ -1748,8 +1748,11 @@ router.post('/meetings/:meetingId/votes', submissionIpBackstop, submissionLimite
   // user_id index) are the source of truth — catch a constraint violation from
   // a race that slipped past the checks above and treat it as already-voted.
   const userId = sessionUserId;
+  // Soft, review-only signal — surfaced in the admin votes inspector to spot
+  // anonymous cookie-reset duplicates. Never used to reject a vote.
+  const ipHash = getIpHash(req, meetingId);
   try {
-    insertVote.run(meetingId, JSON.stringify(ranking), fingerprint, userId);
+    insertVote.run(meetingId, JSON.stringify(ranking), fingerprint, userId, ipHash);
   } catch (err) {
     if (err && typeof err.code === 'string' && err.code.startsWith('SQLITE_CONSTRAINT')) {
       analytics.track(req.session?.userId || fingerprint, 'vote_rejected', { reason: 'already_voted', meetingId });

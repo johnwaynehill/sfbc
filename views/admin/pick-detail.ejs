@@ -460,6 +460,7 @@
             <tr>
               <th class="t-caption">#</th>
               <th class="t-caption">Voter</th>
+              <th class="t-caption">Network</th>
               <th class="t-caption">Ranking</th>
               <th class="t-caption">Submitted</th>
               <th class="t-caption"></th>
@@ -476,6 +477,19 @@
                   <% } else { %>
                     <span class="text-secondary">Anonymous</span>
                     <br><span class="t-caption text-secondary">fp: <%= v.submitted_fingerprint.slice(0, 8) %>&hellip;</span>
+                  <% } %>
+                </td>
+                <td class="t-caption">
+                  <% if (v.network_label) { %>
+                    <% if (v.ip_cluster_count > 1) { %>
+                      <span class="vote-network-flag" title="<%= v.ip_cluster_count %> votes in this meeting came from the same network">
+                        &#9888; <%= v.ip_cluster_count %> &middot; <%= v.network_label %>
+                      </span>
+                    <% } else { %>
+                      <span class="text-secondary"><%= v.network_label %></span>
+                    <% } %>
+                  <% } else { %>
+                    <span class="text-secondary">&mdash;</span>
                   <% } %>
                 </td>
                 <td class="t-body">
