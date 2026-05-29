@@ -7,16 +7,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # Start dev server with --watch (auto-restarts on file changes)
 npm start            # Start production server
+npm test             # Run the test suite (node --test, in-memory SQLite)
+npm run test:watch   # Re-run tests on file changes
 fly deploy           # Deploy to Fly.io (builds Docker image, pushes to sjc region)
 ```
 
-There is no build step, no linter, no test suite. CSS and JS are authored directly and served as static files.
+There is no build step and no linter. CSS and JS are authored directly and served as static files.
+
+Tests use Node's built-in runner (no framework) against an in-memory database — see `Docs/TESTING.md`. When fixing a bug, add a test that reproduces it first.
 
 ## Architecture
 
 **Stack:** Express 5 (CommonJS) + EJS templates + SQLite (better-sqlite3) + vanilla CSS/JS. Zero build step — no bundler, no transpiler, no framework.
 
-**Entry point:** `server.js` bootstraps in order: Sentry → DB + migrations → security (Helmet CSP, rate limiting) → view engine → compression → body parsing → sessions (SQLite-backed) → user injection middleware → global template locals → routes → error handlers.
+**Entry point:** `server.js` handles process concerns (Sentry init, migrations, `app.listen`). The Express app itself is built and exported by `app.js` (no listener) so tests can mount it. `app.js` wires up, in order: security (Helmet CSP, rate limiting) → view engine → compression → body parsing → sessions (SQLite-backed) → user injection middleware → global template locals → routes → error handlers.
 
 **Request flow:** Routes are thin controllers → validate input (via `middleware/validate.js`) → call service functions → render EJS or return JSON. No business logic in route files.
 
@@ -55,6 +59,29 @@ Vanilla JS only. Each file uses an IIFE. DOM lookup by ID (camelCase). Server da
 ## Deployment
 
 Fly.io app `sf-book-club` in `sjc` region. Single machine (SQLite constraint). Persistent volume at `/data`. CI: GitHub Actions auto-deploys on push to `main`. `trust proxy` is required for secure cookies behind Fly's HTTPS termination.
+
+## Documentation
+
+Project docs live in `Docs/`. Keep them in sync as part of the same change that alters behavior — stale docs mislead future work (and future Claude sessions). Update the relevant doc in the same PR, don't defer it.
+
+Key docs and what they cover:
+- `ARCHITECTURE.md` — stack, bootstrap, services, routing, key decisions
+- `TESTING.md` — test suite structure, harness, how to add tests
+- `Tech-Specs.md` — data model and API contracts
+- `Design-Specs.md` / `Brand-Guidelines.md` — visual system, tokens, components
+- `PRD.md` — product spec, user stories, page definitions
+- `ROADMAP.md` — milestone planning; `SHIPPED.md` — release history
+- `MIGRATION-PLAN.md` — multi-club migration plan
+- `Bugs.md` — known issues
+
+When to update:
+- New/changed routes, services, or bootstrap → `ARCHITECTURE.md` (and `Tech-Specs.md` if the data model or API contract changes)
+- New tests, test patterns, or harness changes → `TESTING.md`
+- New design tokens, components, or CSS conventions → `Design-Specs.md`
+- Shipping a user-facing feature → add an entry to `SHIPPED.md`
+- Keep `CLAUDE.md` itself accurate when commands, structure, or conventions change
+
+If a change makes an existing doc statement false, fix it in the same PR.
 
 ## Workflow
 

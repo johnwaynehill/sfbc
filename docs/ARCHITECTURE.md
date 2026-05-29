@@ -9,6 +9,7 @@ Read this alongside:
 - **ROADMAP.md** - milestone planning
 - **SHIPPED.md** - release history
 - **MIGRATION-PLAN.md** - multi-club migration engineering plan
+- **TESTING.md** - test suite structure, harness, and how to add tests
 
 ---
 
@@ -34,7 +35,8 @@ Read this alongside:
 
 ```
 SF-Book-Club-v3/
-  server.js              # Express app entry point
+  server.js              # Process entry point (Sentry, migrations, app.listen)
+  app.js                 # Express app factory (exported for tests, no listener)
   config/index.js        # Environment-based configuration
   package.json           # Dependencies and npm scripts
 
@@ -91,6 +93,7 @@ SF-Book-Club-v3/
     img/                 # Logos, covers, icons
     fonts/               # Self-hosted fonts
 
+  test/                  # node:test suite + harness (setup.js, app-helper.js)
   scripts/               # CLI helpers (seed, fetch covers, etc.)
   docs/                  # This directory
 ```
@@ -99,7 +102,12 @@ SF-Book-Club-v3/
 
 ## 3. Application Bootstrap
 
-`server.js` initializes the app in this order:
+Bootstrap is split across two files so the app can be imported by tests without opening a port:
+
+- **`server.js`** — process-level concerns only: Sentry init, runs migrations, then `require('./app')` and `app.listen(...)`, plus graceful shutdown.
+- **`app.js`** — builds and exports the configured Express app (middleware, routes, error handlers) **without** calling `listen`. Tests mount this directly via `supertest` (see TESTING.md).
+
+`app.js` wires up middleware and routes in this order:
 
 1. **Database + migrations** - Opens SQLite, runs pending `.sql` files, applies post-migration hooks (slug backfill, pick seeding, lifecycle sync)
 2. **Security** - Helmet CSP, rate limiting (1,000 req/15 min; meeting participation paths exempt)
@@ -577,3 +585,20 @@ Browser → POST /api/reviews  (fetch from review-form.js)
     → res.json({ success: true, review })
   → Client JS updates the review list in place
 ```
+
+---
+
+## 17. Testing
+
+The project ships a test suite built on **Node's built-in test runner** (`node --test`) — no test framework dependency, in keeping with the zero-build-step philosophy. The only test-specific dependency is `supertest` for HTTP-level integration tests.
+
+```bash
+npm test            # run the whole suite (~2s)
+npm run test:watch  # re-run on file changes
+```
+
+**How it works.** Every test runs against a fresh **in-memory SQLite** database with all migrations applied. The harness (`test/setup.js`) patches the `db` and `config` modules in `require.cache` so services transparently use the test database instead of the on-disk one. Integration tests import the app from `app.js` (no listener) and drive it with `supertest`.
+
+**Coverage spans** the service layer (voting, lifecycle, reviews, reactions, replies, activity, announcements, fingerprint, books), HTTP routes (API + page redirects + auth guards), empty-state rendering (catching EJS crashes on missing data), SSE stream guards, and migrations.
+
+See **TESTING.md** for the full breakdown, the harness design, and how to add tests.
