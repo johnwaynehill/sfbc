@@ -202,6 +202,12 @@ router.get('/picks/:slug', async (req, res) => {
   let results = null;
   if (['voting', 'results', 'reading', 'upcoming'].includes(meeting.status)) {
     results = calculateResults(meeting.id);
+    // Fall back to cached JSON for imported results (no rows in votes table)
+    if ((!results || results.voteCount === 0) && meeting.status === 'results') {
+      const pick = picksService.getByMonthYear(meeting.month_year);
+      const cachedJson = (pick && pick.vote_results_json) || meeting.vote_results_json;
+      if (cachedJson) results = JSON.parse(cachedJson);
+    }
   }
 
   const qrCodes = await generateQrCodes(meeting.month_year, meeting.status);
