@@ -449,6 +449,57 @@
       </table>
     <% } %>
 
+    <!-- Individual votes (secret: ?votes=1) -->
+    <% if (votes) { %>
+      <h2 class="t-body-bold admin-page__subheading">Individual Votes (<span id="votes-count"><%= votes.length %></span>)</h2>
+      <% if (votes.length === 0) { %>
+        <p class="t-body text-secondary">No votes have been cast yet.</p>
+      <% } else { %>
+        <table class="admin-table" id="votes-table">
+          <thead>
+            <tr>
+              <th class="t-caption">#</th>
+              <th class="t-caption">Voter</th>
+              <th class="t-caption">Ranking</th>
+              <th class="t-caption">Submitted</th>
+              <th class="t-caption"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% votes.forEach(function(v, i) { %>
+              <tr data-vote-id="<%= v.id %>">
+                <td class="t-body"><%= i + 1 %></td>
+                <td class="t-body">
+                  <% if (v.display_name) { %>
+                    <strong><%= v.display_name %></strong>
+                    <br><span class="t-caption text-secondary"><%= v.email %></span>
+                  <% } else { %>
+                    <span class="text-secondary">Anonymous</span>
+                    <br><span class="t-caption text-secondary">fp: <%= v.submitted_fingerprint.slice(0, 8) %>&hellip;</span>
+                  <% } %>
+                </td>
+                <td class="t-body">
+                  <ol style="margin: 0; padding-left: var(--s-3);">
+                    <% JSON.parse(v.ranking_json).forEach(function(bookId) { %>
+                      <li class="t-caption"><%= bookMap[bookId] || ('Book #' + bookId) %></li>
+                    <% }); %>
+                  </ol>
+                </td>
+                <td class="t-caption text-secondary"><%= v.created_at %></td>
+                <td>
+                  <button class="btn btn--danger-quiet btn--sm js-delete-vote"
+                          data-vote-id="<%= v.id %>"
+                          data-voter="<%= v.display_name || 'Anonymous' %>">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+    <% } %>
+
     <!-- Events section -->
     <% if (typeof pick !== 'undefined' && pick) { %>
       <h2 class="t-body-bold admin-page__subheading">
