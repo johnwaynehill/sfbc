@@ -14,7 +14,7 @@ The suite uses **Node's built-in test runner** (`node --test`) with `node:assert
 
 Every test runs against a **fresh in-memory SQLite database** with all migrations applied, so tests never touch the on-disk dev or production database and never interfere with each other.
 
-As of this writing: **259 tests across 18 files**, full run in ~2 seconds.
+As of this writing: **273 tests across 18 files**, full run in ~2 seconds.
 
 ```bash
 npm test            # run the whole suite once
@@ -83,7 +83,7 @@ const { db, freshDb, seedUser, seedBook, seedMeeting,
 | `seedBook({ title, author, cover_url })` | a book row with slugs |
 | `seedMeeting({ month_year, status })` | a meeting row |
 | `seedNominee(meetingId, bookId, { userId, reason, nominator_name })` | a nominee (+ nomination) |
-| `seedVote(meetingId, rankingBookIds, fingerprint)` | a vote row |
+| `seedVote(meetingId, rankingBookIds, fingerprint, userId, ipHash)` | a vote row (`userId` and `ipHash` optional, default `null`) |
 | `seedReview(bookId, userId, { grade, body, has_spoilers, did_finish })` | a review row |
 
 `db` is the proxy — use it for arbitrary queries/assertions inside a test.

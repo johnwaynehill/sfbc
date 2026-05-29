@@ -48,7 +48,7 @@ Dual-mode: magic links (primary, 15-min TTL) + password (secondary, bcrypt cost 
 
 **Never hardcode** colors, spacing, fonts, radii, or shadows — always use CSS custom properties from `tokens.css` (e.g., `var(--s-3)`, `var(--text2)`, `var(--radius-md)`).
 
-**Cache busting** — After any CSS change, bump the `?v=N` query string on CSS `<link>` tags in **all 4 shell layouts** (`app-shell.ejs`, `admin-shell.ejs`, `focus-shell.ejs`, `landing-shell.ejs`). Current versions: tokens `?v=17`, base `?v=19`, components `?v=59`.
+**Cache busting** — After any CSS change, bump the `?v=N` query string on CSS `<link>` tags in **all 4 shell layouts** (`app-shell.ejs`, `admin-shell.ejs`, `focus-shell.ejs`, `landing-shell.ejs`). Current versions: tokens `?v=17`, base `?v=20`, components `?v=80`.
 
 **Dark mode** is handled by the token system's dual-selector pattern (`@media (prefers-color-scheme: dark)` + `[data-theme="dark"]`). New colors must be added to both `:root` and the dark-mode selectors in `tokens.css`. Do not create separate dark-mode component styles.
 

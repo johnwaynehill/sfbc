@@ -60,14 +60,14 @@ SF-Book-Club-v3/
     monthly-picks.js     # Pick lifecycle state machine
     books.js             # Google Books API, cover downloads
     meetings.js          # Meeting CRUD, QR codes
-    voting.js            # Vote submission, seeded shuffle, tallying
+    voting.js            # Vote submission, seeded shuffle, tallying, dedup (hasVoted/hasUserVoted), admin vote inspection (getVotesForMeeting w/ IP clustering)
     reviews.js           # Review CRUD, grade processing
     replies.js           # Review reply management
     reactions.js         # Emoji reactions
     announcements.js     # Club announcements
     activity.js          # Activity feed queries
     email.js             # Nodemailer integration
-    fingerprint.js       # Device fingerprinting for voting
+    fingerprint.js       # Per-meeting device fingerprint + IP hash (getFingerprint/getIpHash) for vote dedup & abuse review
 
   middleware/
     auth.js              # requireMember, requireAdmin
@@ -137,7 +137,7 @@ In production the database lives on a persistent Fly.io volume at `/data/bookclu
 
 ### Migration System
 
-Migrations are numbered SQL files (`001-initial-schema.sql` through `021-usernames.sql`, with `022-028` planned for multi-club) in `db/migrations/`. The runner:
+Migrations are numbered SQL files (`001-initial-schema.sql` through `029-vote-ip-hash.sql`) in `db/migrations/`. The runner:
 
 - Creates a `_migrations` tracking table if it doesn't exist
 - Applies any `.sql` file not yet in the tracking table, in sorted order
