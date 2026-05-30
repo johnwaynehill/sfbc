@@ -543,7 +543,10 @@ router.get('/landing', (req, res) => {
   const totalBooks = picksService.countCompleted();
   const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
   const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
-  const totalNominations = db.prepare('SELECT COUNT(*) AS count FROM nominations').get().count;
+  // Total nominations across the club's full history (includes historically
+  // seeded meetings whose nominees live in vote_results_json). See
+  // picksService.countNominations.
+  const totalNominations = picksService.countNominations();
   const totalReactions = db.prepare('SELECT COUNT(*) AS count FROM review_reactions').get().count;
   const totalReplies = db.prepare('SELECT COUNT(*) AS count FROM review_replies').get().count;
   const totalEngagement = totalReactions + totalReplies;
