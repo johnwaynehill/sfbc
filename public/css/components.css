@@ -8875,54 +8875,6 @@ a.reply__author-link:hover .reply__author {
   }
 }
 
-/* --- Voices (testimonials) --- */
-.lp-voices {
-  padding: 80px 0 100px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.lp-voices__heading {
-  font-family: var(--font-brand);
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  text-align: center;
-  color: var(--text);
-  margin-bottom: var(--s-6);
-}
-.lp-voices__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-4);
-  max-width: var(--maxw);
-  margin: 0 auto;
-}
-.lp-voice {
-  margin: 0;
-  padding: var(--s-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-}
-.lp-voice__quote {
-  font-family: var(--font-reading);
-  font-size: var(--t-base);
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: var(--s-3);
-}
-.lp-voice__by {
-  font-family: var(--font-ui);
-  font-size: var(--t-xs);
-  color: var(--text3);
-}
-.lp-voices__grid .reveal:nth-child(2) { transition-delay: 0.08s; }
-.lp-voices__grid .reveal:nth-child(3) { transition-delay: 0.16s; }
-[data-theme="dark"] .lp-voices { background: var(--surface2); }
-[data-theme="dark"] .lp-voice { background: var(--surface); }
-@media (max-width: 780px) {
-  .lp-voices__grid { grid-template-columns: 1fr; }
-}
-
 /* --- CTA (dark bookend) --- */
 .lp-cta {
   padding: 100px 0 120px;
@@ -9142,12 +9094,6 @@ a.reply__author-link:hover .reply__author {
   :root:not([data-theme="light"]) .lp-cta {
     background: #050505;
   }
-  :root:not([data-theme="light"]) .lp-voices {
-    background: var(--surface2);
-  }
-  :root:not([data-theme="light"]) .lp-voice {
-    background: var(--surface);
-  }
 }
 
 /* --- Mobile refinements --- */
@@ -9208,9 +9154,6 @@ a.reply__author-link:hover .reply__author {
   .lp-showcase__grid {
     grid-template-columns: 1fr;
     gap: var(--s-4);
-  }
-  .lp-voices {
-    padding: var(--s-6) 0 var(--s-7);
   }
 }
 /* Header gets crowded on small screens — drop the secondary text link, keep the CTA */
