@@ -47,17 +47,17 @@
           <p class="lp-frame__caption">The club's home page</p>
           <div class="lp-preview-hero">
             <div class="lp-preview-hero__cover">
-              <img src="<%= showcase.cover_url %>" alt="" loading="lazy">
+              <img src="<%= showcase.home.cover_url %>" alt="" loading="lazy">
             </div>
             <div class="lp-preview-hero__meta">
-              <span class="lp-preview-pill"><%= showcase.label %></span>
-              <span class="lp-preview-hero__title"><%= showcase.title %></span>
-              <span class="lp-preview-hero__author">by <%= showcase.author %></span>
+              <span class="lp-preview-pill"><%= showcase.home.label %></span>
+              <span class="lp-preview-hero__title"><%= showcase.home.title %></span>
+              <span class="lp-preview-hero__author">by <%= showcase.home.author %></span>
             </div>
           </div>
           <p class="lp-preview-label">Recent reads</p>
           <div class="lp-preview-strip">
-            <% for (const c of showcase.recentCovers) { %>
+            <% for (const c of showcase.home.recentCovers) { %>
             <div class="lp-preview-strip__cover"><img src="<%= c.cover_url %>" alt="" loading="lazy"></div>
             <% } %>
           </div>
@@ -65,33 +65,33 @@
       </a>
 
       <!-- Preview 2: a book's archive page -->
-      <a class="lp-frame reveal" href="<%= showcase.href %>">
+      <a class="lp-frame reveal" href="<%= showcase.archive.href %>">
         <div class="lp-frame__bar" aria-hidden="true">
           <span class="lp-frame__dot"></span><span class="lp-frame__dot"></span><span class="lp-frame__dot"></span>
-          <span class="lp-frame__url">gatherbound.club<%= showcase.href %></span>
+          <span class="lp-frame__url">gatherbound.club<%= showcase.archive.href %></span>
         </div>
         <div class="lp-frame__body">
           <p class="lp-frame__caption">Every book becomes an archive</p>
           <div class="lp-preview-book">
             <div class="lp-preview-book__cover">
-              <img src="<%= showcase.cover_url %>" alt="" loading="lazy">
+              <img src="<%= showcase.archive.cover_url %>" alt="" loading="lazy">
             </div>
             <div class="lp-preview-book__meta">
-              <span class="lp-preview-book__title"><%= showcase.title %></span>
-              <% if (showcase.avgGrade) { %>
+              <span class="lp-preview-book__title"><%= showcase.archive.title %></span>
+              <% if (showcase.archive.avgGrade) { %>
               <div class="lp-preview-grade">
-                <span class="lp-preview-grade__badge"><%= showcase.avgGrade %></span>
-                <span class="lp-preview-grade__label">Club average<br>from <%= showcase.reviewCount %> review<%= showcase.reviewCount === 1 ? '' : 's' %></span>
+                <span class="lp-preview-grade__badge"><%= showcase.archive.avgGrade %></span>
+                <span class="lp-preview-grade__label">Club average<br>from <%= showcase.archive.reviewCount %> review<%= showcase.archive.reviewCount === 1 ? '' : 's' %></span>
               </div>
               <% } %>
             </div>
           </div>
-          <% if (showcase.reviewText) { %>
+          <% if (showcase.archive.reviewText) { %>
           <blockquote class="lp-preview-review">
-            <p class="lp-preview-review__text">&ldquo;<%= showcase.reviewText %>&rdquo;</p>
+            <p class="lp-preview-review__text">&ldquo;<%= showcase.archive.reviewText %>&rdquo;</p>
             <p class="lp-preview-review__by">
-              <% if (showcase.reviewGrade) { %><span class="lp-preview-review__grade"><%= showcase.reviewGrade %></span><% } %>
-              <%= showcase.reviewer %>
+              <% if (showcase.archive.reviewGrade) { %><span class="lp-preview-review__grade"><%= showcase.archive.reviewGrade %></span><% } %>
+              <%= showcase.archive.reviewer %>
             </p>
           </blockquote>
           <% } %>

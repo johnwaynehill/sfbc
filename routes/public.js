@@ -554,18 +554,19 @@ router.get('/landing', (req, res) => {
     LIMIT 8
   `).all();
 
-  // Live-product showcase: a real featured book + its real club grade and a
-  // real member review, rendered inside the "peek inside" mockups. Pulling
-  // this from the DB keeps the showcase truthful and never goes stale.
-  const featured = picksService.getHero();
-  let showcase = null;
-  if (featured && featured.cover_url) {
+  // Live-product showcase: two real previews inside the "peek inside" mockups,
+  // pulled from the DB so they stay truthful and never go stale.
+  //   • Home preview  → the currently-reading book (or latest pick)
+  //   • Archive preview → a well-reviewed completed book so the demo always
+  //     shows real grades + a real member review (the currently-reading book
+  //     often has no reviews yet). Pinned to Ubik, with a data-driven fallback.
+  const gradeAndReview = (bookId) => {
     const avgRow = db.prepare(`
       SELECT AVG(gw.weight) AS avg_weight, COUNT(*) AS cnt
       FROM reviews r
       JOIN grade_weights gw ON gw.grade = r.grade
       WHERE r.book_id = ?
-    `).get(featured.book_id);
+    `).get(bookId);
 
     // A clean, positive pull-quote: substantial, no spoiler markup (||…||).
     const reviewRow = db.prepare(`
@@ -579,7 +580,7 @@ router.get('/landing', (req, res) => {
         AND instr(r.body_markdown, '||') = 0
       ORDER BY gw.weight DESC, length(r.body_markdown) DESC
       LIMIT 1
-    `).get(featured.book_id);
+    `).get(bookId);
 
     let reviewText = null;
     if (reviewRow && reviewRow.body_markdown) {
@@ -593,19 +594,57 @@ router.get('/landing', (req, res) => {
       if (reviewText.length > 160) reviewText = reviewText.slice(0, 157).trimEnd() + '…';
     }
 
-    showcase = {
-      title: featured.title,
-      author: featured.author,
-      cover_url: featured.cover_url,
-      href: bookPath(featured.title, featured.author),
-      label: featured.status === 'reading' ? 'Currently Reading' : formatMonthYear(featured.month_year),
-      monthYear: formatMonthYear(featured.month_year),
+    return {
       avgGrade: avgRow && avgRow.cnt > 0 ? weightToGrade(avgRow.avg_weight) : null,
       reviewCount: avgRow ? avgRow.cnt : 0,
       reviewText,
       reviewGrade: reviewRow ? reviewRow.grade : null,
       reviewer: reviewRow ? reviewRow.reviewer : null,
-      recentCovers: recentBooks.filter((b) => b.cover_url).slice(0, 5),
+    };
+  };
+
+  const home = picksService.getHero();
+
+  // Archive preview: Ubik (well-reviewed); fall back to the most-reviewed
+  // completed pick if Ubik isn't present.
+  let archive = db.prepare(`
+    SELECT b.id AS book_id, b.title, b.author, b.cover_url
+    FROM monthly_picks mp
+    JOIN books b ON b.id = mp.book_id
+    WHERE mp.status = 'results' AND b.cover_url IS NOT NULL
+      AND b.author_slug = 'philip-k-dick' AND b.title_slug = 'ubik'
+    LIMIT 1
+  `).get();
+  if (!archive) {
+    archive = db.prepare(`
+      SELECT b.id AS book_id, b.title, b.author, b.cover_url, COUNT(rv.id) AS rc
+      FROM monthly_picks mp
+      JOIN books b ON b.id = mp.book_id
+      JOIN reviews rv ON rv.book_id = b.id
+      WHERE mp.status = 'results' AND b.cover_url IS NOT NULL
+      GROUP BY b.id
+      ORDER BY rc DESC
+      LIMIT 1
+    `).get();
+  }
+
+  let showcase = null;
+  if (home && home.cover_url && archive && archive.cover_url) {
+    showcase = {
+      home: {
+        title: home.title,
+        author: home.author,
+        cover_url: home.cover_url,
+        label: home.status === 'reading' ? 'Currently Reading' : formatMonthYear(home.month_year),
+        recentCovers: recentBooks.filter((b) => b.cover_url).slice(0, 5),
+      },
+      archive: {
+        title: archive.title,
+        author: archive.author,
+        cover_url: archive.cover_url,
+        href: bookPath(archive.title, archive.author),
+        ...gradeAndReview(archive.book_id),
+      },
     };
   }
 
