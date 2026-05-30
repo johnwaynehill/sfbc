@@ -8848,6 +8848,14 @@ a.reply__author-link:hover .reply__author {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
+.lp-feature__icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin-bottom: var(--s-3);
+  color: var(--accent);
+}
+
 .lp-feature strong {
   display: block;
   font-family: var(--font-ui);
