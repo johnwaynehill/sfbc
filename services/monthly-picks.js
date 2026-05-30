@@ -190,6 +190,35 @@ const countCompletedStmt = db.prepare(
   "SELECT COUNT(*) AS cnt FROM monthly_picks WHERE status = 'results'"
 );
 
+/**
+ * Total books nominated across the club's full history.
+ *
+ * Live app nominations live in the `nominations` table, but historically-seeded
+ * meetings (imported from Meetup/Strawpoll) store their balloted nominees only
+ * in `vote_results_json`. Counting that table alone badly undercounts. Instead,
+ * sum the number of balloted nominees (the `rankings` array) from each completed
+ * pick's `vote_results_json`, preferring the pick's own JSON and falling back to
+ * the parallel `meetings` row by month_year (mirroring how the results route
+ * resolves it). One row per pick, so no double-counting.
+ */
+const countNominationsStmt = db.prepare(`
+  SELECT COALESCE(SUM(
+    json_array_length(
+      COALESCE(
+        mp.vote_results_json,
+        (SELECT m.vote_results_json FROM meetings m
+         WHERE m.month_year = mp.month_year AND m.vote_results_json IS NOT NULL LIMIT 1)
+      ), '$.rankings'
+    )
+  ), 0) AS cnt
+  FROM monthly_picks mp
+  WHERE COALESCE(
+    mp.vote_results_json,
+    (SELECT m.vote_results_json FROM meetings m
+     WHERE m.month_year = mp.month_year AND m.vote_results_json IS NOT NULL LIMIT 1)
+  ) IS NOT NULL
+`);
+
 /** History page: all completed picks with grade + review info. */
 const getHistoryStmt = db.prepare(`
   SELECT mp.month_year, mp.status, b.id AS book_id, b.title, b.author,
@@ -484,6 +513,14 @@ function countCompleted() {
 }
 
 /**
+ * Count total books nominated across the club's history (see
+ * countNominationsStmt above for why this reads vote_results_json).
+ */
+function countNominations() {
+  return countNominationsStmt.get().cnt;
+}
+
+/**
  * Get all completed picks for the history page.
  */
 function getHistory() {
@@ -589,6 +626,7 @@ module.exports = {
   getHero,
   getRecentPicks,
   countCompleted,
+  countNominations,
   getHistory,
   getPickForBook,
   getFirstEvent,
