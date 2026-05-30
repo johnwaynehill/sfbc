@@ -8349,7 +8349,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Showcase (peek inside a real club) --- */
 .lp-showcase {
-  padding: 90px 0 100px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
   text-align: center;
 }
 .lp-showcase__eyebrow {
@@ -8611,7 +8611,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Manifesto (two-column standout band) --- */
 .lp-manifesto {
-  padding: var(--s-8) 0;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
   background: var(--surface2);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -8668,7 +8668,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Ritual (How It Works) --- */
 .lp-ritual {
-  padding: 80px 0 100px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
 }
 
 .lp-ritual__heading {
@@ -8719,7 +8719,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Proof (Social Proof) --- */
 .lp-proof {
-  padding: 80px 0 100px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
   text-align: center;
   overflow: hidden;
   background: var(--surface);
@@ -8795,7 +8795,7 @@ a.reply__author-link:hover .reply__author {
 .lp-proof__stats {
   display: flex;
   justify-content: center;
-  gap: var(--s-7);
+  gap: var(--s-5) var(--s-6);
   flex-wrap: wrap;
 }
 
@@ -8825,7 +8825,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Features --- */
 .lp-features {
-  padding: 80px 0 100px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
 }
 
 .lp-features__heading {
@@ -8894,7 +8894,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- CTA (dark bookend) --- */
 .lp-cta {
-  padding: 100px 0 120px;
+  padding: calc(var(--s-8) + var(--s-6)) 0 calc(var(--s-8) + var(--s-7));
   background: #0a0a0a;
   color: #f5f5f5;
   text-align: center;
