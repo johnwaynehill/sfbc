@@ -8349,7 +8349,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Showcase (peek inside a real club) --- */
 .lp-showcase {
-  padding: 90px 0 100px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
   text-align: center;
 }
 .lp-showcase__eyebrow {
@@ -8609,27 +8609,36 @@ a.reply__author-link:hover .reply__author {
   color: var(--accent2);
 }
 
-/* --- Manifesto --- */
+/* --- Manifesto (two-column standout band) --- */
 .lp-manifesto {
-  padding: 100px 0 80px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-manifesto__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-6);
+  align-items: center;
 }
 
 .lp-manifesto__quote {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.8rem, 4.5vw, 3rem);
-  line-height: 1.15;
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  line-height: 1.08;
   letter-spacing: -0.02em;
   color: var(--text);
-  margin-bottom: var(--s-7);
-  max-width: 700px;
+  margin: 0;
+  max-width: 13ch;
 }
 
 .lp-manifesto__problems {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-5);
-  max-width: var(--maxw);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
 }
 
 .lp-manifesto__problem {
@@ -8647,19 +8656,19 @@ a.reply__author-link:hover .reply__author {
   font-weight: 600;
 }
 
-@media (max-width: 680px) {
-  .lp-manifesto__problems {
+@media (max-width: 760px) {
+  .lp-manifesto__inner {
     grid-template-columns: 1fr;
-    gap: var(--s-4);
+    gap: var(--s-5);
+  }
+  .lp-manifesto__quote {
+    max-width: none;
   }
 }
 
 /* --- Ritual (How It Works) --- */
 .lp-ritual {
-  padding: 80px 0 100px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  padding: calc(var(--s-8) + var(--s-6)) 0;
 }
 
 .lp-ritual__heading {
@@ -8710,9 +8719,12 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Proof (Social Proof) --- */
 .lp-proof {
-  padding: 80px 0 100px;
+  padding: calc(var(--s-8) + var(--s-6)) 0;
   text-align: center;
   overflow: hidden;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 /* Auto-scrolling cover marquee */
@@ -8783,7 +8795,7 @@ a.reply__author-link:hover .reply__author {
 .lp-proof__stats {
   display: flex;
   justify-content: center;
-  gap: var(--s-7);
+  gap: var(--s-5) var(--s-6);
   flex-wrap: wrap;
 }
 
@@ -8813,10 +8825,7 @@ a.reply__author-link:hover .reply__author {
 
 /* --- Features --- */
 .lp-features {
-  padding: 80px 0 100px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  padding: calc(var(--s-8) + var(--s-6)) 0;
 }
 
 .lp-features__heading {
@@ -8848,6 +8857,14 @@ a.reply__author-link:hover .reply__author {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
+.lp-feature__icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin-bottom: var(--s-3);
+  color: var(--text2);
+}
+
 .lp-feature strong {
   display: block;
   font-family: var(--font-ui);
@@ -8875,57 +8892,9 @@ a.reply__author-link:hover .reply__author {
   }
 }
 
-/* --- Voices (testimonials) --- */
-.lp-voices {
-  padding: 80px 0 100px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.lp-voices__heading {
-  font-family: var(--font-brand);
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  text-align: center;
-  color: var(--text);
-  margin-bottom: var(--s-6);
-}
-.lp-voices__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-4);
-  max-width: var(--maxw);
-  margin: 0 auto;
-}
-.lp-voice {
-  margin: 0;
-  padding: var(--s-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-}
-.lp-voice__quote {
-  font-family: var(--font-reading);
-  font-size: var(--t-base);
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: var(--s-3);
-}
-.lp-voice__by {
-  font-family: var(--font-ui);
-  font-size: var(--t-xs);
-  color: var(--text3);
-}
-.lp-voices__grid .reveal:nth-child(2) { transition-delay: 0.08s; }
-.lp-voices__grid .reveal:nth-child(3) { transition-delay: 0.16s; }
-[data-theme="dark"] .lp-voices { background: var(--surface2); }
-[data-theme="dark"] .lp-voice { background: var(--surface); }
-@media (max-width: 780px) {
-  .lp-voices__grid { grid-template-columns: 1fr; }
-}
-
 /* --- CTA (dark bookend) --- */
 .lp-cta {
-  padding: 100px 0 120px;
+  padding: calc(var(--s-8) + var(--s-6)) 0 calc(var(--s-8) + var(--s-7));
   background: #0a0a0a;
   color: #f5f5f5;
   text-align: center;
@@ -9106,49 +9075,9 @@ a.reply__author-link:hover .reply__author {
   }
 }
 
-/* --- Dark mode adjustments --- */
-/* Hero & CTA sections are already dark, no changes needed.
-   Middle sections use theme tokens automatically.
-   Only need to handle surface overrides. */
-[data-theme="dark"] .lp-feature {
-  background: var(--surface);
-}
-[data-theme="dark"] .lp-ritual {
-  background: var(--surface2);
-}
-[data-theme="dark"] .lp-features {
-  background: var(--surface2);
-}
-[data-theme="dark"] .lp-hero {
-  background: #050505;
-}
-[data-theme="dark"] .lp-cta {
-  background: #050505;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .lp-feature {
-    background: var(--surface);
-  }
-  :root:not([data-theme="light"]) .lp-ritual {
-    background: var(--surface2);
-  }
-  :root:not([data-theme="light"]) .lp-features {
-    background: var(--surface2);
-  }
-  :root:not([data-theme="light"]) .lp-hero {
-    background: #050505;
-  }
-  :root:not([data-theme="light"]) .lp-cta {
-    background: #050505;
-  }
-  :root:not([data-theme="light"]) .lp-voices {
-    background: var(--surface2);
-  }
-  :root:not([data-theme="light"]) .lp-voice {
-    background: var(--surface);
-  }
-}
+/* The landing page is light-mode only (forced via data-theme="light" in
+   landing-shell.ejs), so no dark-mode overrides are needed here. The hero and
+   CTA bookends are intentionally dark by design regardless of theme. */
 
 /* --- Mobile refinements --- */
 @media (max-width: 640px) {
@@ -9170,7 +9099,7 @@ a.reply__author-link:hover .reply__author {
     display: none;
   }
   .lp-manifesto {
-    padding: var(--s-7) 0 var(--s-6);
+    padding: var(--s-7) 0;
   }
   .lp-ritual {
     padding: var(--s-6) 0 var(--s-7);
@@ -9208,9 +9137,6 @@ a.reply__author-link:hover .reply__author {
   .lp-showcase__grid {
     grid-template-columns: 1fr;
     gap: var(--s-4);
-  }
-  .lp-voices {
-    padding: var(--s-6) 0 var(--s-7);
   }
 }
 /* Header gets crowded on small screens — drop the secondary text link, keep the CTA */

@@ -47,17 +47,17 @@
           <p class="lp-frame__caption">The club's home page</p>
           <div class="lp-preview-hero">
             <div class="lp-preview-hero__cover">
-              <img src="<%= showcase.cover_url %>" alt="" loading="lazy">
+              <img src="<%= showcase.home.cover_url %>" alt="" loading="lazy">
             </div>
             <div class="lp-preview-hero__meta">
-              <span class="lp-preview-pill"><%= showcase.label %></span>
-              <span class="lp-preview-hero__title"><%= showcase.title %></span>
-              <span class="lp-preview-hero__author">by <%= showcase.author %></span>
+              <span class="lp-preview-pill"><%= showcase.home.label %></span>
+              <span class="lp-preview-hero__title"><%= showcase.home.title %></span>
+              <span class="lp-preview-hero__author">by <%= showcase.home.author %></span>
             </div>
           </div>
           <p class="lp-preview-label">Recent reads</p>
           <div class="lp-preview-strip">
-            <% for (const c of showcase.recentCovers) { %>
+            <% for (const c of showcase.home.recentCovers) { %>
             <div class="lp-preview-strip__cover"><img src="<%= c.cover_url %>" alt="" loading="lazy"></div>
             <% } %>
           </div>
@@ -65,33 +65,33 @@
       </a>
 
       <!-- Preview 2: a book's archive page -->
-      <a class="lp-frame reveal" href="<%= showcase.href %>">
+      <a class="lp-frame reveal" href="<%= showcase.archive.href %>">
         <div class="lp-frame__bar" aria-hidden="true">
           <span class="lp-frame__dot"></span><span class="lp-frame__dot"></span><span class="lp-frame__dot"></span>
-          <span class="lp-frame__url">gatherbound.club<%= showcase.href %></span>
+          <span class="lp-frame__url">gatherbound.club<%= showcase.archive.href %></span>
         </div>
         <div class="lp-frame__body">
           <p class="lp-frame__caption">Every book becomes an archive</p>
           <div class="lp-preview-book">
             <div class="lp-preview-book__cover">
-              <img src="<%= showcase.cover_url %>" alt="" loading="lazy">
+              <img src="<%= showcase.archive.cover_url %>" alt="" loading="lazy">
             </div>
             <div class="lp-preview-book__meta">
-              <span class="lp-preview-book__title"><%= showcase.title %></span>
-              <% if (showcase.avgGrade) { %>
+              <span class="lp-preview-book__title"><%= showcase.archive.title %></span>
+              <% if (showcase.archive.avgGrade) { %>
               <div class="lp-preview-grade">
-                <span class="lp-preview-grade__badge"><%= showcase.avgGrade %></span>
-                <span class="lp-preview-grade__label">Club average<br>from <%= showcase.reviewCount %> review<%= showcase.reviewCount === 1 ? '' : 's' %></span>
+                <span class="lp-preview-grade__badge"><%= showcase.archive.avgGrade %></span>
+                <span class="lp-preview-grade__label">Club average<br>from <%= showcase.archive.reviewCount %> review<%= showcase.archive.reviewCount === 1 ? '' : 's' %></span>
               </div>
               <% } %>
             </div>
           </div>
-          <% if (showcase.reviewText) { %>
+          <% if (showcase.archive.reviewText) { %>
           <blockquote class="lp-preview-review">
-            <p class="lp-preview-review__text">&ldquo;<%= showcase.reviewText %>&rdquo;</p>
+            <p class="lp-preview-review__text">&ldquo;<%= showcase.archive.reviewText %>&rdquo;</p>
             <p class="lp-preview-review__by">
-              <% if (showcase.reviewGrade) { %><span class="lp-preview-review__grade"><%= showcase.reviewGrade %></span><% } %>
-              <%= showcase.reviewer %>
+              <% if (showcase.archive.reviewGrade) { %><span class="lp-preview-review__grade"><%= showcase.archive.reviewGrade %></span><% } %>
+              <%= showcase.archive.reviewer %>
             </p>
           </blockquote>
           <% } %>
@@ -108,10 +108,8 @@
 
 <!-- ===== Manifesto ===== -->
 <section class="lp-manifesto reveal">
-  <div class="page-container">
-    <blockquote class="lp-manifesto__quote">
-      Every growing club hits the same wall.
-    </blockquote>
+  <div class="page-container lp-manifesto__inner">
+    <h2 class="lp-manifesto__quote">Every growing club hits the same wall</h2>
     <div class="lp-manifesto__problems">
       <div class="lp-manifesto__problem">
         <strong>Meetup</strong> gets people in the door — then provides zero engagement between events.
@@ -120,7 +118,7 @@
         <strong>Discord</strong> is ephemeral and overwhelming. A discussion about Chapter 3 disappears in a flood of memes.
       </div>
       <div class="lp-manifesto__problem">
-        <strong>Goodreads</strong> is personal. Great for individual tracking, but it doesn't know your club exists.
+        <strong>Goodreads</strong> is a personal tracker. But your club's history gets lost to time and memory.
       </div>
     </div>
   </div>
@@ -177,8 +175,16 @@
         <span class="lp-proof__stat-label">books read</span>
       </div>
       <div class="lp-proof__stat">
+        <span class="lp-proof__stat-num" data-count="<%= totalNominations %>">0</span>
+        <span class="lp-proof__stat-label">nominations</span>
+      </div>
+      <div class="lp-proof__stat">
         <span class="lp-proof__stat-num" data-count="<%= totalReviews %>">0</span>
         <span class="lp-proof__stat-label">reviews written</span>
+      </div>
+      <div class="lp-proof__stat">
+        <span class="lp-proof__stat-num" data-count="<%= totalEngagement %>">0</span>
+        <span class="lp-proof__stat-label">reactions &amp; replies</span>
       </div>
       <div class="lp-proof__stat">
         <span class="lp-proof__stat-num" data-count="<%= totalMembers %>">0</span>
@@ -194,55 +200,35 @@
     <h2 class="lp-features__heading reveal">Everything your club needs</h2>
     <div class="lp-features__grid">
       <div class="lp-feature reveal">
+        <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3"/><path d="M21 14v.01"/><path d="M14 21h.01"/><path d="M17.5 21H21v-3.5"/></svg>
         <strong>QR Nominations</strong>
         <span>Attendees scan and nominate in &lt;10 seconds. No app download, no login required.</span>
       </div>
       <div class="lp-feature reveal">
+        <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="15" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/></svg>
         <strong>Ranked Voting</strong>
-        <span>Drag-to-rank ballot on mobile with live animated results on the projector.</span>
+        <span>Drag-to-rank ballot on mobile and desktop with live animated results everywhere.</span>
       </div>
       <div class="lp-feature reveal">
+        <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         <strong>Full Lifecycle</strong>
-        <span>Nominations &rarr; Voting &rarr; Reading &rarr; Results. One admin panel runs it all.</span>
+        <span>Nominate &rarr; Vote &rarr; Results &rarr; Read. One admin panel runs it all.</span>
       </div>
       <div class="lp-feature reveal">
+        <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         <strong>Beautiful Archive</strong>
-        <span>Every book gets its own page with covers, reviews, grade distributions, and discussions.</span>
+        <span>Every book gets its own dedicated page with large, beautiful covers, reviews &amp; distributions, and reactions &amp; discussions.</span>
       </div>
       <div class="lp-feature reveal">
+        <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <strong>Member Engagement</strong>
         <span>Reviews, emoji reactions, threaded replies, and an activity feed keep the community alive.</span>
       </div>
       <div class="lp-feature reveal">
+        <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         <strong>Works Everywhere</strong>
         <span>Mobile-first responsive design with dark mode. Beautiful on any device, in any lighting.</span>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== Voices (testimonials) ===== -->
-<!--
-  PLACEHOLDER TESTIMONIALS — replace the quote text and attribution below with
-  real quotes from members/organizers before launch. Remove this whole section
-  if you'd rather ship without testimonials than ship placeholders.
--->
-<section class="lp-voices">
-  <div class="page-container">
-    <h2 class="lp-voices__heading reveal">What organizers say</h2>
-    <div class="lp-voices__grid">
-      <figure class="lp-voice reveal">
-        <blockquote class="lp-voice__quote">[Placeholder — add a real organizer quote about running their club on GatherBound.]</blockquote>
-        <figcaption class="lp-voice__by">— Organizer name, Club name</figcaption>
-      </figure>
-      <figure class="lp-voice reveal">
-        <blockquote class="lp-voice__quote">[Placeholder — add a real member quote about staying engaged between meetings.]</blockquote>
-        <figcaption class="lp-voice__by">— Member name, Club name</figcaption>
-      </figure>
-      <figure class="lp-voice reveal">
-        <blockquote class="lp-voice__quote">[Placeholder — add a quote about the archive, voting, or reviews.]</blockquote>
-        <figcaption class="lp-voice__by">— Member name, Club name</figcaption>
-      </figure>
     </div>
   </div>
 </section>
