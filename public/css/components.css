@@ -8853,7 +8853,7 @@ a.reply__author-link:hover .reply__author {
   width: 26px;
   height: 26px;
   margin-bottom: var(--s-3);
-  color: var(--accent);
+  color: var(--text2);
 }
 
 .lp-feature strong {
