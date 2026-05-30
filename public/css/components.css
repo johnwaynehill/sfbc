@@ -8609,27 +8609,36 @@ a.reply__author-link:hover .reply__author {
   color: var(--accent2);
 }
 
-/* --- Manifesto --- */
+/* --- Manifesto (two-column standout band) --- */
 .lp-manifesto {
-  padding: 100px 0 80px;
+  padding: var(--s-8) 0;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-manifesto__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-6);
+  align-items: center;
 }
 
 .lp-manifesto__quote {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.8rem, 4.5vw, 3rem);
-  line-height: 1.15;
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  line-height: 1.08;
   letter-spacing: -0.02em;
   color: var(--text);
-  margin-bottom: var(--s-7);
-  max-width: 700px;
+  margin: 0;
+  max-width: 13ch;
 }
 
 .lp-manifesto__problems {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-5);
-  max-width: var(--maxw);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
 }
 
 .lp-manifesto__problem {
@@ -8647,19 +8656,19 @@ a.reply__author-link:hover .reply__author {
   font-weight: 600;
 }
 
-@media (max-width: 680px) {
-  .lp-manifesto__problems {
+@media (max-width: 760px) {
+  .lp-manifesto__inner {
     grid-template-columns: 1fr;
-    gap: var(--s-4);
+    gap: var(--s-5);
+  }
+  .lp-manifesto__quote {
+    max-width: none;
   }
 }
 
 /* --- Ritual (How It Works) --- */
 .lp-ritual {
   padding: 80px 0 100px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
 }
 
 .lp-ritual__heading {
@@ -8713,6 +8722,9 @@ a.reply__author-link:hover .reply__author {
   padding: 80px 0 100px;
   text-align: center;
   overflow: hidden;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 /* Auto-scrolling cover marquee */
@@ -8814,9 +8826,6 @@ a.reply__author-link:hover .reply__author {
 /* --- Features --- */
 .lp-features {
   padding: 80px 0 100px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
 }
 
 .lp-features__heading {
@@ -9090,7 +9099,7 @@ a.reply__author-link:hover .reply__author {
     display: none;
   }
   .lp-manifesto {
-    padding: var(--s-7) 0 var(--s-6);
+    padding: var(--s-7) 0;
   }
   .lp-ritual {
     padding: var(--s-6) 0 var(--s-7);
