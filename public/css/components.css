@@ -8656,6 +8656,20 @@ a.reply__author-link:hover .reply__author {
   font-weight: 600;
 }
 
+.lp-manifesto__turn {
+  max-width: 760px;
+  margin: var(--s-6) auto 0;
+  font-family: var(--font-reading);
+  font-size: var(--t-lg);
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text2);
+}
+.lp-manifesto__turn strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 @media (max-width: 760px) {
   .lp-manifesto__inner {
     grid-template-columns: 1fr;
@@ -8669,6 +8683,9 @@ a.reply__author-link:hover .reply__author {
 /* --- Ritual (How It Works) --- */
 .lp-ritual {
   padding: calc(var(--s-8) + var(--s-6)) 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .lp-ritual__heading {
@@ -8722,9 +8739,6 @@ a.reply__author-link:hover .reply__author {
   padding: calc(var(--s-8) + var(--s-6)) 0;
   text-align: center;
   overflow: hidden;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
 }
 
 /* Auto-scrolling cover marquee */
@@ -8826,6 +8840,9 @@ a.reply__author-link:hover .reply__author {
 /* --- Features --- */
 .lp-features {
   padding: calc(var(--s-8) + var(--s-6)) 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .lp-features__heading {
