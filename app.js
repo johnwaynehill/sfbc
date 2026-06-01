@@ -35,6 +35,16 @@ app.set('trust proxy', 1);
 // ---------------------------------------------------------------------------
 // Static files
 // ---------------------------------------------------------------------------
+
+// Serve book covers from the persistent data directory FIRST so runtime-
+// downloaded covers take priority over any bundled fallbacks in public/.
+const dataDir = path.dirname(path.resolve(config.databasePath));
+app.use('/img/covers', express.static(path.join(dataDir, 'covers'), {
+  maxAge: config.nodeEnv === 'production' ? '30d' : 0,
+  etag: true,
+}));
+
+// Everything else from the public/ directory (CSS, JS, icons, bundled covers as fallback)
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: config.nodeEnv === 'production' ? '7d' : 0,
   etag: true,

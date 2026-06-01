@@ -22,6 +22,26 @@ const migrate = require('./db/migrate');
 migrate();
 
 // ---------------------------------------------------------------------------
+// One-time cover migration: copy covers from the Docker image's public/
+// directory to the persistent data volume so they survive future deploys.
+// ---------------------------------------------------------------------------
+const fs = require('fs');
+const path = require('path');
+const dataDir = path.dirname(path.resolve(config.databasePath));
+const persistentCovers = path.join(dataDir, 'covers');
+const bundledCovers = path.join(__dirname, 'public', 'img', 'covers');
+
+if (fs.existsSync(bundledCovers)) {
+  fs.mkdirSync(persistentCovers, { recursive: true });
+  for (const file of fs.readdirSync(bundledCovers)) {
+    const dest = path.join(persistentCovers, file);
+    if (!fs.existsSync(dest)) {
+      fs.copyFileSync(path.join(bundledCovers, file), dest);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // App (extracted to app.js for testability)
 // ---------------------------------------------------------------------------
 const app = require('./app');
