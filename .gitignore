@@ -11,3 +11,5 @@ mockups/images/
 *.db-wal
 *.db-shm
 docs/.obsidian/
+public/img/covers/
+data/covers/
