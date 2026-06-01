@@ -8609,6 +8609,70 @@ a.reply__author-link:hover .reply__author {
   color: var(--accent2);
 }
 
+/* Preview 3: the living conversation (activity feed) spans the full width */
+.lp-frame--wide {
+  grid-column: 1 / -1;
+}
+.lp-preview-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3) var(--s-5);
+}
+.lp-preview-feed__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.lp-preview-feed__avatar {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+}
+.lp-preview-feed__text {
+  min-width: 0;
+  font-family: var(--font-reading);
+  font-size: var(--t-sm);
+  line-height: 1.4;
+  color: var(--text2);
+}
+.lp-preview-feed__text strong {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+.lp-preview-feed__text em {
+  font-style: italic;
+  color: var(--text);
+}
+.lp-preview-feed__grade {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--t-xs);
+  color: var(--accent2);
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 2px 7px;
+}
+@media (max-width: 640px) {
+  .lp-preview-feed {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- Manifesto (two-column standout band) --- */
 .lp-manifesto {
   padding: calc(var(--s-8) + var(--s-6)) 0;
@@ -8624,8 +8688,17 @@ a.reply__author-link:hover .reply__author {
   line-height: 1.08;
   letter-spacing: -0.02em;
   color: var(--text);
+  margin: 0 0 var(--s-4);
+  max-width: 22ch;
+}
+
+.lp-manifesto__lead {
+  max-width: 62ch;
   margin: 0 0 var(--s-6);
-  max-width: 18ch;
+  font-family: var(--font-reading);
+  font-size: var(--t-lg);
+  line-height: 1.55;
+  color: var(--text);
 }
 
 /* Evidence (problems) on the left, the synthesis on the right */
@@ -8683,6 +8756,74 @@ a.reply__author-link:hover .reply__author {
   .lp-manifesto__body {
     grid-template-columns: 1fr;
     gap: var(--s-5);
+  }
+}
+
+/* --- Everyone gets a seat (dark statement band, the transformation beat) --- */
+.lp-seat {
+  padding: calc(var(--s-8) + var(--s-6)) 0;
+  background: #0a0a0a;
+  color: #f5f5f5;
+}
+.lp-seat__inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: var(--s-7);
+  align-items: center;
+}
+.lp-seat__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: var(--s-4);
+}
+.lp-seat__text {
+  margin: 0 0 var(--s-4);
+  font-family: var(--font-reading);
+  font-size: var(--t-lg);
+  line-height: 1.6;
+  color: rgba(255,255,255,0.6);
+}
+.lp-seat__text:last-child {
+  margin-bottom: 0;
+}
+.lp-seat__text strong {
+  color: #fff;
+  font-weight: 600;
+}
+.lp-seat__quote {
+  color: #fff;
+  font-style: italic;
+}
+
+/* Dot grid: a small lit cluster (the room) inside the wider field (the club) */
+.lp-seat__viz {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 14px;
+  width: max-content;
+  margin: 0 auto;
+}
+.lp-seat__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.14);
+}
+.lp-seat__dot.is-lit {
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(245,158,11,0.45);
+}
+
+@media (max-width: 760px) {
+  .lp-seat__inner {
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+  }
+  .lp-seat__viz {
+    gap: 12px;
   }
 }
 
