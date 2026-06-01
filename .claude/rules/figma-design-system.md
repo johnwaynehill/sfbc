@@ -220,7 +220,7 @@ The Figma MCP server returns React + Tailwind code. You MUST translate it to thi
 - IMPORTANT: If the Figma MCP server returns a localhost source for an image or SVG, use that source directly
 - IMPORTANT: DO NOT import/add new icon packages — all assets should come from the Figma payload
 - IMPORTANT: DO NOT use or create placeholder images if a localhost source is provided
-- Store downloaded images in `/public/img/` (covers in `/public/img/covers/`)
+- Store downloaded images in `/public/img/` (book covers are stored on the persistent data volume at `<dataDir>/covers/`, served at `/img/covers/` — NOT in `public/`)
 - Inline SVGs are preferred for icons (not icon fonts, not external SVG files)
 - Book covers are lazy-loaded from Google Books API, OpenLibrary, or uploaded
 - Avatars use DiceBear API with initials fallback

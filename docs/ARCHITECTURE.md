@@ -136,6 +136,10 @@ better-sqlite3 → SQLite file on disk
 
 In production the database lives on a persistent Fly.io volume at `/data/bookclub.sqlite`. In development it's at `./data/bookclub.sqlite`.
 
+### Cover Image Storage
+
+Book covers are stored on the persistent data volume alongside the database — at `<dataDir>/covers/` (`/data/covers/` in production, `./data/covers/` in dev). Express serves them at `/img/covers/` via a dedicated static route. Covers are **not** checked into the repo; they are downloaded at runtime via `downloadCover()` when books are nominated or covers are replaced by an admin.
+
 ### Migration System
 
 Migrations are numbered SQL files (`001-initial-schema.sql` through `029-vote-ip-hash.sql`) in `db/migrations/`. The runner:
@@ -289,7 +293,7 @@ Services contain all business logic and database queries. They export plain func
 - `searchGoogleBooksMulti(query)` — Searches by title/author, returns candidates
 - `findOrCreateBook(data)` — Upserts a book record with slug generation
 - `enrichBookMetadata(bookId)` — Fills in ISBN, page count, publisher, language
-- `downloadCover(imageUrl, filename)` — Downloads cover images, rejects placeholders under 15KB
+- `downloadCover(imageUrl, filename)` — Downloads cover images to the persistent data volume (`<dataDir>/covers/`), rejects placeholders under 15KB
 - **Multi-club:** Books are a global catalog — no `club_id` needed
 
 **voting.js** — Vote tallying with seeded shuffle for ballot randomization to eliminate position bias.

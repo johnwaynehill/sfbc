@@ -244,6 +244,9 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Results page book details** — Each results bar is now clickable, opening a book details modal (desktop) or bottom sheet (mobile) with cover, description, subjects, and nomination reason *(GAT-46)*
 - **Admin cover search pagination** — Cover replacement modal loads 5 results at a time with a "Show More" button for browsing beyond the first page *(GAT-11)*
 - **Admin reviews redesign** — Reviews are collapsed by default; clicking "View" opens a centered modal (desktop) or bottom sheet (mobile) with full review content and the delete action *(GAT-31)*
+- **Persistent cover storage** — Book covers now stored on the Fly.io persistent volume (`/data/covers/`) instead of the ephemeral Docker image; covers survive deploys and are served at `/img/covers/` via a dedicated static route *(GAT-58)*
+- **Activity feed privacy** — Home page activity feed anonymizes member names for unauthenticated visitors; shows "A member" instead of real names in server-rendered HTML, SSE broadcasts, and landing page *(GAT-58)*
+- **Admin imported results fix** — Admin pick detail pages now show correct point totals for months with imported vote results (e.g. Strawpoll) by falling back to cached `vote_results_json`
 
 ## Bug Fixes (Sprint 5)
 
