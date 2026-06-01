@@ -8,6 +8,7 @@ const waitlistService = require('../services/waitlist');
 const emailService = require('../services/email');
 const { slugify, bookPath } = require('../utils/slug');
 const { formatMonthYear } = require('../utils/format');
+const { colorHash } = require('../utils/colorHash');
 const { requireMember } = require('../middleware/auth');
 const { enrichBookMetadata } = require('../services/books');
 const { renderMarkdown } = require('../utils/markdown');
@@ -635,6 +636,33 @@ router.get('/landing', (req, res) => {
     `).get();
   }
 
+  // Activity preview: real members reviewing, reacting, and replying. Drop
+  // self-reactions/replies (actor === target) since they read oddly out of
+  // context, then take the most recent few.
+  const toInitials = (name) =>
+    (name || '?').trim().split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  const seenActors = new Set();
+  const activity = activityService
+    .getRecentActivity(40)
+    .filter((a) => !(a.target_name && a.actor_name && a.target_name === a.actor_name))
+    // One item per member so the feed reads as a community, not one person.
+    .filter((a) => {
+      if (seenActors.has(a.actor_name)) return false;
+      seenActors.add(a.actor_name);
+      return true;
+    })
+    .slice(0, 4)
+    .map((a) => ({
+      type: a.type,
+      actorName: a.actor_name,
+      targetName: a.target_name,
+      bookTitle: a.book_title,
+      grade: a.grade,
+      emoji: a.emoji,
+      initials: toInitials(a.actor_name),
+      hue: colorHash(a.actor_name || ''),
+    }));
+
   let showcase = null;
   if (home && home.cover_url && archive && archive.cover_url) {
     showcase = {
@@ -652,6 +680,7 @@ router.get('/landing', (req, res) => {
         href: bookPath(archive.title, archive.author),
         ...gradeAndReview(archive.book_id),
       },
+      activity,
     };
   }
 

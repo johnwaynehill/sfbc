@@ -120,6 +120,35 @@
           <% } %>
         </div>
       </a>
+
+      <!-- Preview 3: the living conversation (activity feed) -->
+      <% if (showcase.activity && showcase.activity.length) { %>
+      <a class="lp-frame lp-frame--wide reveal" href="/">
+        <div class="lp-frame__bar" aria-hidden="true">
+          <span class="lp-frame__dot"></span><span class="lp-frame__dot"></span><span class="lp-frame__dot"></span>
+          <span class="lp-frame__url">gatherbound.club</span>
+        </div>
+        <div class="lp-frame__body">
+          <p class="lp-frame__caption">The conversation never stops</p>
+          <ul class="lp-preview-feed">
+            <% for (const a of showcase.activity) { %>
+            <li class="lp-preview-feed__item">
+              <span class="lp-preview-feed__avatar" style="background: hsl(<%= a.hue %>, 45%, 42%)"><%= a.initials %></span>
+              <span class="lp-preview-feed__text">
+                <strong><%= a.actorName %></strong><%
+                  if (a.type === 'review') { %> reviewed <em><%= a.bookTitle %></em><%
+                  } else if (a.type === 'reaction') { %> reacted <%= a.emoji %> to <strong><%= a.targetName %></strong>&rsquo;s review of <em><%= a.bookTitle %></em><%
+                  } else if (a.type === 'reply') { %> replied to <strong><%= a.targetName %></strong>&rsquo;s review of <em><%= a.bookTitle %></em><%
+                  } else if (a.type === 'nomination') { %> nominated <em><%= a.bookTitle %></em><%
+                  } %>
+              </span>
+              <% if (a.type === 'review' && a.grade) { %><span class="lp-preview-feed__grade"><%= a.grade %></span><% } %>
+            </li>
+            <% } %>
+          </ul>
+        </div>
+      </a>
+      <% } %>
     </div>
 
     <div class="lp-showcase__cta reveal">
