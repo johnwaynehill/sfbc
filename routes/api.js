@@ -1548,23 +1548,36 @@ router.post('/meetings/:meetingId/nominations', submissionIpBackstop, submission
 // SSE client pool for home page (announcements + activity feed)
 // ---------------------------------------------------------------------------
 const activityService = require('../services/activity');
-const homeSseClients = new Set();
+const homeSseClients = new Set(); // Set<{ res, isLoggedIn }>
+
+function anonymizeActivity(items) {
+  return items.map(item => ({
+    ...item,
+    actor_name: 'A member',
+    actor_email: null,
+    actor_slug: null,
+    actor_avatar: null,
+    target_name: item.target_name ? 'another member' : null,
+    target_slug: null,
+  }));
+}
 
 function broadcastHomeAnnouncements() {
   if (homeSseClients.size === 0) return;
   const announcements = announcementsService.getActive();
   const payload = `event: announcements\ndata: ${JSON.stringify(announcements)}\n\n`;
   for (const client of homeSseClients) {
-    client.write(payload);
+    client.res.write(payload);
   }
 }
 
 function broadcastHomeActivity() {
   if (homeSseClients.size === 0) return;
   const activity = activityService.getRecentActivity(15);
-  const payload = `event: activity\ndata: ${JSON.stringify(activity)}\n\n`;
+  const authedPayload = `event: activity\ndata: ${JSON.stringify(activity)}\n\n`;
+  const anonPayload = `event: activity\ndata: ${JSON.stringify(anonymizeActivity(activity))}\n\n`;
   for (const client of homeSseClients) {
-    client.write(payload);
+    client.res.write(client.isLoggedIn ? authedPayload : anonPayload);
   }
 }
 
@@ -1853,15 +1866,19 @@ router.get('/home/stream', (req, res) => {
     'X-Accel-Buffering': 'no',
   });
 
+  const isLoggedIn = !!(req.session && req.session.userId);
+
   // Send initial state
   const announcements = announcementsService.getActive();
   res.write(`event: announcements\ndata: ${JSON.stringify(announcements)}\n\n`);
 
   const activity = activityService.getRecentActivity(15);
-  res.write(`event: activity\ndata: ${JSON.stringify(activity)}\n\n`);
+  const activityData = isLoggedIn ? activity : anonymizeActivity(activity);
+  res.write(`event: activity\ndata: ${JSON.stringify(activityData)}\n\n`);
 
-  // Register client
-  homeSseClients.add(res);
+  // Register client with auth status
+  const client = { res, isLoggedIn };
+  homeSseClients.add(client);
 
   // Heartbeat every 30s
   const heartbeat = setInterval(() => {
@@ -1871,7 +1888,7 @@ router.get('/home/stream', (req, res) => {
   // Cleanup on disconnect
   req.on('close', () => {
     clearInterval(heartbeat);
-    homeSseClients.delete(res);
+    homeSseClients.delete(client);
   });
 });
 
