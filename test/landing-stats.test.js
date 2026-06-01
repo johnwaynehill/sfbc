@@ -6,11 +6,11 @@ const { db, freshDb, seedBook } = require('./setup');
 
 let picks;
 
-// Build a vote_results_json payload with `n` balloted nominees.
-const rankingsJson = (n) =>
+// Build a vote_results_json payload with `n` balloted nominees and `votes` ballots.
+const rankingsJson = (n, votes = 5) =>
   JSON.stringify({
     rankings: Array.from({ length: n }, (_, i) => ({ book_id: i + 1, rank: i + 1 })),
-    voteCount: 5,
+    voteCount: votes,
   });
 
 function insertPick(monthYear, bookId, { status = 'results', resultsJson = null } = {}) {
@@ -62,5 +62,34 @@ describe('monthly-picks countNominations (historic-inclusive)', () => {
   it('ignores picks with no vote results (e.g. still reading)', () => {
     insertPick('2025-05', book.id, { status: 'reading', resultsJson: null });
     assert.equal(picks.countNominations(), 0);
+  });
+});
+
+describe('monthly-picks countVotesCast (ballots, incl. anonymous)', () => {
+  let book;
+
+  beforeEach(() => {
+    freshDb();
+    picks = require('../services/monthly-picks');
+    book = seedBook({ title: 'Test Book', author: 'Test Author' });
+  });
+
+  it('returns 0 when there are no completed picks', () => {
+    assert.equal(picks.countVotesCast(), 0);
+  });
+
+  it("sums each meeting's voteCount across history", () => {
+    insertPick('2025-01', book.id, { resultsJson: rankingsJson(5, 13) });
+    insertPick('2025-02', book.id, { resultsJson: rankingsJson(3, 9) });
+    assert.equal(picks.countVotesCast(), 22);
+  });
+
+  it('falls back to the meetings row when the pick has no JSON', () => {
+    db.prepare(`
+      INSERT INTO meetings (month_year, status, vote_results_json, created_at, updated_at)
+      VALUES ('2025-03', 'results', ?, datetime('now'), datetime('now'))
+    `).run(rankingsJson(4, 7));
+    insertPick('2025-03', book.id, { resultsJson: null });
+    assert.equal(picks.countVotesCast(), 7);
   });
 });
