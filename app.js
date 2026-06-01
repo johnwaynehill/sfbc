@@ -40,6 +40,14 @@ app.use(express.static(path.join(__dirname, 'public'), {
   etag: true,
 }));
 
+// Serve book covers from the persistent data directory so they survive deploys.
+// Covers are stored at <dataDir>/covers/ and served at /img/covers/.
+const dataDir = path.dirname(path.resolve(config.databasePath));
+app.use('/img/covers', express.static(path.join(dataDir, 'covers'), {
+  maxAge: config.nodeEnv === 'production' ? '30d' : 0,
+  etag: true,
+}));
+
 // ---------------------------------------------------------------------------
 // Security headers
 // ---------------------------------------------------------------------------

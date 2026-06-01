@@ -6,7 +6,10 @@ const db = require('../db');
 const config = require('../config');
 const { slugify } = require('../utils/slug');
 
-const COVERS_DIR = path.join(__dirname, '..', 'public', 'img', 'covers');
+// Store covers alongside the database on the persistent volume so they
+// survive deploys. Falls back to public/img/covers for dev convenience.
+const DATA_DIR = path.dirname(path.resolve(config.databasePath));
+const COVERS_DIR = path.join(DATA_DIR, 'covers');
 
 const API_KEY = config.googleBooksApiKey;
 
