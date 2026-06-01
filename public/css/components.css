@@ -8617,13 +8617,6 @@ a.reply__author-link:hover .reply__author {
   border-bottom: 1px solid var(--border);
 }
 
-.lp-manifesto__inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-6);
-  align-items: center;
-}
-
 .lp-manifesto__quote {
   font-family: var(--font-display);
   font-weight: 700;
@@ -8631,8 +8624,16 @@ a.reply__author-link:hover .reply__author {
   line-height: 1.08;
   letter-spacing: -0.02em;
   color: var(--text);
-  margin: 0;
-  max-width: 13ch;
+  margin: 0 0 var(--s-6);
+  max-width: 18ch;
+}
+
+/* Evidence (problems) on the left, the synthesis on the right */
+.lp-manifesto__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-6) var(--s-7);
+  align-items: start;
 }
 
 .lp-manifesto__problems {
@@ -8656,27 +8657,32 @@ a.reply__author-link:hover .reply__author {
   font-weight: 600;
 }
 
+.lp-manifesto__resolution {
+  align-self: center;
+}
+
 .lp-manifesto__turn {
-  max-width: 760px;
-  margin: var(--s-6) auto 0;
+  margin: 0;
   font-family: var(--font-reading);
   font-size: var(--t-lg);
-  line-height: 1.5;
-  text-align: center;
+  line-height: 1.55;
   color: var(--text2);
 }
-.lp-manifesto__turn strong {
+.lp-manifesto__turn--punch {
+  margin-top: var(--s-3);
+}
+.lp-manifesto__turn--punch strong {
   color: var(--text);
   font-weight: 600;
 }
 
 @media (max-width: 760px) {
-  .lp-manifesto__inner {
-    grid-template-columns: 1fr;
-    gap: var(--s-5);
-  }
   .lp-manifesto__quote {
     max-width: none;
+  }
+  .lp-manifesto__body {
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
   }
 }
 
