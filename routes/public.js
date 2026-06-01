@@ -541,12 +541,12 @@ router.get('/join/:code', (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/landing', (req, res) => {
   const totalBooks = picksService.countCompleted();
-  const totalMembers = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
   const totalReviews = db.prepare('SELECT COUNT(*) AS count FROM reviews').get().count;
-  // Total nominations across the club's full history (includes historically
-  // seeded meetings whose nominees live in vote_results_json). See
-  // picksService.countNominations.
+  // Activity stats across the club's full history (include historically seeded
+  // meetings whose data lives in vote_results_json, and anonymous in-room
+  // participants). See picksService.countNominations / countVotesCast.
   const totalNominations = picksService.countNominations();
+  const totalVotesCast = picksService.countVotesCast();
   const totalReactions = db.prepare('SELECT COUNT(*) AS count FROM review_reactions').get().count;
   const totalReplies = db.prepare('SELECT COUNT(*) AS count FROM review_replies').get().count;
   const totalEngagement = totalReactions + totalReplies;
@@ -659,9 +659,9 @@ router.get('/landing', (req, res) => {
     layout: 'layouts/landing-shell',
     pageTitle: 'The digital home for in-person book clubs',
     totalBooks,
-    totalMembers,
     totalReviews,
     totalNominations,
+    totalVotesCast,
     totalEngagement,
     recentBooks,
     showcase,

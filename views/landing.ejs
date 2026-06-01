@@ -2,18 +2,16 @@
 <section class="lp-hero">
   <div class="lp-hero__content">
     <p class="lp-hero__eyebrow">GatherBound</p>
-    <h1 class="lp-hero__title">Give your book club a home between&nbsp;meetings.</h1>
-    <p class="lp-hero__subtitle">The community is always bigger than the room. Give every member a place to nominate, vote, review, and discuss — whether they made it to the meeting or not.</p>
+    <h1 class="lp-hero__title">Your book club is more than a&nbsp;meeting.<br>Give it a&nbsp;home.</h1>
+    <p class="lp-hero__subtitle">Give every member a place to nominate, vote, review, and discuss — whether they made it to the meeting or not.</p>
     <div class="lp-hero__actions">
       <a href="#waitlist" class="lp-hero__cta">Join the waitlist</a>
       <a href="/" class="lp-hero__cta lp-hero__cta--ghost">See a live club&nbsp;&rarr;</a>
     </div>
-    <% if (totalBooks > 0) { %>
     <p class="lp-hero__trust">
-      Already running the <strong>SF Fantasy &amp; Sci-Fi Book Club</strong>
-      &middot; <%= totalMembers %> members &middot; <%= totalBooks %> books read &middot; <%= totalReviews %> reviews
+      Built to run our own club — the <strong>SF Fantasy &amp; Sci-Fi Book Club</strong>.
+      1,083 members, meeting monthly since 2023.
     </p>
-    <% } %>
   </div>
   <% if (recentBooks && recentBooks.length > 0) { %>
   <div class="lp-hero__covers" aria-hidden="true">
@@ -28,13 +26,34 @@
   <% } %>
 </section>
 
+<!-- ===== Manifesto (the problem) ===== -->
+<section class="lp-manifesto reveal">
+  <div class="page-container lp-manifesto__inner">
+    <h2 class="lp-manifesto__quote">Every growing club hits the same wall</h2>
+    <div class="lp-manifesto__problems">
+      <div class="lp-manifesto__problem">
+        <strong>Meetup</strong> gets people in the door — then provides zero engagement between events.
+      </div>
+      <div class="lp-manifesto__problem">
+        <strong>Discord</strong> is ephemeral and overwhelming. A discussion about Chapter 3 disappears in a flood of memes.
+      </div>
+      <div class="lp-manifesto__problem">
+        <strong>Goodreads</strong> is a personal tracker. But your club's history gets lost to time and memory.
+      </div>
+    </div>
+  </div>
+  <div class="page-container">
+    <p class="lp-manifesto__turn">So clubs duct-tape three tools together — none built for a book club. <strong>GatherBound is the first one that is.</strong></p>
+  </div>
+</section>
+
 <!-- ===== Showcase (Peek inside a real club) ===== -->
 <% if (showcase) { %>
 <section class="lp-showcase">
   <div class="page-container">
     <p class="lp-showcase__eyebrow reveal">Take a peek inside</p>
     <h2 class="lp-showcase__heading reveal">This isn't a mockup. It's a real club, running right now.</h2>
-    <p class="lp-showcase__sub reveal">Everything below is live data from the SF Fantasy &amp; Sci-Fi Book Club. Click through and explore it yourself.</p>
+    <p class="lp-showcase__sub reveal">We built GatherBound to run our own club. Everything below is live — real books, real grades, real members. Click in and look around.</p>
 
     <div class="lp-showcase__grid">
       <!-- Preview 1: the club home -->
@@ -106,24 +125,6 @@
 </section>
 <% } %>
 
-<!-- ===== Manifesto ===== -->
-<section class="lp-manifesto reveal">
-  <div class="page-container lp-manifesto__inner">
-    <h2 class="lp-manifesto__quote">Every growing club hits the same wall</h2>
-    <div class="lp-manifesto__problems">
-      <div class="lp-manifesto__problem">
-        <strong>Meetup</strong> gets people in the door — then provides zero engagement between events.
-      </div>
-      <div class="lp-manifesto__problem">
-        <strong>Discord</strong> is ephemeral and overwhelming. A discussion about Chapter 3 disappears in a flood of memes.
-      </div>
-      <div class="lp-manifesto__problem">
-        <strong>Goodreads</strong> is a personal tracker. But your club's history gets lost to time and memory.
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ===== Ritual ===== -->
 <section class="lp-ritual">
   <div class="page-container">
@@ -168,7 +169,7 @@
   </div>
   <% } %>
   <div class="page-container">
-    <p class="lp-proof__eyebrow reveal">By the numbers</p>
+    <p class="lp-proof__eyebrow reveal">What one club has built</p>
     <div class="lp-proof__stats reveal">
       <div class="lp-proof__stat">
         <span class="lp-proof__stat-num" data-count="<%= totalBooks %>">0</span>
@@ -179,16 +180,16 @@
         <span class="lp-proof__stat-label">nominations</span>
       </div>
       <div class="lp-proof__stat">
+        <span class="lp-proof__stat-num" data-count="<%= totalVotesCast %>">0</span>
+        <span class="lp-proof__stat-label">votes cast</span>
+      </div>
+      <div class="lp-proof__stat">
         <span class="lp-proof__stat-num" data-count="<%= totalReviews %>">0</span>
         <span class="lp-proof__stat-label">reviews written</span>
       </div>
       <div class="lp-proof__stat">
         <span class="lp-proof__stat-num" data-count="<%= totalEngagement %>">0</span>
         <span class="lp-proof__stat-label">reactions &amp; replies</span>
-      </div>
-      <div class="lp-proof__stat">
-        <span class="lp-proof__stat-num" data-count="<%= totalMembers %>">0</span>
-        <span class="lp-proof__stat-label">members</span>
       </div>
     </div>
   </div>
@@ -197,38 +198,71 @@
 <!-- ===== Features ===== -->
 <section class="lp-features">
   <div class="page-container">
-    <h2 class="lp-features__heading reveal">Everything your club needs</h2>
+    <h2 class="lp-features__heading reveal">Built for the whole club, not just the meeting</h2>
     <div class="lp-features__grid">
       <div class="lp-feature reveal">
         <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3"/><path d="M21 14v.01"/><path d="M14 21h.01"/><path d="M17.5 21H21v-3.5"/></svg>
-        <strong>QR Nominations</strong>
-        <span>Attendees scan and nominate in &lt;10 seconds. No app download, no login required.</span>
+        <strong>Nominate in one scan</strong>
+        <span>Attendees scan a QR code and nominate in under 10 seconds. No app download, no login required.</span>
       </div>
       <div class="lp-feature reveal">
         <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="15" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/></svg>
-        <strong>Ranked Voting</strong>
-        <span>Drag-to-rank ballot on mobile and desktop with live animated results everywhere.</span>
+        <strong>Decide together, fairly</strong>
+        <span>Drag-to-rank ballot on mobile and desktop, with live animated results everywhere. Ranked choice, so the winner truly wins.</span>
       </div>
       <div class="lp-feature reveal">
         <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        <strong>Full Lifecycle</strong>
-        <span>Nominate &rarr; Vote &rarr; Results &rarr; Read. One admin panel runs it all.</span>
+        <strong>Run the whole month in one place</strong>
+        <span>Nominate &rarr; Vote &rarr; Results &rarr; Read. One admin panel runs the entire cycle, so organizing stops being a chore.</span>
       </div>
       <div class="lp-feature reveal">
         <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <strong>Beautiful Archive</strong>
+        <strong>A library that remembers</strong>
         <span>Every read gets a forever-page with beautiful covers, descriptions, meta-data, and custom library links.</span>
       </div>
       <div class="lp-feature reveal">
         <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <strong>Member Engagement</strong>
-        <span>Reviews, emoji reactions, threaded replies, and an activity feed keep the community alive.</span>
+        <strong>Conversations that don't vanish</strong>
+        <span>Reviews, emoji reactions, threaded replies, and an activity feed keep the discussion alive all month — not lost in a chat scroll.</span>
       </div>
       <div class="lp-feature reveal">
         <svg class="lp-feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-        <strong>Works Everywhere</strong>
-        <span>Mobile-first responsive design with dark mode. Beautiful on any device, in any lighting.</span>
+        <strong>Beautiful on every screen</strong>
+        <span>Mobile-first and responsive — gorgeous on the phone in someone's hand and the projector on the wall.</span>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="lp-faq">
+  <div class="page-container">
+    <h2 class="lp-faq__heading reveal">Questions, answered</h2>
+    <div class="lp-faq__list">
+      <details class="lp-faq__item reveal">
+        <summary class="lp-faq__q">Do members need to download an app or create an account?</summary>
+        <p class="lp-faq__a">No. Anyone can scan a QR code and nominate or vote in seconds — no app, no login. Accounts are optional and free, for members who want to write reviews, react, and keep a profile.</p>
+      </details>
+      <details class="lp-faq__item reveal">
+        <summary class="lp-faq__q">Is it really free?</summary>
+        <p class="lp-faq__a">Yes — free for every club in the private beta, no credit card to start. If pricing ever changes, we'll tell you well before it does.</p>
+      </details>
+      <details class="lp-faq__item reveal">
+        <summary class="lp-faq__q">How long does it take to set up?</summary>
+        <p class="lp-faq__a">Minutes. Tell us about your club and we'll set it up with you personally during the beta — your first nomination round can go out the same week.</p>
+      </details>
+      <details class="lp-faq__item reveal">
+        <summary class="lp-faq__q">Do we have to leave Meetup or Goodreads?</summary>
+        <p class="lp-faq__a">Not at all. Keep Meetup for organizing events and Goodreads for personal tracking. GatherBound is the home for everything that happens around your club — the picks, the votes, the reviews, and the archive.</p>
+      </details>
+      <details class="lp-faq__item reveal">
+        <summary class="lp-faq__q">What kinds of book clubs is it for?</summary>
+        <p class="lp-faq__a">Any in-person club, any genre. It's built for — and proven by — a 1,083-member sci-fi and fantasy club, but nothing about it is genre-specific. If your club reads and meets, it fits.</p>
+      </details>
+      <details class="lp-faq__item reveal">
+        <summary class="lp-faq__q">Can I see it in action first?</summary>
+        <p class="lp-faq__a">Yes. The SF Fantasy &amp; Sci-Fi Book Club runs on GatherBound, live. <a href="/">Explore the real club&nbsp;&rarr;</a></p>
+      </details>
     </div>
   </div>
 </section>
@@ -237,7 +271,7 @@
 <section class="lp-cta" id="waitlist">
   <div class="page-container">
     <h2 class="lp-cta__heading">Start your club<br>on GatherBound</h2>
-    <p class="lp-cta__text">We're onboarding a small group of book clubs for our private beta. Tell us about your club and we'll get you set up.</p>
+    <p class="lp-cta__text">We're onboarding a small first cohort of clubs for our private beta. Tell us about yours and we'll set you up personally.</p>
     <form class="lp-form" id="waitlistForm" novalidate>
       <div class="lp-form__row">
         <label class="lp-form__field">

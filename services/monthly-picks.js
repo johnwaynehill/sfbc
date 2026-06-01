@@ -219,6 +219,31 @@ const countNominationsStmt = db.prepare(`
   ) IS NOT NULL
 `);
 
+/**
+ * Total ballots cast across the club's history. Each meeting's vote_results_json
+ * records a `voteCount` (the number of people who voted that month), which
+ * includes anonymous in-room voters who never created an account. Summing it
+ * gives an honest participation number — unlike the registered-account count.
+ * Same pick-then-meeting fallback as countNominations.
+ */
+const countVotesCastStmt = db.prepare(`
+  SELECT COALESCE(SUM(
+    json_extract(
+      COALESCE(
+        mp.vote_results_json,
+        (SELECT m.vote_results_json FROM meetings m
+         WHERE m.month_year = mp.month_year AND m.vote_results_json IS NOT NULL LIMIT 1)
+      ), '$.voteCount'
+    )
+  ), 0) AS cnt
+  FROM monthly_picks mp
+  WHERE COALESCE(
+    mp.vote_results_json,
+    (SELECT m.vote_results_json FROM meetings m
+     WHERE m.month_year = mp.month_year AND m.vote_results_json IS NOT NULL LIMIT 1)
+  ) IS NOT NULL
+`);
+
 /** History page: all completed picks with grade + review info. */
 const getHistoryStmt = db.prepare(`
   SELECT mp.month_year, mp.status, b.id AS book_id, b.title, b.author,
@@ -521,6 +546,13 @@ function countNominations() {
 }
 
 /**
+ * Count total ballots cast across the club's history (see countVotesCastStmt).
+ */
+function countVotesCast() {
+  return countVotesCastStmt.get().cnt;
+}
+
+/**
  * Get all completed picks for the history page.
  */
 function getHistory() {
@@ -627,6 +659,7 @@ module.exports = {
   getRecentPicks,
   countCompleted,
   countNominations,
+  countVotesCast,
   getHistory,
   getPickForBook,
   getFirstEvent,
