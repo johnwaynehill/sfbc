@@ -27,6 +27,23 @@ const activityService = require('../services/activity');
 // ---------------------------------------------------------------------------
 
 /**
+ * Strip personally-identifiable fields from activity items for
+ * unauthenticated visitors. Keeps the activity type, book info,
+ * grade, and emoji — replaces names with "A member".
+ */
+function anonymizeActivity(items) {
+  return items.map(item => ({
+    ...item,
+    actor_name: 'A member',
+    actor_email: null,
+    actor_slug: null,
+    actor_avatar: null,
+    target_name: item.target_name ? 'another member' : null,
+    target_slug: null,
+  }));
+}
+
+/**
  * Return a cover image URL for a book row.
  * Covers are stored locally in public/img/covers/ via scripts/fetch-covers.js.
  */
@@ -116,8 +133,10 @@ router.get('/', (req, res) => {
   // Active announcements (max 3, non-expired)
   const announcements = announcementsService.getActive();
 
-  // Recent activity feed
-  const activity = activityService.getRecentActivity(15);
+  // Recent activity feed — anonymize names for unauthenticated visitors
+  const isLoggedIn = !!(req.session && req.session.userId);
+  const rawActivity = activityService.getRecentActivity(15);
+  const activity = isLoggedIn ? rawActivity : anonymizeActivity(rawActivity);
 
   res.render('home', {
     pageTitle: 'Home',
@@ -654,13 +673,13 @@ router.get('/landing', (req, res) => {
     .slice(0, 4)
     .map((a) => ({
       type: a.type,
-      actorName: a.actor_name,
-      targetName: a.target_name,
+      actorName: 'A member',
+      targetName: a.target_name ? 'another member' : null,
       bookTitle: a.book_title,
       grade: a.grade,
       emoji: a.emoji,
-      initials: toInitials(a.actor_name),
-      hue: colorHash(a.actor_name || ''),
+      initials: '?',
+      hue: colorHash(a.book_title || ''),
     }));
 
   let showcase = null;
