@@ -52,6 +52,23 @@ function getCoverUrl(book) {
 }
 
 /**
+ * The public /landing page must never expose real member names (matches the
+ * site's public name-hiding policy). Map each real display name to a stable,
+ * fabricated name for the preview activity feed and review attributions.
+ */
+const LANDING_PSEUDONYMS = [
+  'Maya Okonkwo', 'Liam Carter', 'Sofia Reyes', 'Noah Bennett', 'Priya Nair',
+  'Elena Marsh', 'Theo Lindqvist', 'Amara Osei', 'Jonas Weber', 'Ravi Kapoor',
+  'Clara Nguyen', 'Felix Romano', 'Ingrid Solberg', 'Marcus Hale', 'Yuki Tanaka',
+  'Nadia Petrova', 'Oscar Delgado', 'Hana Park', 'Wesley Grant', 'Lucia Ferraro',
+  'Dmitri Volkov', 'Aisha Rahman', 'Caleb Foster', 'Greta Lund',
+];
+function landingPseudonym(realName) {
+  if (!realName) return 'A member';
+  return LANDING_PSEUDONYMS[colorHash(realName) % LANDING_PSEUDONYMS.length];
+}
+
+/**
  * Cache grade_weights once so we don't query every request.
  */
 let _gradeWeights = null;
@@ -626,7 +643,7 @@ router.get('/landing', (req, res) => {
       reviewCount: avgRow ? avgRow.cnt : 0,
       reviewText,
       reviewGrade: reviewRow ? reviewRow.grade : null,
-      reviewer: reviewRow ? reviewRow.reviewer : null,
+      reviewer: reviewRow ? landingPseudonym(reviewRow.reviewer) : null,
     };
   };
 
@@ -660,26 +677,27 @@ router.get('/landing', (req, res) => {
   // context, then take the most recent few.
   const toInitials = (name) =>
     (name || '?').trim().split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-  const seenActors = new Set();
+  const seenNames = new Set();
   const activity = activityService
     .getRecentActivity(40)
     .filter((a) => !(a.target_name && a.actor_name && a.target_name === a.actor_name))
-    // One item per member so the feed reads as a community, not one person.
-    .filter((a) => {
-      if (seenActors.has(a.actor_name)) return false;
-      seenActors.add(a.actor_name);
+    .map((a) => ({ raw: a, name: landingPseudonym(a.actor_name) }))
+    // One item per (pseudonymized) member so the feed reads as a community.
+    .filter(({ name }) => {
+      if (seenNames.has(name)) return false;
+      seenNames.add(name);
       return true;
     })
     .slice(0, 4)
-    .map((a) => ({
+    .map(({ raw: a, name }) => ({
       type: a.type,
-      actorName: 'A member',
-      targetName: a.target_name ? 'another member' : null,
+      actorName: name,
+      targetName: a.target_name ? landingPseudonym(a.target_name) : null,
       bookTitle: a.book_title,
       grade: a.grade,
       emoji: a.emoji,
-      initials: '?',
-      hue: colorHash(a.book_title || ''),
+      initials: toInitials(name),
+      hue: colorHash(name),
     }));
 
   let showcase = null;
