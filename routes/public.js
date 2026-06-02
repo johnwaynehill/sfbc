@@ -53,18 +53,21 @@ function getCoverUrl(book) {
 
 /**
  * The public /landing page must never expose real member names (matches the
- * site's public name-hiding policy). Map each real display name to a stable,
- * fabricated name for the preview activity feed and review attributions.
+ * site's public name-hiding policy). Map each real display name to a stable
+ * stand-in for the preview activity feed and review attributions. We use famous
+ * literary character names: on-brand for a book club, and a fun wink alongside
+ * the "names changed for privacy" note for anyone who recognizes them.
  */
 const LANDING_PSEUDONYMS = [
-  'Maya Okonkwo', 'Liam Carter', 'Sofia Reyes', 'Noah Bennett', 'Priya Nair',
-  'Elena Marsh', 'Theo Lindqvist', 'Amara Osei', 'Jonas Weber', 'Ravi Kapoor',
-  'Clara Nguyen', 'Felix Romano', 'Ingrid Solberg', 'Marcus Hale', 'Yuki Tanaka',
-  'Nadia Petrova', 'Oscar Delgado', 'Hana Park', 'Wesley Grant', 'Lucia Ferraro',
-  'Dmitri Volkov', 'Aisha Rahman', 'Caleb Foster', 'Greta Lund',
+  'Elizabeth Bennet', 'Jay Gatsby', 'Atticus Finch', 'Hermione Granger',
+  'Holden Caulfield', 'Bilbo Baggins', 'Paul Atreides', 'Katniss Everdeen',
+  'Lyra Belacqua', 'Arthur Dent', 'Guy Montag', 'Lisbeth Salander',
+  'Tyrion Lannister', 'Winston Smith', 'Jean Valjean', 'Anna Karenina',
+  'Ender Wiggin', 'Clarissa Dalloway', 'Edmond Dantès', 'Jane Eyre',
+  'Dorian Gray', 'Meg Murry', 'Jo March', 'Sherlock Holmes',
 ];
 function landingPseudonym(realName) {
-  if (!realName) return 'A member';
+  if (!realName) return 'A reader';
   return LANDING_PSEUDONYMS[colorHash(realName) % LANDING_PSEUDONYMS.length];
 }
 
