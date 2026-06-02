@@ -47,5 +47,16 @@
 
   <script src="/js/dialog.js?v=1" defer></script>
   <script src="/js/landing.js?v=2" defer></script>
+  <% if (!isProduction) { %>
+  <script>
+    // Dev: the landing page doesn't register a service worker, but one from the
+    // member app may still control this origin. Unregister it so local edits show.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { r.unregister(); });
+      });
+    }
+  </script>
+  <% } %>
 </body>
 </html>
