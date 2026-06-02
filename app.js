@@ -47,6 +47,13 @@ app.use('/img/covers', express.static(path.join(dataDir, 'covers'), {
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: config.nodeEnv === 'production' ? '7d' : 0,
   etag: true,
+  setHeaders: (res, filePath) => {
+    // The service worker must always be revalidated so logic changes ship
+    // immediately instead of being held by the browser's 7d cache.
+    if (filePath.endsWith('sw.js')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  },
 }));
 
 // ---------------------------------------------------------------------------
@@ -165,6 +172,7 @@ app.use((req, res, next) => {
   res.locals.colorHash = require('./utils/colorHash').colorHash;
   res.locals.posthogApiKey = process.env.NODE_ENV === 'production' ? config.posthog.apiKey : '';
   res.locals.posthogHost = config.posthog.host;
+  res.locals.isProduction = config.nodeEnv === 'production';
   res.locals.gradeTier = function (grade) {
     if (!grade) return '';
     var letter = grade.charAt(0).toUpperCase();

@@ -234,6 +234,7 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 
 - **HOST env override** — Dev binds to `localhost` by default; `HOST=0.0.0.0` makes the server reachable from another device on the LAN (e.g. testing the voting page on a real phone)
 - **Dev CSP `upgrade-insecure-requests` disabled** — Helmet's default would force every CSS/image/font subresource to https when accessed from a LAN IP, breaking on-device dev testing. Disabled in dev only; production behavior unchanged
+- **Service worker gated to production** — The SW (`public/sw.js`) was caching CSS/JS cache-first in dev, serving stale assets and masking local edits unless you bumped `?v=` or manually cleared it. Registration now only happens in production (via `isProduction` local); in dev all three shells actively *unregister* any existing SW so the page always reflects the latest files. `/sw.js` is now served with `Cache-Control: no-cache` so SW logic changes ship immediately instead of being held by the browser's 7-day static cache; `PRECACHE_URLS` no longer pins stale versioned CSS, and `CACHE_VERSION` bumped to `sfbc-v8` to purge old caches
 
 ## Bug Fixes & Quality of Life (May 2026)
 

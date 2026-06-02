@@ -59,7 +59,17 @@
   <% } %>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(function () {});
+      <% if (isProduction) { %>
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      });
+      <% } else { %>
+      // Dev: never run the service worker — unregister any stale one so it
+      // can't serve cached assets and mask local edits.
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { r.unregister(); });
+      });
+      <% } %>
     }
   </script>
 </body>
