@@ -785,6 +785,13 @@
   min-width: 0;
 }
 
+.banner__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
 .banner .btn-primary {
   background: var(--bg);
   color: var(--text);
@@ -794,11 +801,31 @@
   opacity: 0.9;
 }
 
+/* Outline button on the inverted banner surface */
+.banner .btn-secondary {
+  color: var(--cta-text);
+  border-color: color-mix(in srgb, var(--cta-text) 40%, transparent);
+}
+
+.banner .btn-secondary:hover {
+  border-color: var(--cta-text);
+}
+
 @media (max-width: 480px) {
   .banner {
     flex-direction: column;
     text-align: center;
     padding: var(--s-4);
+  }
+
+  .banner__actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .banner__actions .btn-primary,
+  .banner__actions .btn-secondary {
+    width: 100%;
   }
 }
 

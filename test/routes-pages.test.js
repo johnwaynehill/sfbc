@@ -27,6 +27,31 @@ describe('page routes — home', () => {
     const res = await supertest(app).get('/').expect(200);
     assert.ok(res.text.includes('Hero Book'), 'Page should contain the hero book title');
   });
+
+  it('GET / offers a View Nominations link while nominations are open', async () => {
+    seedMeeting({ month_year: '2026-07', status: 'nominations' });
+    const res = await supertest(app).get('/').expect(200);
+    assert.ok(res.text.includes('href="/nominations/july-2026"'), 'Banner should link to the live nominations page');
+    assert.ok(res.text.includes('View Nominations'), 'Banner should show the View Nominations label');
+  });
+
+  it('GET / offers the View Nominations link alongside the hero banner', async () => {
+    const book = seedBook({ title: 'Hero Book', author: 'Great Author' });
+    const picksService = require('../services/monthly-picks');
+    picksService.create(book.id, '2026-06', 'reading');
+    seedMeeting({ month_year: '2026-07', status: 'nominations' });
+
+    const res = await supertest(app).get('/').expect(200);
+    assert.ok(res.text.includes('Hero Book'), 'Hero should still render');
+    assert.ok(res.text.includes('href="/nominations/july-2026"'), 'Hero banner should link to the live nominations page');
+  });
+
+  it('GET / omits the View Nominations link while voting is open', async () => {
+    seedMeeting({ month_year: '2026-07', status: 'voting' });
+    const res = await supertest(app).get('/').expect(200);
+    assert.ok(res.text.includes('Vote Now'), 'Banner should show the voting CTA');
+    assert.ok(!res.text.includes('View Nominations'), 'Voting banner should not offer the nominations link');
+  });
 });
 
 describe('page routes — nominate', () => {

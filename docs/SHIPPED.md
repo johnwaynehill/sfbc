@@ -248,6 +248,7 @@ Everything that's been built, organized by area. Updated each sprint as items mo
 - **Persistent cover storage** — Book covers now stored on the Fly.io persistent volume (`/data/covers/`) instead of the ephemeral Docker image; covers survive deploys and are served at `/img/covers/` via a dedicated static route *(GAT-58)*
 - **Activity feed privacy** — Home page activity feed anonymizes member names for unauthenticated visitors; shows "A member" instead of real names in server-rendered HTML, SSE broadcasts, and landing page *(GAT-58)*
 - **Admin imported results fix** — Admin pick detail pages now show correct point totals for months with imported vote results (e.g. Strawpoll) by falling back to cached `vote_results_json`
+- **"View Nominations" on the home banner** — While nominations are open, the home page CTA banner pairs "Nominate a Book" with a secondary link to the live nominations page (`/nominations/:slug`), so members can browse what's already been nominated before voting opens
 
 ## Bug Fixes (Sprint 5)
 

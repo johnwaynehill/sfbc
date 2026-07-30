@@ -96,7 +96,12 @@
     <div class="banner__text">
       <p class="t-body text-inherit"><strong><%= bannerStatus === 'nominations' ? 'Nominations are open' : 'Voting is open' %></strong> for <%= formatMonthYear(activeMeeting.month_year) %>. <%= bannerStatus === 'nominations' ? 'Submit your pick!' : 'Cast your vote!' %></p>
     </div>
-    <a href="<%= bannerStatus === 'nominations' ? '/nominate' : '/vote' %>" class="btn-primary"><%= bannerStatus === 'nominations' ? 'Nominate a Book' : 'Vote Now' %></a>
+    <div class="banner__actions">
+      <a href="<%= bannerStatus === 'nominations' ? '/nominate' : '/vote' %>" class="btn-primary"><%= bannerStatus === 'nominations' ? 'Nominate a Book' : 'Vote Now' %></a>
+      <% if (bannerStatus === 'nominations') { %>
+        <a href="/nominations/<%= monthYearSlug(activeMeeting.month_year) %>" class="btn-secondary">View Nominations</a>
+      <% } %>
+    </div>
   </div>
 </section>
 <% } %>
@@ -109,7 +114,12 @@
     <div class="banner__text">
       <p class="t-body text-inherit"><strong><%= bannerStatus === 'nominations' ? 'Nominations are open' : 'Voting is open' %></strong> for <%= formatMonthYear(activeMeeting.month_year) %>. <%= bannerStatus === 'nominations' ? 'Submit your pick!' : 'Cast your vote!' %></p>
     </div>
-    <a href="<%= bannerStatus === 'nominations' ? '/nominate' : '/vote' %>" class="btn-primary"><%= bannerStatus === 'nominations' ? 'Nominate a Book' : 'Vote Now' %></a>
+    <div class="banner__actions">
+      <a href="<%= bannerStatus === 'nominations' ? '/nominate' : '/vote' %>" class="btn-primary"><%= bannerStatus === 'nominations' ? 'Nominate a Book' : 'Vote Now' %></a>
+      <% if (bannerStatus === 'nominations') { %>
+        <a href="/nominations/<%= monthYearSlug(activeMeeting.month_year) %>" class="btn-secondary">View Nominations</a>
+      <% } %>
+    </div>
   </div>
 </section>
 <% } else { %>
