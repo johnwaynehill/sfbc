@@ -32,6 +32,12 @@ const app = express();
 // Trust the first proxy (Fly.io)
 app.set('trust proxy', 1);
 
+// The club moved to GatherBound (Oct 2026): with REDIRECT_TO set, every page
+// goes to the same page there. Before anything else, static files included.
+if (process.env.REDIRECT_TO) {
+  app.use(require('./middleware/redirect-to-gatherbound')(process.env.REDIRECT_TO));
+}
+
 // ---------------------------------------------------------------------------
 // Static files
 // ---------------------------------------------------------------------------
